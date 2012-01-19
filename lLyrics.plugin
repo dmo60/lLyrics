@@ -1,0 +1,8 @@
+[Plugin]
+Loader=python
+Module=lyricspane
+IAge=2
+Name=Lyrics Pane
+Description=Displays lyrics in Rhythmbox sidebar
+Authors=Timo Loewe <timoloewe91@gmail.com>
+Website=https://github.com/dmo60/Rhythmbox-Lyrics
