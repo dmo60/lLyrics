@@ -1,0 +1,3 @@
+All existing Rhythmbox plug-ins, which are supposed to provide lyrics functionality, are broken don't work properly.
+So the goal of this project is to write a Rhythmbox plug-in, which displays lyrics for the current playing song in the right sidebar.
+The awesome Songbird plug-in "MLyrics" serves as a model.
