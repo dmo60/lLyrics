@@ -17,8 +17,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.init_sidebar()
 
         self.player = self.shell.props.shell_player
+        # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
+        # search lyrics if song changes 
         self.psc_id = self.player.connect ('playing-song-changed', self.search_lyrics)
         
         print "activated plugin lLyrics"
@@ -64,15 +66,17 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
 
-        #---- pack everything into side pane ----#
+        # pack everything into side pane
         self.vbox.pack_start  (frame, False, True, 0)
         self.vbox.pack_start (self.textview, True, True, 10)
 
         self.vbox.show_all()
         self.vbox.set_size_request(200, -1)
+        # do not add widget yet, this will be done when user starts playback
         self.visible = False
         
     def search_lyrics(self, player, entry):
+        # show sidebar at first playback or when reactivating plugin during playback
         if not self.visible:
             self.shell.add_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, True, True)
             self.visible = True
