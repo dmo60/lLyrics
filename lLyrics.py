@@ -2,6 +2,7 @@ from gi.repository import GObject, Peas, Gdk
 from gi.repository import RB
 from gi.repository import Gtk
 from threading import Thread
+import re
 import chartlyricsParser
 
 llyrics_ui = """
@@ -14,6 +15,9 @@ llyrics_ui = """
 </ui>
 """
 
+LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", "\(feat[^\)]*\)"]
+LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
+LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -122,22 +126,40 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             self.visible = False
         
     def search_lyrics(self, player, entry):
-        self.textbuffer.set_text("searching lyrics...")
+        self.textbuffer.set_text("searching lyrics...")        
         newthread = Thread(target=self._search_lyrics_thread, args=(player, entry))
         newthread.start()
     
     def _search_lyrics_thread(self, player, entry):
-        if entry is not None:
-            artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
-            title = entry.get_string(RB.RhythmDBPropType.TITLE)
-        else:
-            artist = "none"
-            title = "none"     
+        artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
+        title = entry.get_string(RB.RhythmDBPropType.TITLE)
+        print "search lyrics for " + artist + " - " + title
+   
+        (clean_artist, clean_title) = self.clean_song_data(artist, title)
         
-        parser = chartlyricsParser.chartlyricsParser(artist, title)
+        parser = chartlyricsParser.chartlyricsParser(clean_artist, clean_title)
         lyrics = parser.parse()
         Gdk.threads_enter()
         self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
         Gdk.threads_leave()
 
+    def clean_song_data(self, artist, title):
+        # convert to lowercase
+        artist = artist.lower()
+        title = title.lower()
     
+        # replace ampersands and the like
+        for exp in LYRIC_ARTIST_REPLACE:
+            artist = re.sub(exp[0], exp[1], artist)
+        for exp in LYRIC_TITLE_REPLACE:
+            title = re.sub(exp[0], exp[1], title)
+    
+        # strip things like "(live at Somewhere)", "(accoustic)", etc
+        for exp in LYRIC_TITLE_STRIP:
+            title = re.sub (exp, '', title)
+    
+        # compress spaces
+        title = title.strip()
+        artist = artist.strip()
+        
+        return (artist, title)
