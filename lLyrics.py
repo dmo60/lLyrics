@@ -3,6 +3,7 @@ from gi.repository import RB
 from gi.repository import Gtk
 from threading import Thread
 import re
+import pango
 import chartlyricsParser
 
 llyrics_ui = """
@@ -18,6 +19,8 @@ llyrics_ui = """
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", "\(feat[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
+
+LYRIC_SOURCES=["Chartlyrics.com"]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -95,8 +98,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_cursor_visible(False)
         self.textview.set_left_margin(10)
         self.textview.set_right_margin(10)
-        self.textview.set_pixels_above_lines(10)
-        self.textview.set_pixels_below_lines(10)
+        self.textview.set_pixels_above_lines(5)
+        self.textview.set_pixels_below_lines(5)
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
         
         # create a ScrollView
@@ -106,7 +109,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
         self.textview.set_buffer(self.textbuffer)
-
+        # tag to style headers bold and underlined
+        self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
 
         # pack everything into side pane
         self.vbox.pack_start  (frame, False, True, 0)
@@ -131,16 +135,31 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         newthread.start()
     
     def _search_lyrics_thread(self, player, entry):
+        if entry is None:
+            return
         artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
         title = entry.get_string(RB.RhythmDBPropType.TITLE)
         print "search lyrics for " + artist + " - " + title
    
         (clean_artist, clean_title) = self.clean_song_data(artist, title)
         
-        parser = chartlyricsParser.chartlyricsParser(clean_artist, clean_title)
-        lyrics = parser.parse()
+        lyrics = ""
+        i = 0
+        while lyrics == "" and i < len(LYRIC_SOURCES):
+            print "source: " + LYRIC_SOURCES[i]
+            parser = self.get_parser(clean_artist, clean_title, i)
+            lyrics = parser.parse()
+            i += 1
+        if lyrics == "":
+            lyrics = "No lyrics found"
+            
         Gdk.threads_enter()
         self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
+        # make 'artist - title' header bold and underlined 
+        start = self.textbuffer.get_start_iter()
+        end = start.copy()
+        end.forward_to_line_end()
+        self.textbuffer.apply_tag(self.tag, start, end)
         Gdk.threads_leave()
 
     def clean_song_data(self, artist, title):
@@ -154,7 +173,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         for exp in LYRIC_TITLE_REPLACE:
             title = re.sub(exp[0], exp[1], title)
     
-        # strip things like "(live at Somewhere)", "(accoustic)", etc
+        # strip things like "(live at Somewhere)", "(acoustic)", etc
         for exp in LYRIC_TITLE_STRIP:
             title = re.sub (exp, '', title)
     
@@ -163,3 +182,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         artist = artist.strip()
         
         return (artist, title)
+    
+    def get_parser(self, artist, title, source):
+        if source == 0:
+            return chartlyricsParser.chartlyricsParser(artist, title)
+        
+        
