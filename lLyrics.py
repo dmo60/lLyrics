@@ -4,7 +4,7 @@ from gi.repository import Gtk
 from threading import Thread
 import re
 import pango
-import chartlyricsParser
+import ChartlyricsParser, LyricwikiParser
 
 llyrics_ui = """
 <ui>
@@ -20,7 +20,7 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Chartlyrics.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "Chartlyrics.com"]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -154,7 +154,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             lyrics = "No lyrics found"
             
         Gdk.threads_enter()
-        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
+        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics + "\n\n(lyrics from " +  LYRIC_SOURCES[i-1] + ")")
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()
         end = start.copy()
@@ -185,6 +185,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     
     def get_parser(self, artist, title, source):
         if source == 0:
-            return chartlyricsParser.chartlyricsParser(artist, title)
+            return LyricwikiParser.LyricwikiParser(artist, title)
+        if source == 1:
+            return ChartlyricsParser.ChartlyricsParser(artist, title)
         
         
