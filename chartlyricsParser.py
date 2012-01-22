@@ -1,4 +1,6 @@
-import urllib2, time
+# Parser for Chartlyrics.com API
+
+import urllib2, time, string
 from HTMLParser import HTMLParser
 
 class chartlyricsParser(HTMLParser):
@@ -10,42 +12,42 @@ class chartlyricsParser(HTMLParser):
         self.tag = None
         self.lyricId = None
         self.checksum = None
-        self.set = False
+        self.found = False
         self.lyric = "no lyrics found"
-        
-        print "search lyrics for " + artist + " - " + title
-        
+    
+    # define handler for parsing             
     def handle_starttag(self, tag, attrs):
         self.tag = tag
-        
+    
+    # definde handler for parsing    
     def handle_endtag(self, tag):
-        if self.set and tag == "searchlyricresult":
-            self.set = False
+        if self.found and tag == "searchlyricresult":
+            self.found = False
         self.tag = None
-                    
+    
+    # definde handler for parsing               
     def handle_data(self, data):
-#        print "data " + data
         if self.checksum is None and self.tag == "lyricchecksum":
             self.checksum = data
-            self.set = True
+            self.found = True
             return      
         
         if self.lyricId is None and self.tag == "lyricid":
             self.lyricId = data
             return
             
-        if self.set and self.tag == "artist":
-            if data != self.artist:
+        if self.found and self.tag == "artist":
+            if data.lower() != self.artist:
                 self.lyricId = None
                 self.checksum = None
-                self.set = False
+                self.found = False
             return
                 
-        if self.set and self.tag == "song":
-            if data != self.title:
+        if self.found and self.tag == "song":
+            if data.lower() != self.title:
                 self.lyricId = None
                 self.checksum = None
-                self.set = False
+                self.found = False
             return
                 
         if self.tag == "lyric":
@@ -53,7 +55,8 @@ class chartlyricsParser(HTMLParser):
             print "found lyrics"
         
     def parse(self):
-        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyric?artist=" + self.artist.replace(" ", "%20") + "&song=" + self.title.replace(" ", "%20")
+        # API searchLyric request
+        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyric?artist=" + urllib2.quote(self.artist) + "&song=" + urllib2.quote(self.title)
         print "call chartlyrics API: " + url
         req = urllib2.Request(url)
         while True:
@@ -64,6 +67,7 @@ class chartlyricsParser(HTMLParser):
                 time.sleep(2)
         self.feed(resp)
         
+        # API getLyric request
         if self.lyricId is not None and self.checksum is not None:
             url = "http://api.chartlyrics.com/apiv1.asmx/GetLyric?lyricId=" + self.lyricId + "&lyricCheckSum=" + self.checksum
             print "call chartlyrics API: " + url
@@ -76,6 +80,7 @@ class chartlyricsParser(HTMLParser):
                     time.sleep(2) 
             self.feed(resp)
         else:
+            # searchLyric was not successful
             print "no lyrics found"
         
         return self.lyric
