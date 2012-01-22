@@ -1,6 +1,7 @@
 from gi.repository import GObject, Peas
 from gi.repository import RB
 from gi.repository import Gtk
+import chartlyricsParser
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -63,12 +64,16 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_pixels_below_lines(10)
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
         
+        # create a ScrollView
+        sw = Gtk.ScrolledWindow()
+        sw.add(self.textview)
+        
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
 
         # pack everything into side pane
         self.vbox.pack_start  (frame, False, True, 0)
-        self.vbox.pack_start (self.textview, True, True, 10)
+        self.vbox.pack_start (sw, True, True, 0)
 
         self.vbox.show_all()
         self.vbox.set_size_request(200, -1)
@@ -87,7 +92,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         else:
             artist = "none"
             title = "none"     
-            
-        self.textbuffer.set_text(artist + " - " + title)
+        
+        parser = chartlyricsParser.chartlyricsParser(artist, title)
+        lyrics = parser.parse()
+        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
         self.textview.set_buffer(self.textbuffer)
     
