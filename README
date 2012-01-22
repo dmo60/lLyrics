@@ -1,21 +1,48 @@
-The goal of this project is to write a Rhythmbox plug-in, which displays lyrics for the current playing song in the right sidebar.
+lLyrics
+===================
 
------------------
+lLyrics is a Rhythmbox plug-in, which displays lyrics for the current playing song in the right sidebar.
+
+I know there are already plugins, which are supposed to provide lyrics functionality for Rhythmbox, but
+they all don't work for me, so I decided to write my own.
+
+More lyric sources will be added in the future. 
+
+This project is hosted at github: https://github.com/dmo60/lLyrics
+
+
+
 Lyric sources
------------------
+===================
+
 Lyrikwiki.org
 Chartlyrics.com
 
 More coming soon...
 
 
-------------------
+
 INSTALL
-------------------
+===================
+
 Installing this plug-in is easy.
-Create the directory '~/.local/share/rhythmbox/plugins/lLyrics' :
-	mkdir ~/.local/share/rhythmbox/plugins/lastfmplaycount
-Copy all files the newly created directory (or extract this archive's contents into that directory):
-	cp * ~/.local/share/rhythmbox/plugins/lastfmplaycount
-Launch Rhythmbox and enable the plugin under "Edit > Plugins".
+
+	1) Create the directory '~/.local/share/rhythmbox/plugins/lLyrics':
+		mkdir ~/.local/share/rhythmbox/plugins/lastfmplaycount
+		
+	2) Copy all files to the newly created directory (or extract this archive's contents into that directory):
+		cp * ~/.local/share/rhythmbox/plugins/lastfmplaycount
+	
+	3) Launch Rhythmbox and enable the lLyrics plugin under "Edit > Plugins".
+	
 Done.
+
+
+
+Credits
+===================
+
+I was highly inspired from the awesome Songbird plugin "MLyrics" (https://github.com/FreeleX/MLyrics).
+I also took a few lines from the existing plugin ContextPane.
+
+Please report bugs, issues or feature requests to https://github.com/dmo60/lLyrics/issues
