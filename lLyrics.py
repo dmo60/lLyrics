@@ -4,7 +4,7 @@ from gi.repository import Gtk
 from threading import Thread
 import re
 import pango
-import ChartlyricsParser, LyricwikiParser
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser
 
 llyrics_ui = """
 <ui>
@@ -24,7 +24,7 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Chartlyrics.com"]
+LYRIC_SOURCES=["Metrolyrics.com", "Lyricwiki.org", "Chartlyrics.com"]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -194,8 +194,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     
     def get_parser(self, artist, title, source):
         if source == 0:
-            return LyricwikiParser.LyricwikiParser(artist, title)
+            return MetrolyricsParser.MetrolyricsParser(artist, title)
         if source == 1:
+            return LyricwikiParser.LyricwikiParser(artist, title)
+        if source == 2:
             return ChartlyricsParser.ChartlyricsParser(artist, title)
         
         
