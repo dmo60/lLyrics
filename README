@@ -3,8 +3,7 @@ lLyrics
 
 lLyrics is a Rhythmbox plug-in, which displays lyrics for the current playing song in the right sidebar.
 
-I know there are already plugins, which are supposed to provide lyrics functionality for Rhythmbox, but
-they all don't work for me, so I decided to write my own.
+I know there are already plugins, which are supposed to provide lyrics functionality for Rhythmbox, but they all don't work for me, so I decided to write my own.
 
 More lyric sources will be added in the future. 
 
