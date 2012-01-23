@@ -10,6 +10,7 @@ class LyricwikiParser(HTMLParser):
         self.artist = artist
         self.title = title
         self.tag = None
+        self.found = True
         self.lyric_url = None
         self.lyrics = ""
     
@@ -23,7 +24,10 @@ class LyricwikiParser(HTMLParser):
     
     # definde handler for parsing               
     def handle_data(self, data):
-        if self.tag == "url":
+        if self.tag == "lyrics":
+            if data == "Not found":
+                self.found = False
+        if self.found and self.tag == "url":
             self.lyric_url = data
         
     def parse(self):
@@ -36,6 +40,9 @@ class LyricwikiParser(HTMLParser):
             self.feed(resp)
         except:
             print "could not connect to lyricwiki.org API"
+            return ""
+        
+        if self.lyric_url is None:
             return ""
         
         print "url: " + self.lyric_url
@@ -56,10 +63,14 @@ class LyricwikiParser(HTMLParser):
         # cut HTML source to relevant part
         start = resp.find("</a></div>&")
         if start == -1:
-            return ""
+            start = resp.find("</a></div><i>&")
+            if start == -1:
+                print "lyrics start not found"
+                return ""
         resp = resp[(start+10):]
         end = resp.find("<!--")
         if end == -1:
+            print "lyrics end not found "
             return ""
         resp = resp[:(end-1)]
         
@@ -74,6 +85,11 @@ class LyricwikiParser(HTMLParser):
                 resp = resp + unichr(int(c))
             except:
                 print "unknown character " + c
+        
+        # if lyrics incomplete, skip!
+        if resp.find("[...]") != -1:
+            print "uncomplete lyrics"
+            resp = ""
         
         return resp
         
