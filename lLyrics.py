@@ -10,11 +10,15 @@ llyrics_ui = """
 <ui>
     <menubar name="MenuBar">
         <menu name="ViewMenu" action="View">
-            <menuitem name="Lyrics" action="ToggleLyricSideBar" />
+            <menuitem name="lLyrics" action="ToggleLyricSideBar" />
         </menu>
     </menubar>
+    <toolbar name="ToolBar">
+            <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
+    </toolbar>
 </ui>
 """
+
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", "\(feat[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
@@ -46,7 +50,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.psc_id = self.player.connect ('playing-song-changed', self.search_lyrics)
         
         # Add button to toggle visibility of pane
-        self.action = ('ToggleLyricSideBar','gtk-info', _("Lyrics Sidebar"),
+        self.action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
                         None, _("Change the visibility of the lyrics sidebar"),
                         self.toggle_visibility, True)
         self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
