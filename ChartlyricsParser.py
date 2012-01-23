@@ -37,7 +37,6 @@ class ChartlyricsParser(HTMLParser):
             return
         if self.correct and self.tag == "lyric":
             self.lyrics = data
-            print "found lyrics"
         
     def parse(self):
         # API searchLyric request
@@ -49,9 +48,6 @@ class ChartlyricsParser(HTMLParser):
             self.feed(resp)
         except:
             print "could not connect to chartlyric.com API"
-        
-        if self.lyrics == "":
-            print "no lyrics found"
         
         return self.lyrics
         
