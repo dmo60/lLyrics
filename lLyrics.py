@@ -155,10 +155,15 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             lyrics = parser.parse()
             i += 1
         if lyrics == "":
+            print "no lyrics found"
             lyrics = "No lyrics found"
+            source = ""
+        else:
+            source = "\n\n(lyrics from " + LYRIC_SOURCES[i-1] + ")"
+            print "found lyrics"
             
         Gdk.threads_enter()
-        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics + "\n\n(lyrics from " +  LYRIC_SOURCES[i-1] + ")")
+        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics + source)
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()
         end = start.copy()
