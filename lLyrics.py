@@ -2,8 +2,8 @@ from gi.repository import GObject, Peas, Gdk
 from gi.repository import RB
 from gi.repository import Gtk
 from threading import Thread
-import re
-import pango
+import re, os, pango
+
 import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser
 
 llyrics_ui = """
@@ -59,6 +59,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         uim.insert_action_group (self.action_group, 0)
         self.ui_id = uim.add_ui_from_string(llyrics_ui)
         uim.ensure_update()
+        print RB.user_cache_dir()
         
         print "activated plugin lLyrics"
 
@@ -147,23 +148,44 @@ class lLyrics(GObject.GObject, Peas.Activatable):
    
         (clean_artist, clean_title) = self.clean_song_data(artist, title)
         
-        lyrics = ""
-        i = 0
-        while lyrics == "" and i < len(LYRIC_SOURCES):
-            print "source: " + LYRIC_SOURCES[i]
-            parser = self.get_parser(clean_artist, clean_title, i)
-            lyrics = parser.parse()
-            i += 1
-        if lyrics == "":
-            print "no lyrics found"
-            lyrics = "No lyrics found"
-            source = ""
+        # try to load lyrics from cache
+        path = self.build_cache_path(clean_artist, clean_title)
+        if os.path.exists (path):
+            try:
+                cachefile = open(path, "r")
+                lyrics = cachefile.read()
+                cachefile.close()
+                print "got lyrics from cache"
+            except:
+                print "error reading cache file"
         else:
-            source = "\n\n(lyrics from " + LYRIC_SOURCES[i-1] + ")"
-            print "found lyrics"
+            # parse lyrics from sources
+            lyrics = ""
+            i = 0
+            while lyrics == "" and i < len(LYRIC_SOURCES):
+                print "source: " + LYRIC_SOURCES[i]
+                parser = self.get_parser(clean_artist, clean_title, i)
+                lyrics = parser.parse()
+                i += 1
+            if lyrics == "":
+                print "no lyrics found"
+                lyrics = "No lyrics found"
+                source = ""
+            else:
+                print "got lyrics from source"
+                source = "\n\n(lyrics from " + LYRIC_SOURCES[i-1] + ")"
+                lyrics = lyrics + source
+                # write lyrics to cache file
+                try:
+                    cachefile = open(path, "w+")
+                    cachefile.write(lyrics)
+                    cachefile.close()
+                    print "wrote lyrics to cache file"
+                except:
+                    print "error writing lyrics to cache file"
             
         Gdk.threads_enter()
-        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics + source)
+        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()
         end = start.copy()
@@ -201,5 +223,18 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             return MetrolyricsParser.MetrolyricsParser(artist, title)
         if source == 3:
             return ChartlyricsParser.ChartlyricsParser(artist, title)
+    
+    def build_cache_path(self, artist, title):
+        folder = os.path.join(RB.user_cache_dir(), "lyrics")
+    
+        lyrics_folder = os.path.expanduser (folder)
+        if not os.path.exists (lyrics_folder):
+            os.mkdir (lyrics_folder)
+    
+        artist_folder = os.path.join(lyrics_folder, artist[:128])
+        if not os.path.exists (artist_folder):
+            os.mkdir (artist_folder)
+    
+        return os.path.join(artist_folder, title[:128] + '.lyric')
         
         
