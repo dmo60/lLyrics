@@ -1,6 +1,6 @@
 # Parser for Lyricwiki.org
 
-import urllib2, string
+import urllib2
 from HTMLParser import HTMLParser
 
 class LyricwikiParser(HTMLParser):

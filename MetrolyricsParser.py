@@ -1,6 +1,8 @@
 # Parser for Metrolyrics.com
 
-import urllib2, string, re
+import urllib2, re, string
+from HTMLParser import HTMLParser
+
 from LyricwikiParser import LyricwikiParser
 
 class MetrolyricsParser():
@@ -11,8 +13,15 @@ class MetrolyricsParser():
         self.lyrics = ""
         
     def parse(self):
+        # remove punctuation from artist/title
+        clean_artist = self.artist
+        clean_title = self.title
+        for c in string.punctuation:
+            clean_artist = clean_artist.replace(c, "")
+            clean_title = clean_title.replace(c, "")
+            
         # create lyrics Url
-        url = "http://www.metrolyrics.com/" + self.artist.replace(" ", "-") + "-lyrics-" + self.title.replace(" ", "-") + ".html"
+        url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" + clean_artist.replace(" ", "-") + ".html"
         print "metrolyrics Url " + url
         req = urllib2.Request(url)
         try:
@@ -25,17 +34,22 @@ class MetrolyricsParser():
         title = resp
         start = title.find("<title>")
         if start == -1:
-            print "no title found! broken page?"
+            print "no title found"
             return ""
         title = title[(start+7):]
         end = title.find(" LYRICS</title>")
         if end == -1:
-            print "no title end found! broken page?"
+            print "no title end found"
             return ""
         title = title[:end]
+        title = HTMLParser().unescape(title)
         songdata = title.split(" - ")
-        if self.artist != songdata[0].lower() or self.title != songdata[1].lower():
-            print "wrong artist/title!"
+        try:
+            if self.artist != songdata[0].lower() or self.title != songdata[1].lower():
+                print "wrong artist/title! " + songdata[0].lower() + " - " + songdata[1].lower()
+                return ""
+        except:
+            print "incomplete artist/title"
             return ""
         
         self.lyrics = self.get_lyrics(resp)
@@ -46,9 +60,8 @@ class MetrolyricsParser():
         # cut HTML source to relevant part
         start = resp.find("<span class='line line-s' id='line_1'>")
         if start == -1:
-            if start == -1:
-                print "lyrics start not found"
-                return ""
+            print "lyrics start not found"
+            return ""
         resp = resp[start:]
         end = resp.find("</div")
         if end == -1:
@@ -62,11 +75,11 @@ class MetrolyricsParser():
         resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>", "&#10;", resp)
         resp = re.sub("\<em class\=\"smline sm\" data-meaningid\=\"[0-9]+\" \>", "", resp)
         resp = re.sub("(\</em\>)?\</span\>", "", resp)
+        resp = re.sub("(\<br /\>)*\</p\>", "", resp)
         resp = resp.replace("<br />", "&#10;")
-        resp = resp.replace("</p>", "")
         resp = resp.replace("&#", "")
         resp = resp.strip()
-        resp = resp[:1]
+        resp = resp[:-1]
         
         # decode characters
         resp = LyricwikiParser.decode_chars(resp)
