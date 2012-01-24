@@ -23,9 +23,8 @@ class MetrolyricsParser():
         # create lyrics Url
         url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" + clean_artist.replace(" ", "-") + ".html"
         print "metrolyrics Url " + url
-        req = urllib2.Request(url)
         try:
-            resp = urllib2.urlopen(req).read()
+            resp = urllib2.urlopen(url).read()
         except:
             print "could not connect to metrolyrics.com"
             return ""

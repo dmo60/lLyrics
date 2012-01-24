@@ -42,9 +42,8 @@ class ChartlyricsParser(HTMLParser):
         # API searchLyric request
         url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib2.quote(self.artist) + "&song=" + urllib2.quote(self.title)
         print "call chartlyrics API: " + url
-        req = urllib2.Request(url)
         try:
-            resp = urllib2.urlopen(req).read()
+            resp = urllib2.urlopen(url).read()
             self.feed(resp)
         except:
             print "could not connect to chartlyric.com API"

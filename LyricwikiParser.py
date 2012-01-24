@@ -34,9 +34,8 @@ class LyricwikiParser(HTMLParser):
         # API getSong request
         url = "http://lyrics.wikia.com/api.php?func=getSong&artist=" + urllib2.quote(self.artist) + "&song=" + urllib2.quote(self.title) + "&fmt=xml"
         print "call lyrikwiki API: " + url
-        req = urllib2.Request(url)
         try:
-            resp = urllib2.urlopen(req).read()
+            resp = urllib2.urlopen(url).read()
             self.feed(resp)
         except:
             print "could not connect to lyricwiki.org API"
@@ -48,9 +47,8 @@ class LyricwikiParser(HTMLParser):
         print "url: " + self.lyric_url
         
         # open lyrics-URL
-        req = urllib2.Request(self.lyric_url)
         try:
-            resp = urllib2.urlopen(req).read()
+            resp = urllib2.urlopen(self.lyric_url).read()
         except:
             print "could not open lyricwiki url"
             return ""
