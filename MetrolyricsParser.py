@@ -69,7 +69,7 @@ class MetrolyricsParser():
             return ""
         resp = resp[:(end)]
         
-        # replace unwanted characters
+        # replace unwanted parts
         resp = resp.replace("<span class='line line-s' id='line_1'>", "")
         resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>\<span style\=\'color:#888888;font-size:0\.75em\'\>\[.+\]\</span\>", "", resp)
         resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>", "&#10;", resp)

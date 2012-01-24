@@ -70,7 +70,7 @@ class LyricwikiParser(HTMLParser):
         resp = resp[(start+10):]
         end = resp.find("<!--")
         if end == -1:
-            print "lyrics end not found "
+            print "lyrics end not found"
             return ""
         resp = resp[:(end-1)]
         
