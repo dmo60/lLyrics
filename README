@@ -3,11 +3,17 @@ lLyrics
 
 lLyrics is a Rhythmbox plug-in, which displays lyrics for the current playing song in the right sidebar.
 
+
 I know there are already plugins, which are supposed to provide lyrics functionality for Rhythmbox, but they all don't work for me, so I decided to write my own.
 
-More lyric sources will be added in the future. 
 
-This project is hosted at github: https://github.com/dmo60/lLyrics
+Currently lyrics are stored at ~/.cache/rhythmbox/lyrics, so they don't have to be reloaded everytime. If you want to delete lyrics in order to rescan sources, search for the corresponding file and remove it. I am working on a more elegant solution for this.  
+
+More lyric sources will be added in the future. I also plan to provide more functionality like manually reload lyrics from a specified source or writing lyrics to ID3-Tags. 
+
+You will always find the latest version at https://github.com/dmo60/lLyrics. Stay tuned!
+
+Please report bugs, issues or feature requests to https://github.com/dmo60/lLyrics/issues
 
 
 
@@ -18,6 +24,7 @@ Lyrikwiki.org
 Letras.terra.com.br
 Metrolyrics.com
 Chartlyrics.com
+Lyrdb.com
 
 More coming soon...
 
@@ -46,4 +53,4 @@ Credits
 I was highly inspired from the awesome Songbird plugin "MLyrics" (https://github.com/FreeleX/MLyrics).
 I also took a few lines from the existing plugin ContextPane.
 
-Please report bugs, issues or feature requests to https://github.com/dmo60/lLyrics/issues
+All lyrics are property and copyright of their owners.
