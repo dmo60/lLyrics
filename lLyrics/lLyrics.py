@@ -41,6 +41,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         """        
         self.shell = self.object
         self.init_sidebar()
+        self.dict = dict({"Lyricwiki.org": LyricwikiParser, "letras.terra.com.br": TerraParser,\
+                         "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,\
+                         "Lyrdb.com": LyrdbParser})
 
         self.player = self.shell.props.shell_player
         # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
@@ -59,8 +62,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         uim.insert_action_group (self.action_group, 0)
         self.ui_id = uim.add_ui_from_string(llyrics_ui)
         uim.ensure_update()
-        print RB.user_cache_dir()
-        
+                
         print "activated plugin lLyrics"
 
     def do_deactivate(self):
@@ -164,7 +166,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             i = 0
             while lyrics == "" and i < len(LYRIC_SOURCES):
                 print "source: " + LYRIC_SOURCES[i]
-                parser = self.get_parser(clean_artist, clean_title, i)
+                # get the right Parser
+                parser = self.dict[LYRIC_SOURCES[i]].Parser(clean_artist, clean_title)
                 lyrics = parser.parse()
                 i += 1
             if lyrics == "":
@@ -213,18 +216,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         artist = artist.strip()
         
         return (artist, title)
-    
-    def get_parser(self, artist, title, source):
-        if source == 0:
-            return LyricwikiParser.LyricwikiParser(artist, title)
-        if source == 1:
-            return TerraParser.TerraParser(artist, title)
-        if source == 2:
-            return MetrolyricsParser.MetrolyricsParser(artist, title)
-        if source == 3:
-            return ChartlyricsParser.ChartlyricsParser(artist, title)
-        if source == 4:
-            return LyrdbParser.LyrdbParser(artist, title)
     
     def build_cache_path(self, artist, title):
         folder = os.path.join(RB.user_cache_dir(), "lyrics")

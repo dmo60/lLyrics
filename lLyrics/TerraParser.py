@@ -2,7 +2,7 @@
 
 import urllib2, re, string
 
-class TerraParser():
+class Parser():
     
     def __init__(self, artist, title):
         self.artist = artist

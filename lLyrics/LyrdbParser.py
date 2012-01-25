@@ -2,7 +2,7 @@
 
 import urllib2, string
 
-class LyrdbParser():
+class Parser():
     
     def __init__(self, artist, title):
         self.artist = artist

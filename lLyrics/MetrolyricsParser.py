@@ -3,9 +3,9 @@
 import urllib2, re, string
 from HTMLParser import HTMLParser
 
-from LyricwikiParser import LyricwikiParser
+from LyricwikiParser import Parser
 
-class MetrolyricsParser():
+class Parser():
     
     def __init__(self, artist, title):
         self.artist = artist

@@ -7,7 +7,7 @@
 import urllib2, string
 from HTMLParser import HTMLParser
 
-class ChartlyricsParser(HTMLParser):
+class Parser(HTMLParser):
     
     def __init__(self, artist, title):
         HTMLParser.__init__(self)
