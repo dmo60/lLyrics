@@ -4,7 +4,7 @@
 # (it apparently requires a 20-30sec interval between two API-calls), 
 # so just use SearchLyricDirect since it only needs one API request. 
 
-import urllib2
+import urllib2, string
 from HTMLParser import HTMLParser
 
 class ChartlyricsParser(HTMLParser):
@@ -47,6 +47,8 @@ class ChartlyricsParser(HTMLParser):
             self.feed(resp)
         except:
             print "could not connect to chartlyric.com API"
+        
+        self.lyrics = string.capwords(self.lyrics, "\n").strip()
         
         return self.lyrics
         

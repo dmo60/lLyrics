@@ -1,6 +1,6 @@
 # Parser for Lyricwiki.org
 
-import urllib2
+import urllib2, string
 from HTMLParser import HTMLParser
 
 class LyricwikiParser(HTMLParser):
@@ -54,6 +54,7 @@ class LyricwikiParser(HTMLParser):
             return ""
         
         self.lyrics = self.get_lyrics(resp)
+        self.lyrics = string.capwords(self.lyrics, "\n").strip()
         
         return self.lyrics
     
