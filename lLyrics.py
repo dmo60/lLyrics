@@ -4,7 +4,7 @@ from gi.repository import Gtk
 from threading import Thread
 import re, os, pango
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser, LyrdbParser
 
 llyrics_ui = """
 <ui>
@@ -24,7 +24,7 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -223,6 +223,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             return MetrolyricsParser.MetrolyricsParser(artist, title)
         if source == 3:
             return ChartlyricsParser.ChartlyricsParser(artist, title)
+        if source == 4:
+            return LyrdbParser.LyrdbParser(artist, title)
     
     def build_cache_path(self, artist, title):
         folder = os.path.join(RB.user_cache_dir(), "lyrics")
