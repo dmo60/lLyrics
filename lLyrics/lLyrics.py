@@ -4,7 +4,7 @@ from gi.repository import Gtk
 from threading import Thread
 import re, os, pango
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser, LyrdbParser
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser, LyrdbParser, Config
 
 llyrics_ui = """
 <ui>
@@ -24,7 +24,7 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
 
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
@@ -41,10 +41,14 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         """        
         self.shell = self.object
         self.init_sidebar()
-        self.dict = dict({"Lyricwiki.org": LyricwikiParser, "letras.terra.com.br": TerraParser,\
+        self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": TerraParser,\
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,\
                          "Lyrdb.com": LyrdbParser})
-
+        
+        self.config = Config.Config()
+        self.sources = self.config.get_lyrics_sources()
+        self.cache = self.config.get_cache_lyrics()
+        
         self.player = self.shell.props.shell_player
         # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
@@ -164,10 +168,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             # parse lyrics from sources
             lyrics = ""
             i = 0
-            while lyrics == "" and i < len(LYRIC_SOURCES):
-                print "source: " + LYRIC_SOURCES[i]
+            while lyrics == "" and i < len(self.sources):
+                print "source: " + self.sources[i]
                 # get the right Parser
-                parser = self.dict[LYRIC_SOURCES[i]].Parser(clean_artist, clean_title)
+                parser = self.dict[self.sources[i]].Parser(clean_artist, clean_title)
                 lyrics = parser.parse()
                 i += 1
             if lyrics == "":
@@ -176,16 +180,17 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 source = ""
             else:
                 print "got lyrics from source"
-                source = "\n\n(lyrics from " + LYRIC_SOURCES[i-1] + ")"
+                source = "\n\n(lyrics from " + self.sources[i-1] + ")"
                 lyrics = lyrics + source
                 # write lyrics to cache file
-                try:
-                    cachefile = open(path, "w+")
-                    cachefile.write(lyrics)
-                    cachefile.close()
-                    print "wrote lyrics to cache file"
-                except:
-                    print "error writing lyrics to cache file"
+                if self.cache:
+                    try:
+                        cachefile = open(path, "w+")
+                        cachefile.write(lyrics)
+                        cachefile.close()
+                        print "wrote lyrics to cache file"
+                    except:
+                        print "error writing lyrics to cache file"
             
         Gdk.threads_enter()
         self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
