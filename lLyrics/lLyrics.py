@@ -1,6 +1,4 @@
-from gi.repository import GObject, Peas, Gdk
-from gi.repository import RB
-from gi.repository import Gtk
+from gi.repository import GObject, Peas, Gdk, RB, Gtk
 from threading import Thread
 import re, os, pango
 
@@ -26,6 +24,7 @@ LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
 LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
 
+
 class lLyrics(GObject.GObject, Peas.Activatable):
     __gtype_name = 'lLyrics'
     object = GObject.property(type=GObject.GObject)
@@ -35,16 +34,14 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         GObject.threads_init()
         Gdk.threads_init()
 
-    def do_activate(self):
-        """
-        activate plugin
-        """        
+    def do_activate(self):      
         self.shell = self.object
+        
         self.init_sidebar()
+        
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": TerraParser,\
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,\
                          "Lyrdb.com": LyrdbParser})
-        
         self.config = Config.Config()
         self.sources = self.config.get_lyrics_sources()
         self.cache = self.config.get_cache_lyrics()
@@ -69,10 +66,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 
         print "activated plugin lLyrics"
 
-    def do_deactivate(self):
-        """
-        deactivate plugin
-        """        
+    def do_deactivate(self):    
         if self.visible:
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
         self.vbox = None
@@ -88,6 +82,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         uim.remove_action_group (self.action_group)
         self.action = None
         self.action_group = None
+        self.cache = None
+        self.config = None
+        self.dict = None
+        self.sources = None
+        self.ui_id = None
+        self.tag = None
         
         self.shell = None
 
@@ -120,6 +120,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
         self.textview.set_buffer(self.textbuffer)
+        
         # tag to style headers bold and underlined
         self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
 
@@ -177,7 +178,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             if lyrics == "":
                 print "no lyrics found"
                 lyrics = "No lyrics found"
-                source = ""
             else:
                 print "got lyrics from source"
                 source = "\n\n(lyrics from " + self.sources[i-1] + ")"

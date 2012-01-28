@@ -7,14 +7,14 @@ lLyrics is a Rhythmbox plug-in, which displays lyrics for the current playing so
 I know there are already plugins, which are supposed to provide lyrics functionality for Rhythmbox, but they all don't work for me, so I decided to write my own.
 
 
-Per default lyrics are stored at ~/.cache/rhythmbox/lyrics, so they don't have to be reloaded everytime (you can deactivate this via gconf, see below). If you want to delete lyrics in order to rescan sources, search for the corresponding file and remove it. I am working on a more elegant solution for this.  
+Per default lyrics are stored at ~/.cache/rhythmbox/lyrics, so they don't have to be reloaded everytime (you can deactivate this, see below). If you want to delete lyrics in order to rescan sources, search for the corresponding file and remove it. I am working on a more elegant solution for this.  
 
 Currently a few setting can be changed via gconf. You can find the keys under "/apps/rhythmbox/plugins/llyrics/":
 	cache_lyrics: set to "False", if you don't want your lyrics to be saved
-	lyrics_sources: lyrics sources are scanned in the order they are given in this list, you can rearrange them or delete particular sources completely (you can find possible values below "Lyric Sources")
+	lyrics_sources: lyrics sources are scanned in the order they are given in this list, you can rearrange them or delete particular sources completely (see "Lyrics sources" below for possible values)
 
 
-More lyric sources will be added in the future. I also plan to provide more functionality like manually reload lyrics from a specified source or writing lyrics to ID3-Tags. 
+More lyrics sources will be added in the future. I also plan to provide more functionality like manually reload lyrics from a specified source or writing lyrics to ID3-Tags. 
 
 You will always find the latest version at https://github.com/dmo60/lLyrics. Stay tuned!
 
@@ -22,7 +22,7 @@ Please report bugs, issues or feature requests to https://github.com/dmo60/lLyri
 
 
 
-Lyric sources
+Lyrics sources
 ===================
 
 Lyrikwiki.org
