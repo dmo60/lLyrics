@@ -1,3 +1,19 @@
+# Copyright (C) 2012 Timo Loewe
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 from gi.repository import GObject, Peas, Gdk, RB, Gtk
 from threading import Thread
 import re, os, pango
@@ -63,6 +79,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         uim.insert_action_group (self.action_group, 0)
         self.ui_id = uim.add_ui_from_string(llyrics_ui)
         uim.ensure_update()
+        
+        # hide the button in Small Display mode
+        small_display_toggle = uim.get_widget ("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
+        tb_widget = uim.get_widget ("/ToolBar/lLyrics")
+        self.tb_conn_id = small_display_toggle.connect ('toggled', self.hide_if_active, tb_widget)
                 
         print "activated plugin lLyrics"
 
@@ -234,5 +255,14 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             os.mkdir (artist_folder)
     
         return os.path.join(artist_folder, title[:128] + '.lyric')
+    
+    def hide_if_active (self, toggle_widget, ui_element):
+        "Hides ui_element if toggle_widget is active."
+        
+        if (toggle_widget.get_active()):
+            ui_element.hide()
+            
+        else:
+            ui_element.show()
         
         
