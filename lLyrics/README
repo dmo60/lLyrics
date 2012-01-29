@@ -39,13 +39,12 @@ INSTALL
 ===================
 
 Installing this plug-in is easy.
-
-	1) Download this repository as ZIP-File (see "ZIP" button above) and unpack it. 
 		
-	2) Copy the folder "lLyrics" to "~/.local/share/rhythmbox/plugins/" (if this directory doesn't exist, create it with "mkdir ~/.local/share/rhythmbox/plugins/"):
+	1) Copy the folder "lLyrics" to "~/.local/share/rhythmbox/plugins/" :
+	   (if this directory doesn't exist, create it with "mkdir ~/.local/share/rhythmbox/plugins/")
 		cp -r lLyrics ~/.local/share/rhythmbox/plugins/
 	
-	3) Launch Rhythmbox and enable the lLyrics plugin under "Edit > Plugins".
+	2) Launch Rhythmbox and enable the lLyrics plugin under "Edit > Plugins".
 	
 Done.
 
