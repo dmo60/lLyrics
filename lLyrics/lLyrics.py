@@ -201,6 +201,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 print "got lyrics from source"
                 source = "\n\n(lyrics from " + self.sources[i-1] + ")"
                 lyrics = lyrics + source
+                lyrics = lyrics.decode("utf-8", "replace")
                 # write lyrics to cache file
                 if self.cache:
                     try:
