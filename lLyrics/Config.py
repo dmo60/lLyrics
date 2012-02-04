@@ -25,8 +25,8 @@ class Config():
         self.gconf_client = gconf.client_get_default()
         self.gconf_client.add_dir(GCONF_DIR, gconf.CLIENT_PRELOAD_RECURSIVE)
         self.init_sources_key()
-        self.init_cache_key()
-        
+        self.init_cache_key()   
+             
     
     def init_sources_key(self):        
         # create and set key if it doesn't exist

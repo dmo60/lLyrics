@@ -27,7 +27,7 @@ class Parser():
         url = "http://webservices.lyrdb.com/lookup.php?q=" + urllib2.quote(self.artist) + "|" + urllib2.quote(self.title) + "&for=match&agent=llyrics"
         print "call lyrdb API " + url
         try:
-            resp = urllib2.urlopen(url).read()
+            resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to lyrdb.com"
             return ""
@@ -42,7 +42,7 @@ class Parser():
         url = "http://www.lyrdb.com/getlyr.php?q=" + lyricsid
         print "url " + url
         try:
-            self.lyrics = urllib2.urlopen(url).read()
+            self.lyrics = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to lyrdb.com"
             return ""

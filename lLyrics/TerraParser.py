@@ -34,7 +34,7 @@ class Parser():
         url = "http://letras.terra.com.br/" + clean_artist
         print "letras.terra.com.br artist Url " + url
         try:
-            resp = urllib2.urlopen(url).read()
+            resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to letras.terra.com.br"
             return ""
@@ -50,7 +50,7 @@ class Parser():
         url = url + "/" + lyricsid
         print "letras.terra.com.br Url " + url
         try:
-            resp = urllib2.urlopen(url).read()
+            resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to letras.terra.com.br"
             return ""

@@ -16,7 +16,7 @@
 import urllib2, re, string
 from HTMLParser import HTMLParser
 
-from LyricwikiParser import Parser
+import LyricwikiParser
 
 class Parser():
     
@@ -37,7 +37,7 @@ class Parser():
         url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" + clean_artist.replace(" ", "-") + ".html"
         print "metrolyrics Url " + url
         try:
-            resp = urllib2.urlopen(url).read()
+            resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to metrolyrics.com"
             return ""
@@ -95,6 +95,6 @@ class Parser():
         resp = resp[:-1]
         
         # decode characters
-        resp = LyricwikiParser.decode_chars(resp)
+        resp = LyricwikiParser.Parser.decode_chars(resp)
         
         return resp
