@@ -16,6 +16,9 @@ from gi.repository import GObject, Peas, Gdk, RB, Gtk
 from threading import Thread
 import re, os, pango
 
+import gettext
+gettext.install('rhythmbox', RB.locale_dir())
+
 import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser, LyrdbParser, Config
 
 llyrics_ui = """
@@ -50,9 +53,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
 
     def do_activate(self):      
         self.shell = self.object
-        
-        self.init_sidebar()
-        
+        self.player = self.shell.props.shell_player
+                
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": TerraParser,\
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,\
                          "Lyrdb.com": LyrdbParser})
@@ -60,7 +62,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.sources = self.config.get_lyrics_sources()
         self.cache = self.config.get_cache_lyrics()
         
-        self.player = self.shell.props.shell_player
+        self.init_sidebar()
+        
         # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
@@ -114,6 +117,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
        
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
+                
         frame = Gtk.Frame()
         label = Gtk.Label(_("Lyrics"))
         frame.set_shadow_type(Gtk.ShadowType.IN)
@@ -121,6 +125,30 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         frame.set_label_widget(label)
         label.set_use_markup(True)
         label.set_padding(0,4)
+        
+        expander = Gtk.Expander()
+        expander.set_label(_("Lyrics"))
+        expander.set_margin_bottom(5)
+        expander.set_spacing(5)
+        
+        self.combobox = Gtk.ComboBoxText.new()
+        self.combobox.set_margin_right(5)
+        for s in self.sources:
+            self.combobox.append(s, s)
+        self.combobox.append("cache", "From cache file")
+        self.combobox.connect('changed', self.source_changed)
+        self.combobox.set_tooltip_text("Select source to scan for lyrics")
+        
+        self.button = Gtk.Button()
+        self.button.set_label(">")
+        self.button.connect('clicked', self.next_source)
+        self.button.set_tooltip_text("Scan next source in list")
+        
+        hbox = Gtk.HBox()
+        hbox.pack_start(self.combobox, True, True, 0)
+        hbox.pack_end(self.button, False, False, 5)
+        
+        expander.add(hbox)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -144,7 +172,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
 
         # pack everything into side pane
-        self.vbox.pack_start  (frame, False, True, 0)
+#        self.vbox.pack_start  (frame, False, True, 0)
+#        self.vbox.pack_start(hbox, False, False, 0)
+        self.vbox.pack_start(expander, False, False, 0)
         self.vbox.pack_start (sw, True, True, 0)
 
         self.vbox.show_all()
@@ -161,65 +191,16 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             self.visible = False
         
     def search_lyrics(self, player, entry):
-        self.textbuffer.set_text("searching lyrics...")        
-        newthread = Thread(target=self._search_lyrics_thread, args=(player, entry))
-        newthread.start()
-    
-    def _search_lyrics_thread(self, player, entry):
         if entry is None:
             return
-        artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
-        title = entry.get_string(RB.RhythmDBPropType.TITLE)
-        print "search lyrics for " + artist + " - " + title
+        self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
+        self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
+        print "search lyrics for " + self.artist + " - " + self.title
    
-        (clean_artist, clean_title) = self.clean_song_data(artist, title)
+        (self.clean_artist, self.clean_title) = self.clean_song_data(self.artist, self.title)
+        self.path = self.build_cache_path(self.clean_artist, self.clean_title)
         
-        # try to load lyrics from cache
-        path = self.build_cache_path(clean_artist, clean_title)
-        if os.path.exists (path):
-            try:
-                cachefile = open(path, "r")
-                lyrics = cachefile.read()
-                cachefile.close()
-                print "got lyrics from cache"
-            except:
-                print "error reading cache file"
-        else:
-            # parse lyrics from sources
-            lyrics = ""
-            i = 0
-            while lyrics == "" and i < len(self.sources):
-                print "source: " + self.sources[i]
-                # get the right Parser
-                parser = self.dict[self.sources[i]].Parser(clean_artist, clean_title)
-                lyrics = parser.parse()
-                i += 1
-            if lyrics == "":
-                print "no lyrics found"
-                lyrics = "No lyrics found"
-            else:
-                print "got lyrics from source"
-                source = "\n\n(lyrics from " + self.sources[i-1] + ")"
-                lyrics = lyrics + source
-                lyrics = lyrics.decode("utf-8", "replace")
-                # write lyrics to cache file
-                if self.cache:
-                    try:
-                        cachefile = open(path, "w+")
-                        cachefile.write(lyrics)
-                        cachefile.close()
-                        print "wrote lyrics to cache file"
-                    except:
-                        print "error writing lyrics to cache file"
-            
-        Gdk.threads_enter()
-        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
-        # make 'artist - title' header bold and underlined 
-        start = self.textbuffer.get_start_iter()
-        end = start.copy()
-        end.forward_to_line_end()
-        self.textbuffer.apply_tag(self.tag, start, end)
-        Gdk.threads_leave()
+        self.scan_all_sources(self.clean_artist, self.clean_title)
 
     def clean_song_data(self, artist, title):
         # convert to lowercase
@@ -263,5 +244,140 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             
         else:
             ui_element.show()
+            
+    def source_changed(self, combobox):
+        if combobox.get_sensitive():
+            source = combobox.get_active_text()
+            self.scan_source(source, self.clean_artist, self.clean_title)
+        
+    def next_source(self, button):
+        index = self.combobox.get_active() + 1
+        index = index % (len(self.sources)+1)
+        if index >= len(self.sources):
+            source = "From cache file"
+        else:
+            source = self.sources[index]
+        
+        self.scan_source(source, self.clean_artist, self.clean_title)
+    
+    def scan_source(self, source, artist, title):
+        Gdk.threads_enter()
+        self.textbuffer.set_text("searching lyrics...")
+        Gdk.threads_leave()
+          
+        newthread = Thread(target=self._scan_source_thread, args=(source, artist, title))
+        newthread.start()
+    
+    def _scan_source_thread(self, source, artist, title):
+        Gdk.threads_enter()
+        self.button.set_sensitive(False)
+        self.combobox.set_sensitive(False)        
+        Gdk.threads_leave()
+        
+        if source == "From cache file":
+            lyrics = self.get_lyrics_from_cache(self.path)
+        else:   
+            lyrics = self.get_lyrics_from_source(source, artist, title)
+            # check if playing song changed
+            if artist != self.clean_artist or title != self.clean_title:
+                print "song changed"
+                return
+
+        Gdk.threads_enter()                
+        self.show_lyrics(self.artist, self.title, lyrics)        
+        self.button.set_sensitive(True)
+        self.combobox.set_sensitive(True)        
+        Gdk.threads_leave()
+        
+    def scan_all_sources(self, artist, title):
+        
+        Gdk.threads_enter()
+        self.textbuffer.set_text("searching lyrics...")
+        Gdk.threads_leave()
+          
+        newthread = Thread(target=self._scan_all_sources_thread, args=(artist, title))
+        newthread.start()
+    
+    def _scan_all_sources_thread(self, artist, title):
+        Gdk.threads_enter()        
+        self.button.set_sensitive(False)
+        self.combobox.set_sensitive(False)        
+        Gdk.threads_leave()
+        
+        lyrics = self.get_lyrics_from_cache(self.path)
+        
+        if lyrics == "":
+            i = 0
+            while lyrics == "" and i < len(self.sources):
+                lyrics = self.get_lyrics_from_source(self.sources[i], artist, title)
+                # check if playing song changed
+                if artist != self.clean_artist or title != self.clean_title:
+                    print "song changed"
+                    return
+                i += 1
+            if lyrics == "":
+                self.combobox.set_active(-1)
+        
+        Gdk.threads_enter()        
+        self.show_lyrics(self.artist, self.title, lyrics)
+        self.button.set_sensitive(True)
+        self.combobox.set_sensitive(True)        
+        Gdk.threads_leave()
+        
+    def get_lyrics_from_cache(self, path):
+        # try to load lyrics from cache
+        if os.path.exists (path):
+            try:
+                cachefile = open(path, "r")
+                lyrics = cachefile.read()
+                cachefile.close()
+                print "got lyrics from cache"
+                Gdk.threads_enter()
+                self.combobox.set_active_id("cache")
+                Gdk.threads_leave()
+                return lyrics
+            except:
+                print "error reading cache file"
+        return ""
+    
+    def write_lyrics_to_cache(self, path, lyrics):
+        try:
+            cachefile = open(path, "w+")
+            cachefile.write(lyrics)
+            cachefile.close()
+            print "wrote lyrics to cache file"
+        except:
+            print "error writing lyrics to cache file"
+        
+    def get_lyrics_from_source(self, source, artist, title):
+        print "source: " + source
+        
+        Gdk.threads_enter()
+        self.combobox.set_active_id(source)
+        Gdk.threads_leave()
+        
+        parser = self.dict[source].Parser(artist, title)
+        lyrics = parser.parse()
+        
+        if lyrics != "":
+            print "got lyrics from source"
+            lyrics = lyrics + "\n\n(lyrics from " + source + ")"
+            lyrics = lyrics.decode("utf-8", "replace")
+            if lyrics != "" and self.cache:
+                self.write_lyrics_to_cache(self.path, lyrics)
+            
+        return lyrics    
+    
+    def show_lyrics(self, artist, title, lyrics):
+        if lyrics == "":
+            print "no lyrics found"
+            lyrics = "No lyrics found"
+            
+        self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
+        # make 'artist - title' header bold and underlined 
+        start = self.textbuffer.get_start_iter()
+        end = start.copy()
+        end.forward_to_line_end()
+        self.textbuffer.apply_tag(self.tag, start, end)
         
         
