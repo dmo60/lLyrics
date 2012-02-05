@@ -72,7 +72,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         # Add button to toggle visibility of pane
         self.action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
-                        None, _("Change the visibility of the lyrics sidebar"),
+                        None, _("Display lyrics for the playing song"),
                         self.toggle_visibility, True)
         self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
         self.action_group.add_toggle_actions([self.action])
