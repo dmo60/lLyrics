@@ -19,7 +19,7 @@ import re, os, pango
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, TerraParser, LyrdbParser, Config
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, Config
 
 llyrics_ui = """
 <ui>
@@ -27,13 +27,28 @@ llyrics_ui = """
         <menu name="ViewMenu" action="View">
             <menuitem name="lLyrics" action="ToggleLyricSideBar" />
         </menu>
+        
+        <menu name="lLyrics" action="lLyricsMenuAction">
+            <menu name="ScanSource" action="ScanSourceAction">
+                <menuitem name="ScanLyricwiki" action="Lyricwiki.org"/>
+                <menuitem name="ScanTerra" action="Letras.terra.com.br"/>
+                <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
+                <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
+                <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
+                <separator/>
+                <menuitem name="FromCacheFile" action="From cache file"/>
+                <menuitem action="NotFound"/>
+            </menu>
+            <menuitem name="ScanAll" action="ScanAllAction"/>
+            <menuitem name="ScanNext" action="ScanNextAction"/>
+        </menu>
+        
     </menubar>
     <toolbar name="ToolBar">
             <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
     </toolbar>
 </ui>
 """
-
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
@@ -55,14 +70,15 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.shell = self.object
         self.player = self.shell.props.shell_player
                 
-        self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": TerraParser,\
-                         "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,\
+        self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
+                         "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
                          "Lyrdb.com": LyrdbParser})
         self.config = Config.Config()
         self.sources = self.config.get_lyrics_sources()
         self.cache = self.config.get_cache_lyrics()
         
         self.init_sidebar()
+        self.init_menu()
         
         # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
@@ -70,21 +86,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # search lyrics if song changes 
         self.psc_id = self.player.connect ('playing-song-changed', self.search_lyrics)
         
-        # Add button to toggle visibility of pane
-        self.action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
-                        None, _("Display lyrics for the playing song"),
-                        self.toggle_visibility, True)
-        self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
-        self.action_group.add_toggle_actions([self.action])
-        uim = self.shell.props.ui_manager
-        uim.insert_action_group (self.action_group, 0)
-        self.ui_id = uim.add_ui_from_string(llyrics_ui)
-        uim.ensure_update()
-        
         # hide the button in Small Display mode
-        small_display_toggle = uim.get_widget ("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-        tb_widget = uim.get_widget ("/ToolBar/lLyrics")
+        small_display_toggle = self.uim.get_widget ("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
+        tb_widget = self.uim.get_widget ("/ToolBar/lLyrics")
         self.tb_conn_id = small_display_toggle.connect ('toggled', self.hide_if_active, tb_widget)
+        
+        self.current_source = None
                 
         print "activated plugin lLyrics"
 
@@ -114,41 +121,62 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.shell = None
 
         print "deactivated plugin lLyrics"
+        
+    def init_menu(self):
+        self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
+        
+        toggle_action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
+                        None, _("Display lyrics for the playing song"),
+                        self.toggle_visibility, True)
+        self.action_group.add_toggle_actions([toggle_action])
+        
+        menu_action = Gtk.Action("lLyricsMenuAction", _("Lyrics"), None, None)
+        self.action_group.add_action(menu_action)
+        
+        source_action = Gtk.Action("ScanSourceAction", _("Source"), None, None)
+        self.action_group.add_action(source_action)
+        scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org",
+                                 None, None)
+        scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br",
+                                 None, None)
+        scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com",
+                                 None, None)
+        scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com",
+                                 None, None)
+        scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com",
+                                 None, None)
+        scan_cache_action = ("From cache file", None, "From cache file",
+                                 None, None)
+        not_found_action = ("NotFound", None, "Not found", None, None)
+        
+        self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
+                                              scan_chartlyrics_action, scan_lyrdb_action, scan_cache_action, not_found_action], -1, self.scan_source_action_callback, None)
+        
+        self.action_group.get_action("NotFound").set_visible(False)
+        self.action_group.get_action("NotFound").set_active(True)
+        
+        scan_next_action = ('ScanNextAction', None, _("Scan next source"),
+                            None, _("Scan next lyrics source"), self.scan_next_action_callback)
+        scan_all_action = ("ScanAllAction", None, _("Scan all sources"),
+                           None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
+        
+        self.action_group.add_actions([scan_next_action, scan_all_action])
+        
+        self.uim = self.shell.props.ui_manager
+        self.uim.insert_action_group (self.action_group, 0)
+        self.ui_id = self.uim.add_ui_from_string(llyrics_ui)
+        self.uim.ensure_update()
        
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
                 
-        frame = Gtk.Frame()
         label = Gtk.Label(_("Lyrics"))
-        frame.set_shadow_type(Gtk.ShadowType.IN)
+        label.set_use_markup(True)
+        label.set_padding(0,9)
+        
+        frame = Gtk.Frame()
         frame.set_label_align(0.0,0.0)
         frame.set_label_widget(label)
-        label.set_use_markup(True)
-        label.set_padding(0,4)
-        
-        expander = Gtk.Expander()
-        expander.set_label(_("Lyrics"))
-        expander.set_margin_bottom(5)
-        expander.set_spacing(5)
-        
-        self.combobox = Gtk.ComboBoxText.new()
-        self.combobox.set_margin_right(5)
-        for s in self.sources:
-            self.combobox.append(s, s)
-        self.combobox.append("cache", "From cache file")
-        self.combobox.connect('changed', self.source_changed)
-        self.combobox.set_tooltip_text("Select source to scan for lyrics")
-        
-        self.button = Gtk.Button()
-        self.button.set_label(">")
-        self.button.connect('clicked', self.next_source)
-        self.button.set_tooltip_text("Scan next source in list")
-        
-        hbox = Gtk.HBox()
-        hbox.pack_start(self.combobox, True, True, 0)
-        hbox.pack_end(self.button, False, False, 5)
-        
-        expander.add(hbox)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -159,10 +187,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_pixels_above_lines(5)
         self.textview.set_pixels_below_lines(5)
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
-        
+#        self.textview.connect('populate-popup', self.popup_context_menu)
+                
         # create a ScrollView
         sw = Gtk.ScrolledWindow()
         sw.add(self.textview)
+        sw.set_shadow_type(Gtk.ShadowType.IN)
         
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
@@ -172,10 +202,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
 
         # pack everything into side pane
-#        self.vbox.pack_start  (frame, False, True, 0)
-#        self.vbox.pack_start(hbox, False, False, 0)
-        self.vbox.pack_start(expander, False, False, 0)
-        self.vbox.pack_start (sw, True, True, 0)
+        frame.add(sw)
+        self.vbox.pack_start  (frame, True, True, 0)
 
         self.vbox.show_all()
         self.vbox.set_size_request(200, -1)
@@ -200,7 +228,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         (self.clean_artist, self.clean_title) = self.clean_song_data(self.artist, self.title)
         self.path = self.build_cache_path(self.clean_artist, self.clean_title)
         
-        self.scan_all_sources(self.clean_artist, self.clean_title)
+        self.scan_all_sources(self.clean_artist, self.clean_title, True)
 
     def clean_song_data(self, artist, title):
         # convert to lowercase
@@ -245,20 +273,28 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         else:
             ui_element.show()
             
-    def source_changed(self, combobox):
-        if combobox.get_sensitive():
-            source = combobox.get_active_text()
-            self.scan_source(source, self.clean_artist, self.clean_title)
+    def scan_source_action_callback(self, action, activated_action):        
+        source = activated_action.get_label()
+        if source == "Not found" or source == self.current_source:
+            return
         
-    def next_source(self, button):
-        index = self.combobox.get_active() + 1
-        index = index % (len(self.sources)+1)
+        self.scan_source(source, self.clean_artist, self.clean_title)
+        
+    def scan_next_action_callback(self, action):
+        if self.current_source is None or self.current_source == "From cache file":
+            index = 0
+        else:
+            index = self.sources.index(self.current_source) + 1
+            index = index % (len(self.sources)+1)
         if index >= len(self.sources):
             source = "From cache file"
         else:
             source = self.sources[index]
         
         self.scan_source(source, self.clean_artist, self.clean_title)
+    
+    def scan_all_action_callback(self, action):
+        self.scan_all_sources(self.clean_artist, self.clean_title, False)
     
     def scan_source(self, source, artist, title):
         Gdk.threads_enter()
@@ -267,13 +303,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
           
         newthread = Thread(target=self._scan_source_thread, args=(source, artist, title))
         newthread.start()
-    
-    def _scan_source_thread(self, source, artist, title):
-        Gdk.threads_enter()
-        self.button.set_sensitive(False)
-        self.combobox.set_sensitive(False)        
-        Gdk.threads_leave()
-        
+            
+    def _scan_source_thread(self, source, artist, title):        
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
         else:   
@@ -282,29 +313,25 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             if artist != self.clean_artist or title != self.clean_title:
                 print "song changed"
                 return
-
+                
         Gdk.threads_enter()                
-        self.show_lyrics(self.artist, self.title, lyrics)        
-        self.button.set_sensitive(True)
-        self.combobox.set_sensitive(True)        
+        self.show_lyrics(self.artist, self.title, lyrics)          
         Gdk.threads_leave()
         
-    def scan_all_sources(self, artist, title):
+    def scan_all_sources(self, artist, title, cache):
         
         Gdk.threads_enter()
         self.textbuffer.set_text("searching lyrics...")
         Gdk.threads_leave()
-          
-        newthread = Thread(target=self._scan_all_sources_thread, args=(artist, title))
+            
+        newthread = Thread(target=self._scan_all_sources_thread, args=(artist, title, cache))
         newthread.start()
     
-    def _scan_all_sources_thread(self, artist, title):
-        Gdk.threads_enter()        
-        self.button.set_sensitive(False)
-        self.combobox.set_sensitive(False)        
-        Gdk.threads_leave()
-        
-        lyrics = self.get_lyrics_from_cache(self.path)
+    def _scan_all_sources_thread(self, artist, title, cache):
+        if cache:
+            lyrics = self.get_lyrics_from_cache(self.path)
+        else:
+            lyrics = ""
         
         if lyrics == "":
             i = 0
@@ -316,15 +343,15 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                     return
                 i += 1
             if lyrics == "":
-                self.combobox.set_active(-1)
+                self.action_group.get_action("NotFound").set_active(True)
+                self.current_source = None
+                
         
         Gdk.threads_enter()        
-        self.show_lyrics(self.artist, self.title, lyrics)
-        self.button.set_sensitive(True)
-        self.combobox.set_sensitive(True)        
+        self.show_lyrics(self.artist, self.title, lyrics)     
         Gdk.threads_leave()
         
-    def get_lyrics_from_cache(self, path):
+    def get_lyrics_from_cache(self, path):        
         # try to load lyrics from cache
         if os.path.exists (path):
             try:
@@ -332,9 +359,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 lyrics = cachefile.read()
                 cachefile.close()
                 print "got lyrics from cache"
-                Gdk.threads_enter()
-                self.combobox.set_active_id("cache")
-                Gdk.threads_leave()
+                self.current_source = "From cache file"
+                self.action_group.get_action("From cache file").set_active(True)
                 return lyrics
             except:
                 print "error reading cache file"
@@ -350,11 +376,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             print "error writing lyrics to cache file"
         
     def get_lyrics_from_source(self, source, artist, title):
-        print "source: " + source
-        
-        Gdk.threads_enter()
-        self.combobox.set_active_id(source)
-        Gdk.threads_leave()
+        print "source: " + source        
+        self.current_source = source
+        self.action_group.get_action(source).set_active(True)
         
         parser = self.dict[source].Parser(artist, title)
         lyrics = parser.parse()
@@ -363,7 +387,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             print "got lyrics from source"
             lyrics = lyrics + "\n\n(lyrics from " + source + ")"
             lyrics = lyrics.decode("utf-8", "replace")
-            if lyrics != "" and self.cache:
+            if self.cache:
                 self.write_lyrics_to_cache(self.path, lyrics)
             
         return lyrics    
@@ -381,3 +405,44 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textbuffer.apply_tag(self.tag, start, end)
         
         
+#    def popup_context_menu(self, textview, menu):
+##        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+##            self.tvmenu.popup(None, None, None, None, event.button, event.time)
+#
+#     
+#        # context menu
+#        self.menu_items = [] 
+#        
+#        next_source_item = Gtk.MenuItem.new_with_label("Scan next source")
+#        self.menu_items.append(next_source_item)
+#        next_source_item.connect('activate', self.next_source)
+#        
+#        source_item = Gtk.MenuItem.new_with_label("Scan source")
+#        self.menu_items.append(source_item)
+#                
+#        sources_menu = Gtk.Menu()
+#        
+#        for source in self.sources:
+#            check_item = Gtk.CheckMenuItem.new_with_label(source)
+#            sources_menu.append(check_item)
+#            check_item.connect("toggled", self.source_selected)
+#        
+#        sep = Gtk.SeparatorMenuItem()
+#        sources_menu.append(sep)
+#            
+#        check_item = Gtk.CheckMenuItem.new_with_label("From cache file")
+#        sources_menu.append(check_item)
+#        check_item.connect("toggled", self.source_selected)
+#        
+#        source_item.set_submenu(sources_menu)
+#        
+#        items = menu.get_children()
+#        for item in items:
+#            menu.remove(item)
+#        for item in self.menu_items:
+#            menu.append(item)
+#                
+#        menu.show_all()
+    
+        
+
