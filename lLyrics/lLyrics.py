@@ -41,6 +41,8 @@ llyrics_ui = """
             </menu>
             <menuitem name="ScanAll" action="ScanAllAction"/>
             <menuitem name="ScanNext" action="ScanNextAction"/>
+            <separator/>
+            <menuitem name="Instrumental" action="InstrumentalAction"/>
         </menu>
         
     </menubar>
@@ -159,8 +161,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                             None, _("Scan next lyrics source"), self.scan_next_action_callback)
         scan_all_action = ("ScanAllAction", None, _("Scan all sources"),
                            None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
+        instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
+                               None, _("Mark this song as instrumental"), self.instrumental_action_callback)
         
-        self.action_group.add_actions([scan_next_action, scan_all_action])
+        self.action_group.add_actions([scan_next_action, scan_all_action, instrumental_action])
         
         self.uim = self.shell.props.ui_manager
         self.uim.insert_action_group (self.action_group, 0)
@@ -295,6 +299,15 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     
     def scan_all_action_callback(self, action):
         self.scan_all_sources(self.clean_artist, self.clean_title, False)
+        
+    def instrumental_action_callback(self, action):
+        lyrics = "\n-- Instrumental --"
+        if self.cache:
+            self.write_lyrics_to_cache(self.path, lyrics)
+        self.show_lyrics(self.artist, self.title, lyrics)
+        
+        self.action_group.get_action("NotFound").set_active(True)
+        self.current_source = None        
     
     def scan_source(self, source, artist, title):
         Gdk.threads_enter()
