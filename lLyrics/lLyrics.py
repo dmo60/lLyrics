@@ -80,9 +80,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
                          "Lyrdb.com": LyrdbParser})
-        self.config = Config.Config()
-        self.sources = self.config.get_lyrics_sources()
-        self.cache = self.config.get_cache_lyrics()
+        config = Config.Config()
+        self.sources = config.get_lyrics_sources()
+        self.cache = config.get_cache_lyrics()
         
         self.init_sidebar()
         self.init_menu()
@@ -91,11 +91,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
         # search lyrics if song changes 
-        self.psc_id = self.player.connect ('playing-song-changed', self.search_lyrics)
+        self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
         
         # hide the button in Small Display mode
-        small_display_toggle = self.uim.get_widget ("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-        self.tb_conn_id = small_display_toggle.connect ('toggled', self.hide_if_active)
+        small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
+        self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
         
         self.current_source = None
                 
@@ -104,25 +104,34 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     def do_deactivate(self):    
         if self.visible:
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
-        self.vbox = None
-        self.textview = None
-        self.textbuffer = None
+        
         self.player.disconnect(self.psc_id)
-        del self.psc_id
+        self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
+        
+        self.uim.remove_ui (self.ui_id)
+        self.uim.remove_action_group (self.action_group)
+        self.uim.remove_action_group(self.toggle_action_group)
+        
+        self.uim = None
+        self.vbox = None
+        self.textbuffer = None
+        self.psc_id = None
         self.player_cb_ids = None
         self.visible = None
         self.player = None
-        uim = self.shell.props.ui_manager
-        uim.remove_ui (self.ui_id)
-        uim.remove_action_group (self.action_group)
-        self.action = None
         self.action_group = None
+        self.toggle_action_group = None
         self.cache = None
-        self.config = None
         self.dict = None
         self.sources = None
         self.ui_id = None
         self.tag = None
+        self.current_source = None
+        self.artist = None
+        self.title = None
+        self.clean_artist = None
+        self.clean_title = None
+        self.path = None
         
         self.shell = None
 
@@ -195,24 +204,24 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         frame.set_label_widget(label)
         
         # create a TextView for displaying lyrics
-        self.textview = Gtk.TextView()
-        self.textview.set_editable(False)
-        self.textview.set_cursor_visible(False)
-        self.textview.set_left_margin(10)
-        self.textview.set_right_margin(10)
-        self.textview.set_pixels_above_lines(5)
-        self.textview.set_pixels_below_lines(5)
-        self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
-#        self.textview.connect('populate-popup', self.popup_context_menu)
+        textview = Gtk.TextView()
+        textview.set_editable(False)
+        textview.set_cursor_visible(False)
+        textview.set_left_margin(10)
+        textview.set_right_margin(10)
+        textview.set_pixels_above_lines(5)
+        textview.set_pixels_below_lines(5)
+        textview.set_wrap_mode(Gtk.WrapMode.WORD)
+#        textview.connect('populate-popup', self.popup_context_menu)
                 
         # create a ScrollView
         sw = Gtk.ScrolledWindow()
-        sw.add(self.textview)
+        sw.add(textview)
         sw.set_shadow_type(Gtk.ShadowType.IN)
         
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
-        self.textview.set_buffer(self.textbuffer)
+        textview.set_buffer(self.textbuffer)
         
         # tag to style headers bold and underlined
         self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
