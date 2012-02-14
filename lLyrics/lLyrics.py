@@ -43,6 +43,10 @@ llyrics_ui = """
             <menuitem name="ScanNext" action="ScanNextAction"/>
             <separator/>
             <menuitem name="Instrumental" action="InstrumentalAction"/>
+            <separator/>
+            <menuitem name="Clear" action="ClearAction"/>
+            <menuitem name="SaveToCache" action="SaveToCacheAction"/>
+            <separator/>
         </menu>
         
     </menubar>
@@ -125,12 +129,14 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         print "deactivated plugin lLyrics"
         
     def init_menu(self):
-        self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
+        self.toggle_action_group = Gtk.ActionGroup(name='lLyricsPluginToggleActions')
         
         toggle_action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
                         None, _("Display lyrics for the playing song"),
                         self.toggle_visibility, True)
-        self.action_group.add_toggle_actions([toggle_action])
+        self.toggle_action_group.add_toggle_actions([toggle_action])
+        
+        self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
         
         menu_action = Gtk.Action("lLyricsMenuAction", _("Lyrics"), None, None)
         self.action_group.add_action(menu_action)
@@ -163,10 +169,17 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                            None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
         instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
                                None, _("Mark this song as instrumental"), self.instrumental_action_callback)
+        save_to_cache_action = ("SaveToCacheAction", None, _("Save lyrics"),
+                                None, _("Save current lyrics to the cache file"), self.save_to_cache_action_callback)
+        clear_action = ("ClearAction", None, _("Clear lyrics"), None,
+                        _("Delete current lyrics"), self.clear_action_callback)
         
-        self.action_group.add_actions([scan_next_action, scan_all_action, instrumental_action])
+        self.action_group.add_actions([scan_next_action, scan_all_action, instrumental_action, 
+                                       save_to_cache_action, clear_action])
+        self.action_group.set_sensitive(False)
         
         self.uim = self.shell.props.ui_manager
+        self.uim.insert_action_group (self.toggle_action_group, 0)
         self.uim.insert_action_group (self.action_group, 0)
         self.ui_id = self.uim.add_ui_from_string(llyrics_ui)
         self.uim.ensure_update()
@@ -301,13 +314,29 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.scan_all_sources(self.clean_artist, self.clean_title, False)
         
     def instrumental_action_callback(self, action):
-        lyrics = "\n-- Instrumental --"
-        if self.cache:
-            self.write_lyrics_to_cache(self.path, lyrics)
+        lyrics = "-- Instrumental --"
+        self.write_lyrics_to_cache(self.path, lyrics)
         self.show_lyrics(self.artist, self.title, lyrics)
         
         self.action_group.get_action("NotFound").set_active(True)
-        self.current_source = None        
+        self.current_source = None
+        
+    def save_to_cache_action_callback(self, action):
+        start = self.textbuffer.get_start_iter()
+        start.forward_lines(1)
+        end = self.textbuffer.get_end_iter()
+        lyrics = self.textbuffer.get_text(start, end, False)
+        
+        self.write_lyrics_to_cache(self.path, lyrics)
+        
+    def clear_action_callback(self, action):
+        self.textbuffer.set_text("")
+        try:
+            os.remove(self.path)
+        except:
+            print "No cache file found to clear"
+        self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+        print "cleared lyrics"
     
     def scan_source(self, source, artist, title):
         Gdk.threads_enter()
@@ -317,7 +346,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         newthread = Thread(target=self._scan_source_thread, args=(source, artist, title))
         newthread.start()
             
-    def _scan_source_thread(self, source, artist, title):        
+    def _scan_source_thread(self, source, artist, title):
+        self.action_group.set_sensitive(False)
+             
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
         else:   
@@ -327,9 +358,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 print "song changed"
                 return
                 
-        Gdk.threads_enter()                
+        Gdk.threads_enter()           
         self.show_lyrics(self.artist, self.title, lyrics)          
         Gdk.threads_leave()
+        
+        self.action_group.set_sensitive(True)
         
     def scan_all_sources(self, artist, title, cache):
         
@@ -341,6 +374,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         newthread.start()
     
     def _scan_all_sources_thread(self, artist, title, cache):
+        self.action_group.set_sensitive(False)
+        
         if cache:
             lyrics = self.get_lyrics_from_cache(self.path)
         else:
@@ -363,6 +398,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         Gdk.threads_enter()        
         self.show_lyrics(self.artist, self.title, lyrics)     
         Gdk.threads_leave()
+        
+        self.action_group.set_sensitive(True)
         
     def get_lyrics_from_cache(self, path):        
         # try to load lyrics from cache
@@ -409,6 +446,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         if lyrics == "":
             print "no lyrics found"
             lyrics = "No lyrics found"
+            self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+        else:        
+            self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
             
         self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
         # make 'artist - title' header bold and underlined 
