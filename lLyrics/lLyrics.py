@@ -87,6 +87,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.init_sidebar()
         self.init_menu()
         
+        # used to pop out sidebar on initial start of playback
+        self.first = True
+        
         # search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
@@ -126,6 +129,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.sources = None
         self.ui_id = None
         self.tag = None
+        self.first = None
         self.current_source = None
         self.artist = None
         self.title = None
@@ -247,9 +251,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             self.uim.get_widget("/MenuBar/lLyrics").hide()
         
     def search_lyrics(self, player, entry):
-        if not self.visible:
+        if self.first and not self.visible:
             self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
-            self.visible = True
+            self.first = False
+            
         if entry is None:
             return
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
