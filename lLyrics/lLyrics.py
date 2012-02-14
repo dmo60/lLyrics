@@ -75,6 +75,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     def do_activate(self):      
         self.shell = self.object
         self.player = self.shell.props.shell_player
+        self.uim = self.shell.props.ui_manager
                 
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
@@ -94,8 +95,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         # hide the button in Small Display mode
         small_display_toggle = self.uim.get_widget ("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-        tb_widget = self.uim.get_widget ("/ToolBar/lLyrics")
-        self.tb_conn_id = small_display_toggle.connect ('toggled', self.hide_if_active, tb_widget)
+        self.tb_conn_id = small_display_toggle.connect ('toggled', self.hide_if_active)
         
         self.current_source = None
                 
@@ -133,7 +133,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         toggle_action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
                         None, _("Display lyrics for the playing song"),
-                        self.toggle_visibility, True)
+                        self.toggle_visibility, False)
         self.toggle_action_group.add_toggle_actions([toggle_action])
         
         self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
@@ -178,7 +178,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                                        save_to_cache_action, clear_action])
         self.action_group.set_sensitive(False)
         
-        self.uim = self.shell.props.ui_manager
         self.uim.insert_action_group (self.toggle_action_group, 0)
         self.uim.insert_action_group (self.action_group, 0)
         self.ui_id = self.uim.add_ui_from_string(llyrics_ui)
@@ -224,18 +223,24 @@ class lLyrics(GObject.GObject, Peas.Activatable):
 
         self.vbox.show_all()
         self.vbox.set_size_request(200, -1)
-        self.shell.add_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, True, True)
-        self.visible = True 
+        self.visible = False
     
     def toggle_visibility (self, action):
         if not self.visible:
             self.shell.add_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, True, True)
             self.visible = True
+            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+            self.uim.get_widget("/MenuBar/lLyrics").show()
         else:
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
             self.visible = False
+            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
+            self.uim.get_widget("/MenuBar/lLyrics").hide()
         
     def search_lyrics(self, player, entry):
+        if not self.visible:
+            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+            self.visible = True
         if entry is None:
             return
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
@@ -281,14 +286,19 @@ class lLyrics(GObject.GObject, Peas.Activatable):
     
         return os.path.join(artist_folder, title[:128] + '.lyric')
     
-    def hide_if_active (self, toggle_widget, ui_element):
+    def hide_if_active (self, toggle_widget):
         "Hides ui_element if toggle_widget is active."
         
+        menubar_item = self.uim.get_widget("/MenuBar/lLyrics")
+        toolbar_item = self.uim.get_widget("/ToolBar/lLyrics")
+        
         if (toggle_widget.get_active()):
-            ui_element.hide()
+            toolbar_item.hide()
+            menubar_item.hide()
             
         else:
-            ui_element.show()
+            toolbar_item.show()
+            menubar_item.show()
             
     def scan_source_action_callback(self, action, activated_action):        
         source = activated_action.get_label()
