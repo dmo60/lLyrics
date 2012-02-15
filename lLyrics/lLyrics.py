@@ -38,7 +38,7 @@ llyrics_ui = """
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
                 <separator/>
                 <menuitem name="FromCacheFile" action="From cache file"/>
-                <menuitem action="NotFound"/>
+                <menuitem action="SelectNothing"/>
             </menu>
             <menuitem name="ScanAll" action="ScanAllAction"/>
             <menuitem name="ScanNext" action="ScanNextAction"/>
@@ -165,13 +165,15 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         
     def init_menu(self):
+        # Action to toggle the visibility of the sidebar,
+        # used by the toolbar button and the ViewMenu entry.
         self.toggle_action_group = Gtk.ActionGroup(name='lLyricsPluginToggleActions')
-        
         toggle_action = ('ToggleLyricSideBar','gtk-info', _("Lyrics"),
                         None, _("Display lyrics for the playing song"),
                         self.toggle_visibility, False)
         self.toggle_action_group.add_toggle_actions([toggle_action])
         
+        # Actions used by the lyrics menu
         self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
         
         menu_action = Gtk.Action("lLyricsMenuAction", _("Lyrics"), None, None)
@@ -179,25 +181,23 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         source_action = Gtk.Action("ScanSourceAction", _("Source"), None, None)
         self.action_group.add_action(source_action)
-        scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org",
-                                 None, None)
-        scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br",
-                                 None, None)
-        scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com",
-                                 None, None)
-        scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com",
-                                 None, None)
-        scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com",
-                                 None, None)
-        scan_cache_action = ("From cache file", None, "From cache file",
-                                 None, None)
-        not_found_action = ("NotFound", None, "Not found", None, None)
+        
+        scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org", None, None)
+        scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br", None, None)
+        scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
+        scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
+        scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
+        scan_cache_action = ("From cache file", None, "From cache file", None, None)
+        select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
         self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                              scan_chartlyrics_action, scan_lyrdb_action, scan_cache_action, not_found_action], -1, self.scan_source_action_callback, None)
+                                             scan_chartlyrics_action, scan_lyrdb_action, scan_cache_action, select_nothing_action],
+                                             -1, self.scan_source_action_callback, None)
         
-        self.action_group.get_action("NotFound").set_visible(False)
-        self.action_group.get_action("NotFound").set_active(True)
+        # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
+        # so I use an invisible action for that
+        self.action_group.get_action("SelectNothing").set_visible(False)
+        self.action_group.get_action("SelectNothing").set_active(True)
         
         scan_next_action = ('ScanNextAction', None, _("Scan next source"),
                             None, _("Scan next lyrics source"), self.scan_next_action_callback)
@@ -214,8 +214,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         self.action_group.add_actions([scan_next_action, scan_all_action, instrumental_action, 
                                        save_to_cache_action, clear_action, edit_action])
+        
+        # Make action group insensitive as long as there are no lyrics displayed
         self.action_group.set_sensitive(False)
         
+        # Insert the UI
         self.uim.insert_action_group (self.toggle_action_group, 0)
         self.uim.insert_action_group (self.action_group, 0)
         self.ui_id = self.uim.add_ui_from_string(llyrics_ui)
@@ -293,6 +296,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             
         
     def search_lyrics(self, player, entry):
+        # pop out sidebar at first playback
         if self.first and not self.visible:
             self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
             self.first = False
@@ -364,7 +368,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             
     def scan_source_action_callback(self, action, activated_action):        
         source = activated_action.get_label()
-        if source == "Not found" or source == self.current_source:
+        if source == "SelectNothing" or source == self.current_source:
             return
         
         self.scan_source(source, self.clean_artist, self.clean_title)
@@ -396,7 +400,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.write_lyrics_to_cache(self.path, lyrics)
         self.show_lyrics(self.artist, self.title, lyrics)
         
-        self.action_group.get_action("NotFound").set_active(True)
+        self.action_group.get_action("SelectNothing").set_active(True)
         self.current_source = None
         
         
@@ -555,19 +559,19 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                     return
                 i += 1
         
+        # We can't display new lyrics while user is editing! 
         self.edit_event.wait()
+        
         # check if playing song changed
         if artist != self.clean_artist or title != self.clean_title:
             print "song changed"
             return
             
         if lyrics == "":
-            self.action_group.get_action("NotFound").set_active(True)
+            self.action_group.get_action("SelectNothing").set_active(True)
             self.current_source = None  
         
-        Gdk.threads_enter()
         self.show_lyrics(self.artist, self.title, lyrics)
-        Gdk.threads_leave()  
         
         self.action_group.set_sensitive(True)
         
@@ -602,6 +606,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             
         
     def get_lyrics_from_source(self, source, artist, title):
+        # Playing song might change during search, so we want to 
+        # conserve the correct cache path.
+        path = self.path
+        
         print "source: " + source        
         self.current_source = source
         self.action_group.get_action(source).set_active(True)
@@ -614,7 +622,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             lyrics = lyrics + "\n\n(lyrics from " + source + ")"
             lyrics = lyrics.decode("utf-8", "replace")
             if self.cache:
-                self.write_lyrics_to_cache(self.path, lyrics)
+                self.write_lyrics_to_cache(path, lyrics)
             
         return lyrics    
     
@@ -628,7 +636,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         else:        
             self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
         
-#        Gdk.threads_enter()
+        Gdk.threads_enter()
         
         self.textbuffer.set_text(artist + " - " + title + "\n" + lyrics)
         # make 'artist - title' header bold and underlined 
@@ -637,7 +645,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         end.forward_to_line_end()
         self.textbuffer.apply_tag(self.tag, start, end)
         
-#        Gdk.threads_leave()
+        Gdk.threads_leave()
         
         
 #    def popup_context_menu(self, textview, menu):
