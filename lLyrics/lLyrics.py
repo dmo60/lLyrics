@@ -13,9 +13,8 @@
 
 
 from gi.repository import GObject, Peas, Gdk, RB, Gtk
-import threading
 from threading import Thread
-import re, os, pango
+import re, os, pango, threading, webbrowser
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
@@ -42,6 +41,8 @@ llyrics_ui = """
             </menu>
             <menuitem name="ScanAll" action="ScanAllAction"/>
             <menuitem name="ScanNext" action="ScanNextAction"/>
+            <separator/>
+            <menuitem name="SearchOnline" action="SearchOnlineAction"/>
             <separator/>
             <menuitem name="Instrumental" action="InstrumentalAction"/>
             <separator/>
@@ -199,10 +200,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.action_group.get_action("SelectNothing").set_visible(False)
         self.action_group.get_action("SelectNothing").set_active(True)
         
-        scan_next_action = ('ScanNextAction', None, _("Scan next source"),
+        scan_next_action = ("ScanNextAction", None, _("Scan next source"),
                             None, _("Scan next lyrics source"), self.scan_next_action_callback)
         scan_all_action = ("ScanAllAction", None, _("Scan all sources"),
                            None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
+        search_online_action = ("SearchOnlineAction", None, _("Search online"),
+                                None, _("Search lyrics for the current song online (opens your web browser)"), self.search_online_action_callback)
         instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
                                None, _("Mark this song as instrumental"), self.instrumental_action_callback)
         save_to_cache_action = ("SaveToCacheAction", None, _("Save lyrics"),
@@ -212,8 +215,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         edit_action = ("EditAction", None, _("Edit lyrics"), None,
                        _("Manually edit current lyrics"), self.edit_action_callback)
         
-        self.action_group.add_actions([scan_next_action, scan_all_action, instrumental_action, 
-                                       save_to_cache_action, clear_action, edit_action])
+        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action,
+                                       instrumental_action, save_to_cache_action, clear_action, edit_action])
         
         # Make action group insensitive as long as there are no lyrics displayed
         self.action_group.set_sensitive(False)
@@ -231,11 +234,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 
         label = Gtk.Label(_("Lyrics"))
         label.set_use_markup(True)
-        label.set_padding(0,9)
-        
-        frame = Gtk.Frame()
-        frame.set_label_align(0.0,0.0)
-        frame.set_label_widget(label)
+        label.set_padding(3, 9)
+        label.set_alignment(0, 0)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -249,9 +249,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
 #        self.textview.connect('populate-popup', self.popup_context_menu)
                 
         # create a ScrollView
-        self.sw = Gtk.ScrolledWindow()
-        self.sw.add(self.textview)
-        self.sw.set_shadow_type(Gtk.ShadowType.IN)
+        sw = Gtk.ScrolledWindow()
+        sw.add(self.textview)
+        sw.set_shadow_type(Gtk.ShadowType.IN)
         
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
@@ -270,8 +270,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.hbox.pack_start(cancel_button, True, True, 3)
         
         # pack everything into side pane
-        frame.add(self.sw)
-        self.vbox.pack_start  (frame, True, True, 0)
+        self.vbox.pack_start(label, False, False, 0)
+        self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
 
         self.vbox.show_all()
@@ -394,7 +394,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.scan_all_sources(self.clean_artist, self.clean_title, False)
         
         
+    def search_online_action_callback(self, action):
+        webbrowser.open("http://www.google.com/search?q=" + self.clean_artist + "+" + self.clean_title + "+lyrics")
         
+        
+            
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
         self.write_lyrics_to_cache(self.path, lyrics)
