@@ -14,7 +14,7 @@
 
 from gi.repository import GObject, Peas, Gdk, RB, Gtk
 from threading import Thread
-import re, os, pango, threading, webbrowser
+import re, os, threading, webbrowser, pango, urllib2
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
@@ -50,6 +50,8 @@ llyrics_ui = """
             <menuitem name="SaveToCache" action="SaveToCacheAction"/>
             <separator/>
             <menuitem name="Edit" action="EditAction"/>
+            <separator/>
+            <menuitem name="SearchMeanings" action="SearchMeaningsAction"/>
         </menu>
         
     </menubar>
@@ -59,7 +61,8 @@ llyrics_ui = """
 </ui>
 """
 
-LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
+LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
+                   "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
@@ -138,7 +141,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textbuffer = None
         self.textview = None
         self.psc_id = None
-        self.player_cb_ids = None
         self.visible = None
         self.player = None
         self.action_group = None
@@ -206,6 +208,9 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                            None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
         search_online_action = ("SearchOnlineAction", None, _("Search online"),
                                 None, _("Search lyrics for the current song online (opens your web browser)"), self.search_online_action_callback)
+        search_meanings_action = ("SearchMeaningsAction", None, _("Look up song meanings"),
+                                  None, _("Search song meanings for the current title online on songmeanings.net (opens your web browser)"), 
+                                  self.search_meanings_action_callback)
         instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
                                None, _("Mark this song as instrumental"), self.instrumental_action_callback)
         save_to_cache_action = ("SaveToCacheAction", None, _("Save lyrics"),
@@ -215,7 +220,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         edit_action = ("EditAction", None, _("Edit lyrics"), None,
                        _("Manually edit current lyrics"), self.edit_action_callback)
         
-        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action,
+        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action, search_meanings_action,
                                        instrumental_action, save_to_cache_action, clear_action, edit_action])
         
         # Make action group insensitive as long as there are no lyrics displayed
@@ -246,7 +251,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_pixels_above_lines(5)
         self.textview.set_pixels_below_lines(5)
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
-#        self.textview.connect('populate-popup', self.popup_context_menu)
                 
         # create a ScrollView
         sw = Gtk.ScrolledWindow()
@@ -258,7 +262,8 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_buffer(self.textbuffer)
         
         # tag to style headers bold and underlined
-        self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, pixels_above_lines=10, pixels_below_lines=20)
+        self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, 
+                                              pixels_above_lines=10, pixels_below_lines=20)
         
         # create save and cancel buttons for edited lyrics
         save_button = Gtk.Button.new_with_label(_("Save"))
@@ -295,14 +300,16 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             
             
         
-    def search_lyrics(self, player, entry):
+    def search_lyrics(self, player, entry):            
+        if entry is None:
+            return
+        
         # pop out sidebar at first playback
         if self.first and not self.visible:
             self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
             self.first = False
             
-        if entry is None:
-            return
+        # get the song data
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
         print "search lyrics for " + self.artist + " - " + self.title
@@ -398,6 +405,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         webbrowser.open("http://www.google.com/search?q=" + self.clean_artist + "+" + self.clean_title + "+lyrics")
         
         
+    
+    def search_meanings_action_callback(self, action):
+        newthread = Thread(target=self._search_meanings_thread, args=(self.clean_artist, self.clean_title))
+        newthread.start()
+    
+    
             
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
@@ -555,7 +568,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         if lyrics == "":
             i = 0
-            while lyrics == "" and i < len(self.sources):
+            while lyrics == "" and i in range(len(self.sources)):
                 lyrics = self.get_lyrics_from_source(self.sources[i], artist, title)
                 # check if playing song changed
                 if artist != self.clean_artist or title != self.clean_title:
@@ -651,45 +664,59 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         Gdk.threads_leave()
         
-        
-#    def popup_context_menu(self, textview, menu):
-##        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-##            self.tvmenu.popup(None, None, None, None, event.button, event.time)
-#
-#     
-#        # context menu
-#        self.menu_items = [] 
-#        
-#        next_source_item = Gtk.MenuItem.new_with_label("Scan next source")
-#        self.menu_items.append(next_source_item)
-#        next_source_item.connect('activate', self.next_source)
-#        
-#        source_item = Gtk.MenuItem.new_with_label("Scan source")
-#        self.menu_items.append(source_item)
-#                
-#        sources_menu = Gtk.Menu()
-#        
-#        for source in self.sources:
-#            check_item = Gtk.CheckMenuItem.new_with_label(source)
-#            sources_menu.append(check_item)
-#            check_item.connect("toggled", self.source_selected)
-#        
-#        sep = Gtk.SeparatorMenuItem()
-#        sources_menu.append(sep)
-#            
-#        check_item = Gtk.CheckMenuItem.new_with_label("From cache file")
-#        sources_menu.append(check_item)
-#        check_item.connect("toggled", self.source_selected)
-#        
-#        source_item.set_submenu(sources_menu)
-#        
-#        items = menu.get_children()
-#        for item in items:
-#            menu.remove(item)
-#        for item in self.menu_items:
-#            menu.append(item)
-#                
-#        menu.show_all()
     
+    
+    def _search_meanings_thread(self, artist, title):
+        link = self.get_songmeanings_link(artist, title)
+        if link == "":
+            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.WARNING, 
+                                       Gtk.ButtonsType.CLOSE, "No song meanings found")
+            dialog.format_secondary_markup("You can try to search manually on <a href=\"http://www.songmeanings.net\">www.songmeanings.net</a>")
+            
+            Gdk.threads_enter()
+            dialog.run()
+            Gdk.threads_leave()
+            
+            Gdk.threads_enter()
+            dialog.destroy()
+            Gdk.threads_leave()
+        else:
+            print "open songmeanings link: " + link
+            webbrowser.open(link)
+            
+    
+    
+    def get_songmeanings_link(self, artist, title):
+        # format artist, e.g. "the strokes" -> "strokes, the"
+        if re.match("the .*", artist) is not None:
+            artist = artist[4:] + ", the"
+        # Get the artist's song list from songmeanings.net
+        url = "http://www.songmeanings.net/artist/view/songs/" + artist.replace(" ", "%20")
+        print "songmeanings url: " + url
+        try:
+            resp = urllib2.urlopen(url, None, 3).read()
+        except:
+            print "could not connect to songmeanings.net"
+            return ""
         
-
+        start = resp.find("<!-- SONGS BEGINS -->")
+        end = resp.find("<!-- SONGS ENDS -->")
+        if start == -1 or end == -1:
+            print "songmeanings: song list not found"
+            return ""
+        resp = resp[start:end]
+        
+        # find the correct title and return the link if found
+        songs = resp.split("</tr>")
+        for song in songs:
+            if re.search(title, song, re.I) is not None:
+                match = re.search("\<a href\=\"(\/songs\/view\/[0-9]*\/\#comment)\"\>[0-9]*\<\/a\>\<\/td\>", song)
+                if match is None:
+                    print "songmeanings: title not found"
+                    return ""
+                link = match.group(1)
+                return "http://www.songmeanings.net" + link
+        
+        print "no song meanings found"
+        return ""
+        
