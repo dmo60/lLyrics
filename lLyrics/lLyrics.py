@@ -19,7 +19,7 @@ import re, os, threading, webbrowser, pango, urllib2, chardet
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, Config
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser, Config
 
 llyrics_ui = """
 <ui>
@@ -35,6 +35,7 @@ llyrics_ui = """
                 <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
                 <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
+                <menuitem name="ScanSogou" action="Sogou.com"/>
                 <separator/>
                 <menuitem name="FromCacheFile" action="From cache file"/>
                 <menuitem action="SelectNothing"/>
@@ -66,7 +67,7 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", "Sogou.com"]
 
 
 class lLyrics(GObject.GObject, Peas.Activatable):
@@ -91,7 +92,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
-                         "Lyrdb.com": LyrdbParser})
+                         "Lyrdb.com": LyrdbParser, "Sogou.com": SogouParser})
         
         # Get the user preferences
         config = Config.Config()
@@ -190,11 +191,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
         scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
         scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
+        scan_sogou_action = ("Sogou.com", None, "Sogou.com", None, None)
         scan_cache_action = ("From cache file", None, "From cache file", None, None)
         select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
         self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                             scan_chartlyrics_action, scan_lyrdb_action, scan_cache_action, select_nothing_action],
+                                             scan_chartlyrics_action, scan_lyrdb_action, scan_sogou_action, scan_cache_action, select_nothing_action],
                                              -1, self.scan_source_action_callback, None)
         
         # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
