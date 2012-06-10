@@ -105,6 +105,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # Create flag, used to pop out sidebar on initial start of playback
         self.first = True
         
+        # Event flag indicates whether the user is currently editing lyrics
+        self.edit_event = threading.Event()
+        self.edit_event.set()
+        
+        self.current_source = None
+        
         # Search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
@@ -114,12 +120,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # Hide the lLyrics UI elements when in Small Display mode
         small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
         self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
-        
-        # Event flag indicates whether the user is currently editing lyrics
-        self.edit_event = threading.Event()
-        self.edit_event.set()
-        
-        self.current_source = None
                 
         print "activated plugin lLyrics"
         
