@@ -119,8 +119,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
         
         # Hide the lLyrics UI elements when in Small Display mode
-        small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-        self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
+        # Since Rhythmbox 2.97 there is no longer a SmallDisplayMode, but for now we keep it for compatibility 
+        try:
+            small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
+            self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
+        except:
+            pass
                 
         print "activated plugin lLyrics"
         
@@ -131,7 +135,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
         
         self.player.disconnect(self.psc_id)
-        self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
+        try:
+            self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
+        except:
+            pass
         
         self.uim.remove_ui (self.ui_id)
         self.uim.remove_action_group (self.action_group)
