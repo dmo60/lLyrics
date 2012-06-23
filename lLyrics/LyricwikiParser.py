@@ -90,7 +90,7 @@ class Parser(HTMLParser):
         resp = resp.replace("<br\n/>", "&#10;").replace("<br />", "&#10;").replace("<i>", "").replace("</i>", "").replace("&#", "");
         
         # decode characters
-        resp = self.decode_chars(resp)
+        resp = decode_chars(resp)
         
         # if lyrics incomplete, skip!
         if resp.find("[...]") != -1:
@@ -99,16 +99,16 @@ class Parser(HTMLParser):
         
         return resp
     
-    @staticmethod
-    def decode_chars(resp):
-        chars = resp.split(";")
-        resp = ""
-        for c in chars:
-            try:
-                resp = resp + unichr(int(c))
-            except:
-                print "unknown character " + c
-        return resp
+    
+def decode_chars(resp):
+    chars = resp.split(";")
+    resp = ""
+    for c in chars:
+        try:
+            resp = resp + unichr(int(c))
+        except:
+            print "unknown character " + c
+    return resp
         
         
         
