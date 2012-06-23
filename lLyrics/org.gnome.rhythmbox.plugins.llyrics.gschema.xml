@@ -8,7 +8,7 @@
 			<description>
 				Lyrics sources are scanned in the order they are given in this list, you can rearrange them or delete particular sources completely. 
 Separate values by comma. 
-Possbile values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'
+Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'
 			</description>
 		</key>
 		
