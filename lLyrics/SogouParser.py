@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, urllib2
+import re, urllib2, chardet
 
 class Parser():
 
@@ -50,5 +50,11 @@ class Parser():
         except:
             print "could not download sogou lrc file"
             return ""
-
+        
+        try:
+            encoding = chardet.detect(lyrics)['encoding']
+        except:
+            encoding = 'gb18030'
+            lyrics = lyrics.decode(encoding, 'replace')
+        
         return lyrics
