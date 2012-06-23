@@ -1,5 +1,5 @@
 # install schema
-sudo cp ./lLyrics/org.gnome.rhythmbox.plugins.llyrics.gschema.xml /usr/share/glib-2.0/schemas/
+sudo cp ./org.gnome.rhythmbox.plugins.llyrics.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # install plugin
