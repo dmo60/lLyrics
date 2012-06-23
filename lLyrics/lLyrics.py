@@ -20,6 +20,7 @@ import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
 import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser, Config
+from Config import ConfigDialog
 
 llyrics_ui = """
 <ui>
@@ -70,14 +71,14 @@ LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", "Sogou.com"]
 
 
-class lLyrics(GObject.GObject, Peas.Activatable):
-    __gtype_name = 'lLyrics'
-    object = GObject.property(type=GObject.GObject)
+class lLyrics(GObject.Object, Peas.Activatable):
+    __gtype_name__ = 'lLyrics'
+    object = GObject.property(type=GObject.Object)
     
     
     
     def __init__(self):
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
         GObject.threads_init()
         Gdk.threads_init()
         
@@ -96,8 +97,10 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         
         # Get the user preferences
         config = Config.Config()
-        self.sources = config.get_lyrics_sources()
-        self.cache = config.get_cache_lyrics()
+        self.settings = config.get_settings()
+        self.get_user_preferences(self.settings, None, config)
+        # Watch for setting changes
+        self.skc_id = self.settings.connect('changed', self.get_user_preferences, config)
         
         # Initialize the UI
         self.init_sidebar()
@@ -134,6 +137,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         if self.visible:
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
         
+        self.settings.disconnect(self.skc_id)
         self.player.disconnect(self.psc_id)
         try:
             self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
@@ -174,7 +178,13 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         print "deactivated plugin lLyrics"
         
         
+    
+    def get_user_preferences(self, settings, key, config):
+        self.sources = config.get_lyrics_sources()
+        self.cache = config.get_cache_lyrics()
+
         
+           
     def init_menu(self):
         # Action to toggle the visibility of the sidebar,
         # used by the toolbar button and the ViewMenu entry.
