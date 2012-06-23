@@ -2,14 +2,16 @@
 <schemalist>
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
-		<key name="lyrics-sources" type="as">
+		<key name="active-sources" type="as">
 			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com']</default>
 			<summary>List of lyrics sources to be scanned</summary>
-			<description>
-				Lyrics sources are scanned in the order they are given in this list, you can rearrange them or delete particular sources completely. 
-Separate values by comma. 
-Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'
-			</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'</description>
+		</key>
+		
+		<key name="scanning-order" type="as">
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com']</default>
+			<summary>Sources are scanned in this order</summary>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'</description>
 		</key>
 		
 		<key name="cache-lyrics" type="b">
