@@ -12,15 +12,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import GObject, Peas, Gdk, RB, Gtk
+from gi.repository import GObject, Peas, Gdk, RB, Gtk, Pango
 from threading import Thread
-import re, os, threading, webbrowser, pango, urllib2, chardet
+import re, os, threading, webbrowser, urllib2, chardet
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
 import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser, Config
-from Config import ConfigDialog
+from Config import ConfigDialog, Config
 
 llyrics_ui = """
 <ui>
@@ -96,7 +96,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                          "Lyrdb.com": LyrdbParser, "Sogou.com": SogouParser})
         
         # Get the user preferences
-        config = Config.Config()
+        config = Config()
         self.settings = config.get_settings()
         self.get_user_preferences(self.settings, None, config)
         # Watch for setting changes
@@ -281,7 +281,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textview.set_buffer(self.textbuffer)
         
         # tag to style headers bold and underlined
-        self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, 
+        self.tag = self.textbuffer.create_tag(None, underline=Pango.Underline.SINGLE, weight=600, 
                                               pixels_above_lines=10, pixels_below_lines=20)
         
         # create save and cancel buttons for edited lyrics
