@@ -95,6 +95,6 @@ class Parser():
         resp = resp[:-1]
         
         # decode characters
-        resp = LyricwikiParser.Parser.decode_chars(resp)
+        resp = LyricwikiParser.decode_chars(resp)
         
         return resp

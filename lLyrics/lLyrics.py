@@ -12,14 +12,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from gi.repository import GObject, Peas, Gdk, RB, Gtk
+from gi.repository import GObject, Peas, Gdk, RB, Gtk, Pango
 from threading import Thread
-import re, os, threading, webbrowser, pango, urllib2
+import re, os, threading, webbrowser, urllib2, chardet
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, Config
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser, Config
+from Config import ConfigDialog, Config
 
 llyrics_ui = """
 <ui>
@@ -35,6 +36,7 @@ llyrics_ui = """
                 <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
                 <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
+                <menuitem name="ScanSogou" action="Sogou.com"/>
                 <separator/>
                 <menuitem name="FromCacheFile" action="From cache file"/>
                 <menuitem action="SelectNothing"/>
@@ -66,17 +68,17 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", "Sogou.com"]
 
 
-class lLyrics(GObject.GObject, Peas.Activatable):
-    __gtype_name = 'lLyrics'
-    object = GObject.property(type=GObject.GObject)
+class lLyrics(GObject.Object, Peas.Activatable):
+    __gtype_name__ = 'lLyrics'
+    object = GObject.property(type=GObject.Object)
     
     
     
     def __init__(self):
-        GObject.GObject.__init__(self)
+        GObject.Object.__init__(self)
         GObject.threads_init()
         Gdk.threads_init()
         
@@ -91,12 +93,14 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
-                         "Lyrdb.com": LyrdbParser})
+                         "Lyrdb.com": LyrdbParser, "Sogou.com": SogouParser})
         
         # Get the user preferences
-        config = Config.Config()
-        self.sources = config.get_lyrics_sources()
-        self.cache = config.get_cache_lyrics()
+        config = Config()
+        self.settings = config.get_settings()
+        self.get_user_preferences(self.settings, None, config)
+        # Watch for setting changes
+        self.skc_id = self.settings.connect('changed', self.get_user_preferences, config)
         
         # Initialize the UI
         self.init_sidebar()
@@ -118,8 +122,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
         
         # Hide the lLyrics UI elements when in Small Display mode
-        small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-        self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
+        # Since Rhythmbox 2.97 there is no longer a SmallDisplayMode, but for now we keep it for compatibility 
+        try:
+            small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
+            self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
+        except:
+            pass
                 
         print "activated plugin lLyrics"
         
@@ -129,8 +137,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         if self.visible:
             self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
         
+        self.settings.disconnect(self.skc_id)
         self.player.disconnect(self.psc_id)
-        self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
+        try:
+            self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
+        except:
+            pass
         
         self.uim.remove_ui (self.ui_id)
         self.uim.remove_action_group (self.action_group)
@@ -166,7 +178,13 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         print "deactivated plugin lLyrics"
         
         
+    
+    def get_user_preferences(self, settings, key, config):
+        self.sources = config.get_lyrics_sources()
+        self.cache = config.get_cache_lyrics()
+
         
+           
     def init_menu(self):
         # Action to toggle the visibility of the sidebar,
         # used by the toolbar button and the ViewMenu entry.
@@ -190,11 +208,12 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
         scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
         scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
+        scan_sogou_action = ("Sogou.com", None, "Sogou.com", None, None)
         scan_cache_action = ("From cache file", None, "From cache file", None, None)
         select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
         self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                             scan_chartlyrics_action, scan_lyrdb_action, scan_cache_action, select_nothing_action],
+                                             scan_chartlyrics_action, scan_lyrdb_action, scan_sogou_action, scan_cache_action, select_nothing_action],
                                              -1, self.scan_source_action_callback, None)
         
         # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
@@ -262,7 +281,7 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         self.textview.set_buffer(self.textbuffer)
         
         # tag to style headers bold and underlined
-        self.tag = self.textbuffer.create_tag(None, underline=pango.UNDERLINE_SINGLE, weight=600, 
+        self.tag = self.textbuffer.create_tag(None, underline=Pango.Underline.SINGLE, weight=600, 
                                               pixels_above_lines=10, pixels_below_lines=20)
         
         # create save and cancel buttons for edited lyrics
@@ -601,6 +620,11 @@ class lLyrics(GObject.GObject, Peas.Activatable):
                 cachefile = open(path, "r")
                 lyrics = cachefile.read()
                 cachefile.close()
+                try:
+                    encoding = chardet.detect(lyrics)['encoding']
+                except:
+                    encoding = "utf-8"
+                lyrics = lyrics.decode(encoding, 'replace')
                 print "got lyrics from cache"
                 self.current_source = "From cache file"
                 self.action_group.get_action("From cache file").set_active(True)
@@ -637,7 +661,6 @@ class lLyrics(GObject.GObject, Peas.Activatable):
         if lyrics != "":
             print "got lyrics from source"
             lyrics = lyrics + "\n\n(lyrics from " + source + ")"
-            lyrics = lyrics.decode("utf-8", "replace")
             if self.cache:
                 self.write_lyrics_to_cache(path, lyrics)
             

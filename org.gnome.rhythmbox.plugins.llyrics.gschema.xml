@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
+		
+		<key name="active-sources" type="as">
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com']</default>
+			<summary>List of lyrics sources to be scanned</summary>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'</description>
+		</key>
+		
+		<key name="scanning-order" type="as">
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com']</default>
+			<summary>Sources are scanned in this order</summary>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'</description>
+		</key>
+		
+		<key name="cache-lyrics" type="b">
+			<default>true</default>
+			<summary>Whether lyrics are saved or not</summary>
+			<description>
+				If set to True, lyrics are stored under "~/.cache/rhythmbox/lyrics/". 
+Set to False to disable this (note that in this case, lyrics sources have to be rescanned everytime).
+			</description>
+		</key>
+
+	</schema>
+</schemalist>
