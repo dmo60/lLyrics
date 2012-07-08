@@ -14,12 +14,12 @@
 
 from gi.repository import GObject, Peas, Gdk, RB, Gtk, Pango
 from threading import Thread
-import re, os, threading, webbrowser, urllib2, chardet
+import re, os, threading, webbrowser, urllib2
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser, Config
+import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser
 from Config import ConfigDialog, Config
 
 llyrics_ui = """
@@ -620,11 +620,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 cachefile = open(path, "r")
                 lyrics = cachefile.read()
                 cachefile.close()
-                try:
-                    encoding = chardet.detect(lyrics)['encoding']
-                except:
-                    encoding = "utf-8"
-                lyrics = lyrics.decode(encoding, 'replace')
+#                try:
+#                    encoding = chardet.detect(lyrics)['encoding']
+#                except:
+#                    encoding = "utf-8"
+#                lyrics = lyrics.decode(encoding, 'replace')
                 print "got lyrics from cache"
                 self.current_source = "From cache file"
                 self.action_group.get_action("From cache file").set_active(True)
@@ -661,6 +661,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if lyrics != "":
             print "got lyrics from source"
             lyrics = lyrics + "\n\n(lyrics from " + source + ")"
+            lyrics = lyrics.encode("utf-8", "replace")
             if self.cache:
                 self.write_lyrics_to_cache(path, lyrics)
             
