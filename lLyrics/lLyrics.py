@@ -258,7 +258,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
         label = Gtk.Label(_("Lyrics"))
         label.set_use_markup(True)
-        label.set_padding(3, 9)
+        label.set_padding(3, 11)
         label.set_alignment(0, 0)
         
         # create a TextView for displaying lyrics
