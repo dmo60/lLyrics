@@ -14,7 +14,7 @@
 
 from gi.repository import GObject, Peas, Gdk, RB, Gtk, Pango, GdkPixbuf
 from threading import Thread
-import re, os, threading, webbrowser, urllib2
+import re, os, threading, webbrowser, urllib2, rb
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
@@ -187,16 +187,16 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
            
     def init_menu(self):
+        # Create an icon for the toolbar button
+        icon_factory = Gtk.IconFactory()
+        pxbf = GdkPixbuf.Pixbuf.new_from_file(rb.find_plugin_file(self, "book-open-icon.png"))
+        icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
+        icon_factory.add_default()
+        
         # Action to toggle the visibility of the sidebar,
         # used by the toolbar button and the ViewMenu entry.
-	icon_factory = Gtk.IconFactory()
-	pxbf = GdkPixbuf.Pixbuf.new_from_file(self.find_file("book-open-icon.png"))
-	icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
-	icon_factory.add_default()
-
         self.toggle_action_group = Gtk.ActionGroup(name='lLyricsPluginToggleActions')
-#'gtk-info'
-        toggle_action = ('ToggleLyricSideBar',STOCK_IMAGE, _("Lyrics"),
+        toggle_action = ('ToggleLyricSideBar', STOCK_IMAGE, _("Lyrics"),
                         None, _("Display lyrics for the playing song"),
                         self.toggle_visibility, False)
         self.toggle_action_group.add_toggle_actions([toggle_action])
@@ -752,13 +752,4 @@ class lLyrics(GObject.Object, Peas.Activatable):
         return ""
         
 
-    def find_file(self, filename):
-	info = self.plugin_info
-	data_dir = info.get_data_dir()
-	path = os.path.join(data_dir, filename)
-
-	if os.path.exists(path):
-		return path
-
-	return RB.file(filename)
 
