@@ -211,7 +211,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def init_menu(self):
         # Create an icon for the toolbar button
         icon_factory = Gtk.IconFactory()
-        pxbf = GdkPixbuf.Pixbuf.new_from_file(rb.find_plugin_file(self, "book-open-icon.png"))
+        pxbf = GdkPixbuf.Pixbuf.new_from_file(rb.find_plugin_file(self, "lLyrics-icon.png"))
         icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
         icon_factory.add_default()
         
