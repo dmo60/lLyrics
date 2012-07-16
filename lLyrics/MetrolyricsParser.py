@@ -13,12 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2, re, string
+import urllib2
+import re
+import string
+
 from HTMLParser import HTMLParser
 
 import LyricwikiParser
 
-class Parser():
+class Parser(object):
     
     def __init__(self, artist, title):
         self.artist = artist

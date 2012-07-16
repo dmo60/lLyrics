@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2, string
+import urllib2
+import string
+
 from HTMLParser import HTMLParser
 
 class Parser(HTMLParser):

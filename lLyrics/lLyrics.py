@@ -11,16 +11,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+import os
+import threading
+import urllib2
+import webbrowser
 
-from gi.repository import GObject, Peas, Gdk, RB, Gtk, Pango, GdkPixbuf
 from threading import Thread
-import re, os, threading, webbrowser, urllib2, rb
+
+from gi.repository import GObject
+from gi.repository import Peas
+from gi.repository import Gdk
+from gi.repository import RB
+from gi.repository import Gtk
+from gi.repository import Pango
+from gi.repository import GdkPixbuf
+
+import rb
+
+import ChartlyricsParser
+import LyricwikiParser
+import MetrolyricsParser
+import LetrasTerraParser
+import LyrdbParser
+import SogouParser
+
+from Config import Config
+from Config import ConfigDialog
 
 import gettext
 gettext.install('rhythmbox', RB.locale_dir())
 
-import ChartlyricsParser, LyricwikiParser, MetrolyricsParser, LetrasTerraParser, LyrdbParser, SogouParser
-from Config import ConfigDialog, Config
 
 llyrics_ui = """
 <ui>
@@ -71,6 +92,7 @@ LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", "Sogou.com"]
 
 STOCK_IMAGE = "stock-llyrics-button"
+
 
 class lLyrics(GObject.Object, Peas.Activatable):
     __gtype_name__ = 'lLyrics'

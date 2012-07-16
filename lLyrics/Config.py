@@ -13,7 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gio, GObject, PeasGtk, Gtk
+from gi.repository import Gio
+from gi.repository import GObject
+from gi.repository import PeasGtk
+from gi.repository import Gtk
+
 import lLyrics
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'

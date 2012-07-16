@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2, string
+import urllib2
+import string
 
-class Parser():
+class Parser(object):
     
     def __init__(self, artist, title):
         self.artist = artist
