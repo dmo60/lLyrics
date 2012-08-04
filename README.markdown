@@ -15,7 +15,7 @@ Rhythmbox ships with a lyrics plugin, that is more or less broken and doesn't in
 Lyrics sources
 ---------------
 
-  - Lyrikwiki.org
+  - Lyricwiki.org
   - Letras.terra.com.br
   - Metrolyrics.com
   - Chartlyrics.com
@@ -40,7 +40,7 @@ Note that Rhythmbox version 2.90 or higher is required to run lLyrics!
 Credits
 ---------------
 
-I was inspired from the awesome Songbird plugin [MLyrics](https://github.com/FreeleX/MLyrics).
+I was inspired by the awesome Songbird plugin [MLyrics](https://github.com/FreeleX/MLyrics).
 Thanks to all who contribute, report issues or help in any other way to make this plugin better.
 
 You will always find the latest version on [GitHub](https://github.com/dmo60/lLyrics).
