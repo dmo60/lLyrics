@@ -36,6 +36,7 @@ Installation
 
 To install this plugin, just run the "install.sh" script and afterwards enable "lLyrics" plugin in Rhythmbox under 'Edit > Plugins'.
 
+Note that Rhythmbox version 2.90 or higher is required to run lLyrics!
 
 
 Credits
