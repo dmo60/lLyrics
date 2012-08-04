@@ -7,27 +7,23 @@ Rhythmbox ships with a lyrics plugin, that is more or less broken and doesn't in
 
 
 
-![Screenshot](https://docs.google.com/open?id=0B9oJ91xHShBXZXdoRUlNSFpYc2s)
+![Screenshot](http://www.dmo60.de/lLyricsScreenshot.png)
 
-
-
-You will always find the latest version at https://github.com/dmo60/lLyrics.
-
-Please report bugs, issues or feature requests to https://github.com/dmo60/lLyrics/issues
 
 
 
 Lyrics sources
 ---------------
 
-Lyrikwiki.org
-Letras.terra.com.br
-Metrolyrics.com
-Chartlyrics.com
-Lyrdb.com
-Sogou.com (provides synchronized lyrics which is not implemented yet)
+  - Lyrikwiki.org
+  - Letras.terra.com.br
+  - Metrolyrics.com
+  - Chartlyrics.com
+  - Lyrdb.com
+  - Sogou.com (provides synchronized lyrics which is not implemented yet)
 
 More may come in the future...
+
 
 
 
@@ -39,10 +35,15 @@ To install this plugin, just run the "install.sh" script and afterwards enable "
 Note that Rhythmbox version 2.90 or higher is required to run lLyrics!
 
 
+
+
 Credits
 ---------------
 
 I was inspired from the awesome Songbird plugin [MLyrics](https://github.com/FreeleX/MLyrics).
 Thanks to all who contribute, report issues or help in any other way to make this plugin better.
+
+You will always find the latest version on [GitHub](https://github.com/dmo60/lLyrics).
+Please report bugs, issues or feature requests there.
 
 All lyrics are property and copyright of their owners.
