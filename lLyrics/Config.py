@@ -36,12 +36,6 @@ class Config(object):
                 entries.remove(source)
                 changed = True
                 print "remove invalid entry in active-sources: " + source
-                
-#        # if list is empty, set default
-#        if len(entries) == 0:
-#            self.settings.reset("active-sources")
-#            print "set dconf lyrics_sources default"
-#            return
         
         # update key, if changed
         if changed:
@@ -104,14 +98,14 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         switch.connect("notify::active", self.switch_toggled, "cache-lyrics")
         
         label = Gtk.Label()
-        label.set_text("Cache lyrics")
+        label.set_text(_("Cache lyrics"))
         
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(switch, False, False, 5)
         dialog.pack_start(hbox, False, False, 5)
         
         # check buttons for lyric sources
-        label = Gtk.Label("Lyric sources:")
+        label = Gtk.Label(_("Sources:"))
         label.set_alignment(0, 0)
         label.set_padding(5, 0)
         label.set_use_markup(True)

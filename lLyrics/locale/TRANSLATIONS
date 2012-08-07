@@ -1,0 +1,13 @@
+Help with translation is appreciated!
+
+If you want to provide locales for your language, start like this:
+
+1) 	Run "intltool-update -p -g messages".
+	This will recreate the messages.pot file so that is up to date with the latest lLyrics source files.
+
+2)	Run "msginit --locale=YOUR_LANGUAGE_CODE".
+	Replace YOUR_LANGUAGE_CODE with your appropriate language short cut, e.g. "fr" for French or "ru" for Russian.
+	This will create a new .po file with your language code.
+	
+Now you can translate all messages in the .po file into your language. The original string is given by "msgid", your translation should go to "msgstr".
+

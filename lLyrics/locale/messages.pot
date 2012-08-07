@@ -1,0 +1,132 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-08-07 18:23+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lLyrics.py:219 ../lLyrics.py:227 ../lLyrics.py:286
+msgid "Lyrics"
+msgstr ""
+
+#: ../lLyrics.py:220
+msgid "Display lyrics for the current playing song"
+msgstr ""
+
+#: ../lLyrics.py:230
+msgid "Source"
+msgstr ""
+
+#: ../lLyrics.py:239
+msgid "From cache file"
+msgstr ""
+
+#: ../lLyrics.py:251
+msgid "Scan next source"
+msgstr ""
+
+#: ../lLyrics.py:252
+msgid "Scan next lyrics source"
+msgstr ""
+
+#: ../lLyrics.py:253
+msgid "Scan all sources"
+msgstr ""
+
+#: ../lLyrics.py:254
+msgid "Rescan all lyrics sources"
+msgstr ""
+
+#: ../lLyrics.py:255
+msgid "Search online"
+msgstr ""
+
+#: ../lLyrics.py:256
+msgid "Search lyrics for the current song online"
+msgstr ""
+
+#: ../lLyrics.py:257
+msgid "Look up song meanings"
+msgstr ""
+
+#: ../lLyrics.py:258
+msgid "Search song meanings for the current title online on songmeanings.net"
+msgstr ""
+
+#: ../lLyrics.py:260
+msgid "Mark as instrumental"
+msgstr ""
+
+#: ../lLyrics.py:261
+msgid "Mark this song as instrumental"
+msgstr ""
+
+#: ../lLyrics.py:262
+msgid "Save lyrics"
+msgstr ""
+
+#: ../lLyrics.py:263
+msgid "Save current lyrics to the cache file"
+msgstr ""
+
+#: ../lLyrics.py:264
+msgid "Clear lyrics"
+msgstr ""
+
+#: ../lLyrics.py:265
+msgid "Delete current lyrics"
+msgstr ""
+
+#: ../lLyrics.py:266
+msgid "Edit lyrics"
+msgstr ""
+
+#: ../lLyrics.py:267
+msgid "Edit current lyrics"
+msgstr ""
+
+#. create save and cancel buttons for edited lyrics
+#: ../lLyrics.py:315
+msgid "Save"
+msgstr ""
+
+#: ../lLyrics.py:317
+msgid "Cancel"
+msgstr ""
+
+#: ../lLyrics.py:532 ../lLyrics.py:557 ../lLyrics.py:569 ../lLyrics.py:599
+msgid "searching lyrics..."
+msgstr ""
+
+#: ../lLyrics.py:699
+msgid "No lyrics found"
+msgstr ""
+
+#: ../lLyrics.py:721
+msgid "No song meanings found"
+msgstr ""
+
+#: ../lLyrics.py:722
+msgid "You can try to search manually on"
+msgstr ""
+
+#: ../Config.py:101
+msgid "Cache lyrics"
+msgstr ""
+
+#. check buttons for lyric sources
+#: ../Config.py:108
+msgid "Sources:"
+msgstr ""
