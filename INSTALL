@@ -1,0 +1,16 @@
+INSTALL for current user only:
+
+1) Open a terminal in your current directory (the one where the INSTALL file and Makefile is located).
+2) Run "make install".
+3) Enable plugin in Rhythmbox under 'Edit > Plugins'
+
+INSTALL system wide for all users:
+
+1) Open a terminal in your current directory (the one where the INSTALL file and Makefile is located).
+2) Run "make install-systemwide".
+3) Enable plugin in Rhythmbox under 'Edit > Plugins'
+
+UNINSTALL:
+
+1) Open a terminal in your current directory (the one where the INSTALL file and Makefile is located).
+2) Run "make uninstall".
