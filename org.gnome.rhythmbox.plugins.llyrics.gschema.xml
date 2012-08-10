@@ -18,8 +18,16 @@
 			<default>true</default>
 			<summary>Whether lyrics are saved or not</summary>
 			<description>
-				If set to True, lyrics are stored under "~/.cache/rhythmbox/lyrics/". 
+				If set to True, lyrics are stored in 'lyrics-folder' (default is "~/.cache/rhythmbox/lyrics/"). 
 Set to False to disable this (note that in this case, lyrics sources have to be rescanned everytime).
+			</description>
+		</key>
+		
+		<key name="lyrics-folder" type="s">
+			<default>"~/.cache/rhythmbox/lyrics"</default>
+			<summary>Folder where fetched lyrics are saved</summary>
+			<description>
+				Default is "~/.cache/rhythmbox/lyrics/". Folder must exist, otherwise key is reset to default.
 			</description>
 		</key>
 

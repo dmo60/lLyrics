@@ -203,6 +203,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def get_user_preferences(self, settings, key, config):
         self.sources = config.get_lyrics_sources()
         self.cache = config.get_cache_lyrics()
+        self.lyrics_folder = config.get_lyrics_folder()
 
         
            
@@ -391,13 +392,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def build_cache_path(self, artist, title):
-        folder = os.path.join(RB.user_cache_dir(), "lyrics")
-    
-        lyrics_folder = os.path.expanduser (folder)
-        if not os.path.exists (lyrics_folder):
-            os.mkdir (lyrics_folder)
-    
-        artist_folder = os.path.join(lyrics_folder, artist[:128])
+        artist_folder = os.path.join(self.lyrics_folder, artist[:128])
         if not os.path.exists (artist_folder):
             os.mkdir (artist_folder)
     

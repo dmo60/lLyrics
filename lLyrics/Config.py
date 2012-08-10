@@ -13,10 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import PeasGtk
 from gi.repository import Gtk
+from gi.repository import RB
 
 import lLyrics
 
@@ -61,6 +64,28 @@ class Config(object):
         # update key, if changed
         if changed:
             self.settings["scanning-order"] = entries
+            
+    def check_lyrics_folder(self):
+        folder = self.settings["lyrics-folder"]
+        changed = False
+        
+        # expand user directory
+        if "~" in folder:
+            folder = os.path.expanduser(folder)
+            changed = True
+            
+        # path not set or invalid
+        if not folder or not os.path.exists(folder):
+            folder = os.path.join(RB.user_cache_dir(), "lyrics")
+            folder = os.path.expanduser(folder)
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            changed = True
+            print "invalid path in lyrics-folder, set to default"
+        
+        if changed:
+            self.settings["lyrics-folder"] = folder
+        
     
     def get_settings(self):
         return self.settings
@@ -77,6 +102,10 @@ class Config(object):
     
     def get_cache_lyrics(self):
         return self.settings["cache-lyrics"]
+    
+    def get_lyrics_folder(self):
+        self.check_lyrics_folder()
+        return self.settings["lyrics-folder"]
     
   
     
@@ -97,11 +126,23 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         switch.set_active(self.settings["cache-lyrics"])
         switch.connect("notify::active", self.switch_toggled, "cache-lyrics")
         
-        label = Gtk.Label()
-        label.set_text(_("Cache lyrics"))
+        label = Gtk.Label(_("Save lyrics "))
         
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(switch, False, False, 5)
+        dialog.pack_start(hbox, False, False, 5)
+        
+        # file chooser for lyrics-folder
+        hbox = Gtk.HBox()
+        file_chooser = Gtk.FileChooserButton()
+        file_chooser.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        file_chooser.set_current_folder(self.settings["lyrics-folder"])
+        file_chooser.connect("current-folder-changed", self.folder_set)
+        
+        label = Gtk.Label(_("Folder for lyrics"))
+        
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(file_chooser, True, True, 5)
         dialog.pack_start(hbox, False, False, 5)
         
         # check buttons for lyric sources
@@ -119,15 +160,14 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             check.connect("toggled", self.source_toggled, source)
             hbox.pack_start(check, True, True, 3)
             
-#            if not self.settings["scanning-order"].index(source) == 0:
             button_up = Gtk.Button(u'\u2191')
-            button_up.connect("clicked", self.source_up, source, hbox, vbox, "up")
+            button_up.connect("clicked", self.reorder_sources, source, hbox, vbox, "up")
             hbox.pack_start(button_up, False, False, 3)
             if self.settings["scanning-order"].index(source) == 0:
                 button_up.set_sensitive(False)
             
             button_down = Gtk.Button(u'\u2193')
-            button_down.connect("clicked", self.source_up, source, hbox, vbox, "down")
+            button_down.connect("clicked", self.reorder_sources, source, hbox, vbox, "down")
             hbox.pack_start(button_down, False, False, 3)
             if self.settings["scanning-order"].index(source) == len(self.settings["scanning-order"]) - 1:
                 button_down.set_sensitive(False)
@@ -154,7 +194,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             
         self.settings["active-sources"] = entries
         
-    def source_up(self, button, source, hbox, vbox, direction):
+    def reorder_sources(self, button, source, hbox, vbox, direction):
         rows = vbox.get_children()
         if direction == "up":
             new_index = rows.index(hbox) - 1
@@ -179,6 +219,12 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         entries.remove(source)
         entries.insert(new_index, source)
         self.settings["scanning-order"] = entries
+        
+    def folder_set(self, file_chooser):
+        new_folder = file_chooser.get_current_folder()
+        if self.settings["lyrics-folder"] != new_folder:
+            print "folder changed"
+            self.settings["lyrics-folder"] = new_folder
         
         
         
