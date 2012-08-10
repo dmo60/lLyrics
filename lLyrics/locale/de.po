@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 13:25+0200\n"
+"POT-Creation-Date: 2012-08-10 16:02+0200\n"
 "PO-Revision-Date: 2012-08-05 12:01+0200\n"
 "Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
 "Language-Team: German\n"
@@ -17,7 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lLyrics.py:220 ../lLyrics.py:228 ../lLyrics.py:287
+#: ../lLyrics.py:220
+#: ../lLyrics.py:228
+#: ../lLyrics.py:287
 msgid "Lyrics"
 msgstr "Liedtexte"
 
@@ -63,8 +65,7 @@ msgstr "Bedeutung des Liedes nachschlagen"
 
 #: ../lLyrics.py:259
 msgid "Search song meanings for the current title online on songmeanings.net"
-msgstr ""
-"Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
+msgstr "Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
 
 #: ../lLyrics.py:261
 msgid "Mark as instrumental"
@@ -98,8 +99,8 @@ msgstr "Liedtext bearbeiten"
 msgid "Edit current lyrics"
 msgstr "Löscht aktuellen Liedtext"
 
-#. create save and cancel buttons for edited lyrics
 #: ../lLyrics.py:316
+#. create save and cancel buttons for edited lyrics
 msgid "Save"
 msgstr "Speichern"
 
@@ -107,7 +108,10 @@ msgstr "Speichern"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: ../lLyrics.py:527 ../lLyrics.py:552 ../lLyrics.py:564 ../lLyrics.py:594
+#: ../lLyrics.py:527
+#: ../lLyrics.py:552
+#: ../lLyrics.py:564
+#: ../lLyrics.py:594
 msgid "searching lyrics..."
 msgstr "suche Liedtexte..."
 
@@ -128,10 +132,15 @@ msgid "Save lyrics "
 msgstr "Liedtexte speichern"
 
 #: ../Config.py:142
+msgid "default"
+msgstr "Standardeinstellung"
+
+#: ../Config.py:145
 msgid "Folder for lyrics"
 msgstr "Ordner für Liedtexte"
 
+#: ../Config.py:153
 #. check buttons for lyric sources
-#: ../Config.py:149
 msgid "Sources:"
 msgstr "Quellen:"
+
