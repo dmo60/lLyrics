@@ -139,10 +139,14 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         file_chooser.set_current_folder(self.settings["lyrics-folder"])
         file_chooser.connect("current-folder-changed", self.folder_set)
         
+        default_button = Gtk.Button(_("default"))
+        default_button.connect("clicked", self.set_folder_default, file_chooser)
+        
         label = Gtk.Label(_("Folder for lyrics"))
         
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(file_chooser, True, True, 5)
+        hbox.pack_start(default_button, False, False, 5)
         dialog.pack_start(hbox, False, False, 5)
         
         # check buttons for lyric sources
@@ -225,8 +229,9 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         if self.settings["lyrics-folder"] != new_folder:
             print "folder changed"
             self.settings["lyrics-folder"] = new_folder
-        
-        
+    
+    def set_folder_default(self, button, file_chooser):
+        file_chooser.set_current_folder(os.path.join(RB.user_cache_dir(), "lyrics"))
         
         
         
