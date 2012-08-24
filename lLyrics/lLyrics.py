@@ -33,6 +33,7 @@ import MetrolyricsParser
 import LetrasTerraParser
 import LyrdbParser
 import SogouParser
+import Util
 
 from Config import Config
 from Config import ConfigDialog
@@ -135,12 +136,16 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.edit_event.set()
         
         self.current_source = None
+        self.tags = None
+        self.current_tag = None
         
         # Search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
         # Search lyrics everytime the song changes 
         self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
+        # Connect to elapsed-changed signal to handle synchronized lyrics
+        self.pec_id = self.player.connect('elapsed-changed', self.elapsed_changed)
         
         # Hide the lLyrics UI elements when in Small Display mode
         # Since Rhythmbox 2.97 there is no longer a SmallDisplayMode, but for now we keep it for compatibility 
@@ -160,6 +165,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         self.settings.disconnect(self.skc_id)
         self.player.disconnect(self.psc_id)
+        self.player.disconnect(self.pec_id)
         try:
             self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
         except:
@@ -311,6 +317,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # tag to style headers bold and underlined
         self.tag = self.textbuffer.create_tag(None, underline=Pango.Underline.SINGLE, weight=600, 
                                               pixels_above_lines=10, pixels_below_lines=20)
+        # tag to highlight synchronized lyrics
+        self.sync_tag = self.textbuffer.create_tag(None, weight=600)
         
         # create save and cancel buttons for edited lyrics
         save_button = Gtk.Button.new_with_label(_("Save"))
@@ -347,7 +355,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
             
         
-    def search_lyrics(self, player, entry):            
+    def search_lyrics(self, player, entry):
+        # clear sync stuff
+        if self.tags is not None:
+            self.tags = None
+            self.current_tag = None
+            start, end = self.textbuffer.get_bounds()
+            self.textbuffer.remove_tag(self.sync_tag, start, end)
+                
         if entry is None:
             return
         
@@ -491,6 +506,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Conserve lyrics in order to restore original lyrics when editing is canceled 
         start, end = self.textbuffer.get_bounds()
         self.lyrics_before_edit = self.textbuffer.get_text(start, end, False)
+        # remove sync tag
+        self.textbuffer.remove_tag(self.sync_tag, start, end)
         # Conserve cache path in order to be able to correctly save edited lyrics although
         # the playing song might have changed during editing.
         self.path_before_edit = self.path
@@ -695,6 +712,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
         else:        
             self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
+            lyrics, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()
         
@@ -706,7 +724,41 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textbuffer.apply_tag(self.tag, start, end)
         
         Gdk.threads_leave()
+    
+    
+    
+    def elapsed_changed(self, player, seconds):
+        if not self.tags or not self.edit_event.is_set():
+            return
         
+        matching_tag = None
+        for tag in self.tags:
+            time, _ = tag
+            if time > seconds:
+                break
+            matching_tag = tag
+        
+        if matching_tag is None or self.current_tag == matching_tag:
+            return
+        
+        self.current_tag = matching_tag
+        
+        Gdk.threads_enter()
+        
+        # remove old tag
+        start, end = self.textbuffer.get_bounds()
+        self.textbuffer.remove_tag(self.sync_tag, start, end)
+        
+        # highlight next line
+        line = self.tags.index(self.current_tag) + 1
+        start = self.textbuffer.get_iter_at_line(line)
+        end = start.copy()
+        end.forward_to_line_end()
+        self.textbuffer.apply_tag(self.sync_tag, start, end)
+        self.textview.scroll_to_iter(start, 0.1, False, 0, 0)
+        
+        Gdk.threads_leave()
+                
     
     
     def _search_meanings_thread(self, artist, title):
