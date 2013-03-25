@@ -79,7 +79,7 @@ class Parser(object):
             print "lyrics start not found"
             return ""
         resp = resp[start:]
-        end = resp.find("</div")
+        end = resp.find("<link itemprop=\"name\"")
         if end == -1:
             print "lyrics end not found "
             return ""
@@ -88,6 +88,7 @@ class Parser(object):
         # replace unwanted parts
         resp = resp.replace("<span class='line line-s' id='line_1'>", "")
         resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>\<span style\=\'color:#888888;font-size:0\.75em\'\>\[.+\]\</span\>", "", resp)
+        resp = re.sub("<meta itemprop=\"line\" content=\".*?\" />", "", resp)
         resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>", "&#10;", resp)
         resp = re.sub("\<em class\=\"smline sm\" data-meaningid\=\"[0-9]+\" \>", "", resp)
         resp = re.sub("(\</em\>)?\</span\>", "", resp)
