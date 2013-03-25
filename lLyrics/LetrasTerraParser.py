@@ -42,7 +42,7 @@ class Parser(object):
             return ""
         
         # find title id
-        match = re.search("\<li\>\<a class\=\"elemsug\" href\=\"/" + clean_artist + "/([0-9]*)/\"\>" + re.escape(self.title) + "\</a\>\</li\>", resp, re.I)
+        match = re.search("\<a itemprop\=\"url\" href\=\"/" + clean_artist + "/([0-9]*)/\"\>\<span itemprop\=\"name\"\>" + re.escape(self.title) + "\</span\>\</a\>", resp, re.I)
         if match is None:
             print "could not find title"
             return ""
@@ -69,11 +69,11 @@ class Parser(object):
             print "lyrics start not found"
             return ""
         resp = resp[(start+3):]
-        end = resp.find("</p></div>")
+        end = resp.find("</div>")
         if end == -1:
             print "lyrics end not found "
             return ""
-        resp = resp[:(end-1)]
+        resp = resp[:(end-4)]
         
         # replace unwanted parts
         resp = resp.replace("<br/>", "")
