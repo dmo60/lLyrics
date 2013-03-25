@@ -19,7 +19,7 @@ import string
 
 from HTMLParser import HTMLParser
 
-import LyricwikiParser
+import Util
 
 class Parser(object):
     
@@ -98,6 +98,6 @@ class Parser(object):
         resp = resp[:-1]
         
         # decode characters
-        resp = LyricwikiParser.decode_chars(resp)
+        resp =Util.decode_chars(resp)
         
         return resp

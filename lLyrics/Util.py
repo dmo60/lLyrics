@@ -20,6 +20,18 @@
 import re
 
 
+def decode_chars(resp):
+    chars = resp.split(";")
+    resp = ""
+    for c in chars:
+        try:
+            resp = resp + unichr(int(c))
+        except:
+            print "unknown character " + c
+    return resp
+
+
+
 def parse_lrc(data):
     tag_regex = "(\[\d+\:\d+\.\d*])"
     match = re.search(tag_regex, data)
