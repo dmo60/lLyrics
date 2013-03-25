@@ -71,8 +71,6 @@ llyrics_ui = """
             <menuitem name="SaveToCache" action="SaveToCacheAction"/>
             <separator/>
             <menuitem name="Edit" action="EditAction"/>
-            <separator/>
-            <menuitem name="SearchMeanings" action="SearchMeaningsAction"/>
         </menu>
         
     </menubar>
@@ -255,9 +253,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
                            None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
         search_online_action = ("SearchOnlineAction", None, _("Search online"),
                                 None, _("Search lyrics for the current song online"), self.search_online_action_callback)
-        search_meanings_action = ("SearchMeaningsAction", None, _("Look up song meanings"),
-                                  None, _("Search song meanings for the current title online on songmeanings.net"), 
-                                  self.search_meanings_action_callback)
         instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
                                None, _("Mark this song as instrumental"), self.instrumental_action_callback)
         save_to_cache_action = ("SaveToCacheAction", None, _("Save lyrics"),
@@ -267,7 +262,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         edit_action = ("EditAction", None, _("Edit lyrics"), None,
                        _("Edit current lyrics"), self.edit_action_callback)
         
-        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action, search_meanings_action,
+        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action,
                                        instrumental_action, save_to_cache_action, clear_action, edit_action])
         
         # Make action group insensitive as long as there are no lyrics displayed
@@ -442,15 +437,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.scan_all_sources(self.clean_artist, self.clean_title, False)
         
         
+        
     def search_online_action_callback(self, action):
         webbrowser.open("http://www.google.com/search?q=%s+%s+lyrics" % (self.clean_artist, self.clean_title))
         
-        
-    
-    def search_meanings_action_callback(self, action):
-        newthread = Thread(target=self._search_meanings_thread, args=(self.clean_artist, self.clean_title))
-        newthread.start()
-    
     
             
     def instrumental_action_callback(self, action):
@@ -707,61 +697,3 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         Gdk.threads_leave()
         
-    
-    
-    def _search_meanings_thread(self, artist, title):
-        link = self.get_songmeanings_link(artist, title)
-        if link == "":
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.WARNING, 
-                                       Gtk.ButtonsType.CLOSE, _("No song meanings found"))
-            dialog.format_secondary_markup(_("You can try to search manually on") + " <a href=\"http://www.songmeanings.net\">www.songmeanings.net</a>")
-            
-            Gdk.threads_enter()
-            dialog.run()
-            Gdk.threads_leave()
-            
-            Gdk.threads_enter()
-            dialog.destroy()
-            Gdk.threads_leave()
-        else:
-            print "open songmeanings link: " + link
-            webbrowser.open(link)
-            
-    
-    
-    def get_songmeanings_link(self, artist, title):
-        # format artist, e.g. "the strokes" -> "strokes, the"
-        if re.match("the .*", artist) is not None:
-            artist = artist[4:] + ", the"
-        # Get the artist's song list from songmeanings.net
-        url = "http://www.songmeanings.net/artist/view/songs/" + artist.replace(" ", "%20")
-        print "songmeanings url: " + url
-        try:
-            resp = urllib2.urlopen(url, None, 3).read()
-        except:
-            print "could not connect to songmeanings.net"
-            return ""
-        
-        start = resp.find("<!-- SONGS BEGINS -->")
-        end = resp.find("<!-- SONGS ENDS -->")
-        if start == -1 or end == -1:
-            print "songmeanings: song list not found"
-            return ""
-        resp = resp[start:end]
-        
-        # find the correct title and return the link if found
-        songs = resp.split("</tr>")
-        for song in songs:
-            if re.search(title, song, re.I) is not None:
-                match = re.search("\<a href\=\"(\/songs\/view\/[0-9]*\/\#comment)\"\>[0-9]*\<\/a\>\<\/td\>", song)
-                if match is None:
-                    print "songmeanings: title not found"
-                    return ""
-                link = match.group(1)
-                return "http://www.songmeanings.net" + link
-        
-        print "no song meanings found"
-        return ""
-        
-
-
