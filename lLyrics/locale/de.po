@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 16:02+0200\n"
+"POT-Creation-Date: 2013-03-26 16:18+0100\n"
 "PO-Revision-Date: 2012-08-05 12:01+0200\n"
 "Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
 "Language-Team: German\n"
@@ -17,115 +17,98 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lLyrics.py:220
-#: ../lLyrics.py:228
-#: ../lLyrics.py:287
+#: ../lLyrics.py:242 ../lLyrics.py:250 ../lLyrics.py:308
 msgid "Lyrics"
 msgstr "Liedtexte"
 
-#: ../lLyrics.py:221
+#: ../lLyrics.py:243
 msgid "Display lyrics for the current playing song"
 msgstr "Zeige Liedtext für den gerade gespielten Titel"
 
-#: ../lLyrics.py:231
+#: ../lLyrics.py:253
 msgid "Source"
 msgstr "Quelle"
 
-#: ../lLyrics.py:240
+#: ../lLyrics.py:262
+msgid "External"
+msgstr "Extern"
+
+#: ../lLyrics.py:263
 msgid "From cache file"
 msgstr "Aus Cache Datei"
 
-#: ../lLyrics.py:252
+#: ../lLyrics.py:276
 msgid "Scan next source"
 msgstr "Durchsuche nächste Quelle"
 
-#: ../lLyrics.py:253
+#: ../lLyrics.py:277
 msgid "Scan next lyrics source"
 msgstr "Die nächste Liedtext Quelle durchsuchen"
 
-#: ../lLyrics.py:254
+#: ../lLyrics.py:278
 msgid "Scan all sources"
 msgstr "Durchsuche alle Quellen"
 
-#: ../lLyrics.py:255
+#: ../lLyrics.py:279
 msgid "Rescan all lyrics sources"
 msgstr "Alle Liedtext Quellen erneut durchsuchen"
 
-#: ../lLyrics.py:256
+#: ../lLyrics.py:280
 msgid "Search online"
 msgstr "Online suchen"
 
-#: ../lLyrics.py:257
+#: ../lLyrics.py:281
 msgid "Search lyrics for the current song online"
 msgstr "Sucht online nach Liedtexten für den gerade gespielten Titel"
 
-#: ../lLyrics.py:258
-msgid "Look up song meanings"
-msgstr "Bedeutung des Liedes nachschlagen"
-
-#: ../lLyrics.py:259
-msgid "Search song meanings for the current title online on songmeanings.net"
-msgstr "Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
-
-#: ../lLyrics.py:261
+#: ../lLyrics.py:282
 msgid "Mark as instrumental"
 msgstr "Als instrumental markieren"
 
-#: ../lLyrics.py:262
+#: ../lLyrics.py:283
 msgid "Mark this song as instrumental"
 msgstr "Markiert diesen Titel als instrumental"
 
-#: ../lLyrics.py:263
+#: ../lLyrics.py:284
 msgid "Save lyrics"
 msgstr "Liedtext speichern"
 
-#: ../lLyrics.py:264
+#: ../lLyrics.py:285
 msgid "Save current lyrics to the cache file"
 msgstr "Speichert aktuellen Liedtext in die Cache Datei"
 
-#: ../lLyrics.py:265
+#: ../lLyrics.py:286
 msgid "Clear lyrics"
 msgstr "Liedtext löschen"
 
-#: ../lLyrics.py:266
+#: ../lLyrics.py:287
 msgid "Delete current lyrics"
 msgstr "Löscht aktuellen Liedtext"
 
-#: ../lLyrics.py:267
+#: ../lLyrics.py:288
 msgid "Edit lyrics"
 msgstr "Liedtext bearbeiten"
 
-#: ../lLyrics.py:268
+#: ../lLyrics.py:289
 msgid "Edit current lyrics"
 msgstr "Löscht aktuellen Liedtext"
 
-#: ../lLyrics.py:316
 #. create save and cancel buttons for edited lyrics
+#: ../lLyrics.py:339
 msgid "Save"
 msgstr "Speichern"
 
-#: ../lLyrics.py:318
+#: ../lLyrics.py:341
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: ../lLyrics.py:527
-#: ../lLyrics.py:552
-#: ../lLyrics.py:564
-#: ../lLyrics.py:594
+#: ../lLyrics.py:555 ../lLyrics.py:580 ../lLyrics.py:592 ../lLyrics.py:622
 msgid "searching lyrics..."
 msgstr "suche Liedtexte..."
 
-#: ../lLyrics.py:694
+#: ../lLyrics.py:732
 msgid "No lyrics found"
 msgstr "Keine Liedtexte gefunden"
-
-#: ../lLyrics.py:716
-msgid "No song meanings found"
-msgstr "Keine Liedbedeutungen gefunden"
-
-#: ../lLyrics.py:717
-msgid "You can try to search manually on"
-msgstr "Du kannst versuchen manuell zu suchen auf"
 
 #: ../Config.py:129
 msgid "Save lyrics "
@@ -139,8 +122,35 @@ msgstr "Standardeinstellung"
 msgid "Folder for lyrics"
 msgstr "Ordner für Liedtexte"
 
-#: ../Config.py:153
 #. check buttons for lyric sources
+#: ../Config.py:153
 msgid "Sources:"
 msgstr "Quellen:"
 
+#: ../Config.py:181
+msgid ""
+"Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
+"I can not guarantee that the provided engines work properly! They might have "
+"bugs or make the plugin crash!\n"
+"If you experience any problems, try to deselect some lyrics sites in the "
+"'lyrics' plugin's preference dialog or deactivate the 'External' source."
+msgstr ""
+"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin.\n"
+"Ich kann nicht garantieren, dass die darin bereitgestellten Parser richtig funktionieren! Sie können "
+"Fehler enthalten oder das Plugin zum Abstürzen bringen!\n"
+"Falls Sie auf Probleme treffen, versuchen Sie im Einstellungsdialog des 'Liedtexte' Plugins Seiten zu deselektieren "
+"oder deaktivieren Sie 'Externe' Quellen."
+
+#~ msgid "Look up song meanings"
+#~ msgstr "Bedeutung des Liedes nachschlagen"
+
+#~ msgid ""
+#~ "Search song meanings for the current title online on songmeanings.net"
+#~ msgstr ""
+#~ "Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
+
+#~ msgid "No song meanings found"
+#~ msgstr "Keine Liedbedeutungen gefunden"
+
+#~ msgid "You can try to search manually on"
+#~ msgstr "Du kannst versuchen manuell zu suchen auf"
