@@ -155,6 +155,11 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label.set_padding(5, 0)
         label.set_use_markup(True)
         
+        label2 = Gtk.Label(_("('External' calls the Rhythmbox built-in lyrics plugin)"))
+        label2.set_alignment(0, 0)
+        label2.set_padding(5, 0)
+        label2.set_use_markup(True)
+        
         vbox = Gtk.VBox()
         vbox.set_margin_left(30)
         for source in self.settings["scanning-order"]:
@@ -179,6 +184,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             vbox.pack_start(hbox, False, False, 0)
         
         dialog.pack_start(label, False, False, 0)
+        dialog.pack_start(label2, False, False, 0)
         dialog.pack_start(vbox, False, False, 0)
         
         dialog.show_all()

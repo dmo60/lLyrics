@@ -16,6 +16,7 @@ import os
 import threading
 import urllib2
 import webbrowser
+import sys
 
 from threading import Thread
 
@@ -33,6 +34,7 @@ import MetrolyricsParser
 import LetrasTerraParser
 import LyrdbParser
 import SogouParser
+import External
 import Util
 
 from Config import Config
@@ -57,6 +59,8 @@ llyrics_ui = """
                 <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
                 <menuitem name="ScanSogou" action="Sogou.com"/>
+                <separator/>
+                <menuitem name="External" action="External"/>
                 <separator/>
                 <menuitem name="FromCacheFile" action="From cache file"/>
                 <menuitem action="SelectNothing"/>
@@ -86,7 +90,8 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", "Sogou.com"]
+LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "Chartlyrics.com", "Lyrdb.com", 
+               "Sogou.com", "External"]
 
 STOCK_IMAGE = "stock-llyrics-button"
 
@@ -113,7 +118,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "Chartlyrics.com": ChartlyricsParser,
-                         "Lyrdb.com": LyrdbParser, "Sogou.com": SogouParser})
+                         "Lyrdb.com": LyrdbParser, "Sogou.com": SogouParser, "External": External})
+        self.add_builtin_lyrics_sources()
         
         # Get the user preferences
         config = Config()
@@ -152,7 +158,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
         except:
             pass
-                
+        
         print "activated plugin lLyrics"
         
         
@@ -201,7 +207,20 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.shell = None
 
         print "deactivated plugin lLyrics"
-        
+    
+    
+    
+    def add_builtin_lyrics_sources(self):
+        # find and append path for built-in lyrics plugin
+        for p in sys.path:
+            if p.endswith("/rhythmbox/plugins/rb"):
+                path = p.replace("/rb", "/lyrics")
+                sys.path.append(path)
+                break
+        else:
+            print "Path to built-in lyrics plugin could not be detected"
+            return
+    
         
     
     def get_user_preferences(self, settings, key, config):
@@ -241,11 +260,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
         scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
         scan_sogou_action = ("Sogou.com", None, "Sogou.com", None, None)
+        scan_external_action = ("External", None, _("External"), None, None)
         scan_cache_action = ("From cache file", None, _("From cache file"), None, None)
         select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
         self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                             scan_chartlyrics_action, scan_lyrdb_action, scan_sogou_action, scan_cache_action, select_nothing_action],
+                                             scan_chartlyrics_action, scan_lyrdb_action, scan_sogou_action, 
+                                             scan_external_action, scan_cache_action, select_nothing_action],
                                              -1, self.scan_source_action_callback, None)
         
         # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
@@ -439,6 +460,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         else:
             index = self.sources.index(self.current_source) + 1
             index = index % (len(self.sources)+1)
+            
         if index >= len(self.sources):
             source = "From cache file"
         else:
@@ -682,16 +704,26 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.action_group.get_action(source).set_active(True)
         
         parser = self.dict[source].Parser(artist, title)
-        lyrics = parser.parse()
+        try:
+            lyrics = parser.parse()
+        except Exception, e:
+            print "Error in parser " + source
+            print str(e)
+            return ""
         
         if lyrics != "":
             print "got lyrics from source"
-            lyrics = "%s\n\n(lyrics from %s)" % (lyrics, source)
-            lyrics = lyrics.encode("utf-8", "replace")
+            if source != "External":
+                lyrics = "%s\n\n(lyrics from %s)" % (lyrics, source)
+            try:
+                lyrics = lyrics.encode("utf-8", "replace")
+            except:
+                print "failed to utf8 encode lyrics!"
+                return ""
             if self.cache:
                 self.write_lyrics_to_cache(path, lyrics)
             
-        return lyrics    
+        return lyrics
     
     
     
