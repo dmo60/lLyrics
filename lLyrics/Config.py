@@ -155,11 +155,6 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label.set_padding(5, 0)
         label.set_use_markup(True)
         
-        label2 = Gtk.Label(_("('External' calls the Rhythmbox built-in lyrics plugin)"))
-        label2.set_alignment(0, 0)
-        label2.set_padding(5, 0)
-        label2.set_use_markup(True)
-        
         vbox = Gtk.VBox()
         vbox.set_margin_left(30)
         for source in self.settings["scanning-order"]:
@@ -183,9 +178,19 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             
             vbox.pack_start(hbox, False, False, 0)
         
+        label2 = Gtk.Label(_("Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
+                             "I can not guarantee that the provided engines work properly! "
+                             "They might have bugs or make the plugin crash!\n"
+                             "If you experience any problems, try to deselect some lyrics sites "
+                             "in the 'lyrics' plugin's preference dialog or deactivate the 'External' source."))
+        label2.set_alignment(0, 0)
+        label2.set_padding(5, 0)
+        label2.set_line_wrap(True)
+        label2.set_use_markup(True)
+        
         dialog.pack_start(label, False, False, 0)
-        dialog.pack_start(label2, False, False, 0)
         dialog.pack_start(vbox, False, False, 0)
+        dialog.pack_start(label2, False, False, 0)
         
         dialog.show_all()
         dialog.set_size_request(300, -1)
