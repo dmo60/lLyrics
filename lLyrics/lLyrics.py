@@ -14,7 +14,6 @@
 import re
 import os
 import threading
-import urllib2
 import webbrowser
 import sys
 
