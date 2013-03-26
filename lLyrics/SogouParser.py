@@ -53,10 +53,10 @@ class Parser(object):
             print "could not download sogou lrc file"
             return ""
         
-        try:
-            encoding = chardet.detect(lyrics)['encoding']
-        except:
-            encoding = 'gb18030'
-            lyrics = lyrics.decode(encoding, 'replace')
+#        try:
+#            encoding = chardet.detect(lyrics)['encoding']
+#        except:
+#            encoding = 'gb18030'
+#        lyrics = lyrics.decode(encoding, 'replace')
         
         return lyrics

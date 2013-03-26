@@ -16,6 +16,10 @@ import os
 import threading
 import webbrowser
 import sys
+try:
+    import chardet
+except:
+    print "module chardet not found or not installed!"
 
 from threading import Thread
 
@@ -715,6 +719,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
             if source != "External":
                 lyrics = "%s\n\n(lyrics from %s)" % (lyrics, source)
             try:
+                encoding = chardet.detect(lyrics)['encoding']
+            except:
+                print "could not detect lyrics encoding, assume utf-8"
+                encoding = 'utf-8'
+            try:
+                lyrics = lyrics.decode(encoding, 'replace')
                 lyrics = lyrics.encode("utf-8", "replace")
             except:
                 print "failed to utf8 encode lyrics!"
