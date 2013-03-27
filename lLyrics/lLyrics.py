@@ -39,6 +39,7 @@ import LyrdbParser
 import SogouParser
 import AZLyricsParser
 import LeoslyricsParser
+import LyricsmaniaParser
 import External
 import Util
 
@@ -62,6 +63,7 @@ llyrics_ui = """
                 <menuitem name="ScanTerra" action="Letras.terra.com.br"/>
                 <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
                 <menuitem name="ScanAZLyrics" action="AZLyrics.com"/>
+                <menuitem name="ScanLyricsmania" action="Lyricsmania.com"/>
                 <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
                 <menuitem name="ScanLeoslyrics" action="Leoslyrics.com"/>
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
@@ -97,8 +99,8 @@ LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([
 LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Chartlyrics.com",  
-               "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External"]
+LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
+               "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External"]
 
 STOCK_IMAGE = "stock-llyrics-button"
 
@@ -125,9 +127,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
-                         "Chartlyrics.com": ChartlyricsParser, "Lyrdb.com": LyrdbParser,
-                         "Leoslyrics.com": LeoslyricsParser, "Sogou.com": SogouParser, 
-                         "External": External})
+                         "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
+                         "Lyrdb.com": LyrdbParser, "Leoslyrics.com": LeoslyricsParser, 
+                         "Sogou.com": SogouParser, "External": External})
         self.add_builtin_lyrics_sources()
         
         # Get the user preferences
@@ -267,6 +269,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br", None, None)
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
         scan_azlyrics_action = ("AZLyrics.com", None, "AZLyrics.com", None, None)
+        scan_lyricsmania_action = ("Lyricsmania.com", None, "Lyricsmania.com", None, None)
         scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
         scan_leoslyrics_action = ("Leoslyrics.com", None, "Leoslyrics.com", None, None)
         scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
@@ -277,8 +280,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
                                              scan_chartlyrics_action, scan_lyrdb_action, scan_azlyrics_action,
-                                             scan_leoslyrics_action, scan_sogou_action, scan_external_action,
-                                             scan_cache_action, select_nothing_action],
+                                             scan_leoslyrics_action, scan_lyricsmania_action, scan_sogou_action, 
+                                             scan_external_action, scan_cache_action, select_nothing_action],
                                              -1, self.scan_source_action_callback, None)
         
         # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
