@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import string
 
 
 def decode_chars(resp):
@@ -29,6 +30,14 @@ def decode_chars(resp):
         except:
             print "unknown character " + c
     return resp
+
+
+
+def remove_punctuation(data):
+    for c in string.punctuation:
+        data = data.replace(c, "")
+    
+    return data
 
 
 

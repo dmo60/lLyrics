@@ -30,11 +30,8 @@ class Parser(object):
         
     def parse(self):
         # remove punctuation from artist/title
-        clean_artist = self.artist
-        clean_title = self.title
-        for c in string.punctuation:
-            clean_artist = clean_artist.replace(c, "")
-            clean_title = clean_title.replace(c, "")
+        clean_artist = Util.remove_punctuation(self.artist)
+        clean_title = Util.remove_punctuation(self.title)
             
         # create lyrics Url
         url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" + clean_artist.replace(" ", "-") + ".html"

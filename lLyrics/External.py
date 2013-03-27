@@ -1,4 +1,4 @@
-# Parser for Lyricwiki.org
+# Module to retrieve lyrics from the builtin lyrics plugin
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

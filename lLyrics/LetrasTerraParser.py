@@ -17,6 +17,8 @@ import urllib2
 import re
 import string
 
+import Util
+
 class Parser(object):
     
     def __init__(self, artist, title):
@@ -28,8 +30,7 @@ class Parser(object):
         # remove punctuation from artist
         clean_artist = self.artist
         clean_artist = clean_artist.replace("+", "and")
-        for c in string.punctuation:
-            clean_artist = clean_artist.replace(c, "")
+        clean_artist = Util.remove_punctuation(clean_artist)
         clean_artist = clean_artist.replace(" ", "-")
             
         # create artist Url
