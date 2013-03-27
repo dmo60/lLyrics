@@ -3,13 +3,13 @@
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
 		<key name="active-sources" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Chartlyrics.com', 'Lyrdb.com']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com']</default>
 			<summary>List of lyrics sources to be scanned</summary>
 			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com'</description>
 		</key>
 		
 		<key name="scanning-order" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com', 'External']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External']</default>
 			<summary>Sources are scanned in this order</summary>
 			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'Chartlyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
 		</key>
