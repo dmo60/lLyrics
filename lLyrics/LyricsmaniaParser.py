@@ -35,7 +35,7 @@ class Parser(object):
         clean_title = Util.remove_punctuation(clean_title)
         clean_title = clean_title.replace(" ", "_")
             
-        # create artist Url
+        # create lyrics Url
         url = "http://www.lyricsmania.com/" + clean_title + "_lyrics_" + clean_artist + ".html"
         print "lyricsmania Url " + url
         try:

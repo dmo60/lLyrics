@@ -96,12 +96,12 @@ llyrics_ui = """
 </ui>
 """
 
-LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
+LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
-LYRIC_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
-LYRIC_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
+LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
+LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRIC_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
+LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
                "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External"]
 
 STOCK_IMAGE = "stock-llyrics-button"
@@ -425,13 +425,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         title = title.lower()
     
         # replace ampersands and the like
-        for exp in LYRIC_ARTIST_REPLACE:
+        for exp in LYRICS_ARTIST_REPLACE:
             artist = re.sub(exp[0], exp[1], artist)
-        for exp in LYRIC_TITLE_REPLACE:
+        for exp in LYRICS_TITLE_REPLACE:
             title = re.sub(exp[0], exp[1], title)
     
         # strip things like "(live at Somewhere)", "(acoustic)", etc
-        for exp in LYRIC_TITLE_STRIP:
+        for exp in LYRICS_TITLE_STRIP:
             title = re.sub (exp, '', title)
     
         # compress spaces

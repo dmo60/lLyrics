@@ -35,7 +35,7 @@ class Config(object):
         changed = False
         entries = self.settings["active-sources"]
         for source in entries:
-            if not source in lLyrics.LYRIC_SOURCES:
+            if not source in lLyrics.LYRICS_SOURCES:
                 entries.remove(source)
                 changed = True
                 print "remove invalid entry in active-sources: " + source
@@ -49,13 +49,13 @@ class Config(object):
         changed = False
         entries = self.settings["scanning-order"]
         for source in entries:
-            if not source in lLyrics.LYRIC_SOURCES:
+            if not source in lLyrics.LYRICS_SOURCES:
                 entries.remove(source)
                 changed = True
                 print "remove invalid entry in scanning-order: " + source
                 
         # fill up missing keys
-        for source in lLyrics.LYRIC_SOURCES:
+        for source in lLyrics.LYRICS_SOURCES:
             if source not in entries:
                 entries.append(source)
                 changed = True
