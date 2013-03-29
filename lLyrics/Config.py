@@ -107,6 +107,9 @@ class Config(object):
         self.check_lyrics_folder()
         return self.settings["lyrics-folder"]
     
+    def get_ignore_brackets(self):
+        return self.settings["ignore-brackets"]
+    
   
     
 class ConfigDialog(GObject.Object, PeasGtk.Configurable):
@@ -126,11 +129,12 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         switch.set_active(self.settings["cache-lyrics"])
         switch.connect("notify::active", self.switch_toggled, "cache-lyrics")
         
-        label = Gtk.Label(_("Save lyrics "))
+        label = Gtk.Label("<b>" + _("Save lyrics ") + "</b>")
+        label.set_use_markup(True)
         
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(switch, False, False, 5)
-        dialog.pack_start(hbox, False, False, 5)
+        dialog.pack_start(hbox, False, False, 10)
         
         # file chooser for lyrics-folder
         hbox = Gtk.HBox()
@@ -142,21 +146,48 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         default_button = Gtk.Button(_("default"))
         default_button.connect("clicked", self.set_folder_default, file_chooser)
         
-        label = Gtk.Label(_("Folder for lyrics"))
+        label = Gtk.Label("<b>" + _("Folder for lyrics") + "</b>")
+        label.set_use_markup(True)
         
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(file_chooser, True, True, 5)
         hbox.pack_start(default_button, False, False, 5)
-        dialog.pack_start(hbox, False, False, 5)
+        dialog.pack_start(hbox, False, False, 10)
+        
+        # switch for ignore-brackets
+        hbox = Gtk.HBox()
+        switch = Gtk.Switch()
+        switch.set_active(self.settings["ignore-brackets"])
+        switch.connect("notify::active", self.switch_toggled, "ignore-brackets")
+        
+        label = Gtk.Label("<b>" + _("Always ignore parentheses in song title ") + "</b>")
+        label.set_use_markup(True)
+        
+        label2 = Gtk.Label("<i>" + _("When turned off, only parentheses containing specific strings "
+                             "(e.g. 'remix', 'live', 'edit', etc) are filtered") + "</i>")
+        label2.set_alignment(0, 0)
+        label2.set_margin_left(15)
+        label2.set_line_wrap(True)
+        label2.set_use_markup(True)
+        
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(switch, False, False, 5)
+        vbox = Gtk.VBox()
+        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(label2, False, False, 0)
+        
+        dialog.pack_start(vbox, False, False, 10)
         
         # check buttons for lyric sources
-        label = Gtk.Label(_("Sources:"))
+        label = Gtk.Label("<b>" + _("Sources:") + "</b>")
         label.set_alignment(0, 0)
         label.set_padding(5, 0)
         label.set_use_markup(True)
         
         vbox = Gtk.VBox()
         vbox.set_margin_left(30)
+        vbox.set_margin_top(5)
+        vbox.set_margin_bottom(5)
         for source in self.settings["scanning-order"]:
             hbox = Gtk.HBox()
             check = Gtk.CheckButton(source)
@@ -178,24 +209,36 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             
             vbox.pack_start(hbox, False, False, 0)
         
-        label2 = Gtk.Label(_("Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
+        label2 = Gtk.Label("<i>" + 
+                           _("Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
                              "I can not guarantee that the provided engines work properly! "
                              "They might have bugs or make the plugin crash!\n"
                              "If you experience any problems, try to deselect some lyrics sites "
-                             "in the 'lyrics' plugin's preference dialog or deactivate the 'External' source."))
+                             "in the 'lyrics' plugin's preference dialog or deactivate the 'External' source.") 
+                           + "</i>")
         label2.set_alignment(0, 0)
-        label2.set_padding(5, 0)
+        label2.set_margin_left(15)
         label2.set_line_wrap(True)
         label2.set_use_markup(True)
         
-        dialog.pack_start(label, False, False, 0)
-        dialog.pack_start(vbox, False, False, 0)
-        dialog.pack_start(label2, False, False, 0)
+        vbox2 = Gtk.VBox()
+        vbox2.pack_start(label, False, False, 0)
+        vbox2.pack_start(vbox, False, False, 0)
+        vbox2.pack_start(label2, False, False, 0)
         
-        dialog.show_all()
-        dialog.set_size_request(300, -1)
+        dialog.pack_start(vbox2, False, False, 10)
         
-        return dialog
+        vp = Gtk.Viewport()
+        vp.add(dialog)
+        
+        sw = Gtk.ScrolledWindow()
+        sw.add(vp)
+        sw.set_shadow_type(Gtk.ShadowType.IN)
+        
+        sw.show_all()
+        sw.set_size_request(550, 750)
+        
+        return sw
     
     def switch_toggled(self, switch, active, key):
         self.settings[key] = switch.get_active()

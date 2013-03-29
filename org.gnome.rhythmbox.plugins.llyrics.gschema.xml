@@ -30,6 +30,14 @@ Set to False to disable this (note that in this case, lyrics sources have to be 
 				Default is "~/.cache/rhythmbox/lyrics/". Folder must exist, otherwise key is reset to default.
 			</description>
 		</key>
+		
+		<key name="ignore-brackets" type="b">
+			<default>false</default>
+			<summary>Always ignore parentheses in song title</summary>
+			<description>
+				Whether to generally ignore parentheses in song title. Per default, only some specific strings are filtered.
+			</description>
+		</key>
 
 	</schema>
 </schemalist>

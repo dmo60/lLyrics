@@ -241,6 +241,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.sources = config.get_lyrics_sources()
         self.cache = config.get_cache_lyrics()
         self.lyrics_folder = config.get_lyrics_folder()
+        self.ignore_brackets = config.get_ignore_brackets()
 
         
            
@@ -423,6 +424,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # convert to lowercase
         artist = artist.lower()
         title = title.lower()
+        
+        if self.ignore_brackets:
+            LYRICS_TITLE_STRIP.append("\(.*\)")
     
         # replace ampersands and the like
         for exp in LYRICS_ARTIST_REPLACE:
@@ -437,7 +441,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # compress spaces
         title = title.strip()
         artist = artist.strip()
-        
+                
         return (artist, title)
     
     
