@@ -118,6 +118,9 @@ class Config(object):
         
         return lyrics_sources
     
+    def get_show_first(self):
+        return self.settings["show-first"]
+    
     def get_cache_lyrics(self):
         return self.settings["cache-lyrics"]
     
@@ -153,6 +156,12 @@ class Config(object):
     def get_toplevel_menu(self):
         return self.settings["toplevel-menu"]
     
+    def get_left_sidebar(self):
+        return self.settings["left-sidebar"]
+    
+    def get_hide_label(self):
+        return self.settings["hide-label"]
+    
   
     
 class ConfigDialog(GObject.Object, PeasGtk.Configurable):
@@ -166,6 +175,19 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
     def do_create_configure_widget(self):
         # page 1 for general settings
         page1 = Gtk.VBox()
+        
+        # switch for show-first
+        hbox = Gtk.HBox()
+        switch = Gtk.Switch()
+        switch.set_active(self.settings["show-first"])
+        switch.connect("notify::active", self.switch_toggled, "show-first")
+        
+        label = Gtk.Label("<b>" + _("Show sidebar on first playback") + "</b>")
+        label.set_use_markup(True)
+        
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(switch, False, False, 5)
+        page1.pack_start(hbox, False, False, 10)
         
         # switch for cache-lyrics
         hbox = Gtk.HBox()
@@ -363,6 +385,44 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label.set_use_markup(True)
         
         descr = Gtk.Label("<i>" + _("When turned off, the lyrics menu is moved to the 'Control' menu") + "</i>")
+        descr.set_alignment(0, 0)
+        descr.set_margin_left(15)
+        descr.set_line_wrap(True)
+        descr.set_use_markup(True)
+        
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(switch, False, False, 5)
+        vbox = Gtk.VBox()
+        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(descr, False, False, 0)
+        
+        page3.pack_start(vbox, False, False, 10)
+        
+        # switch for hide-label
+        hbox = Gtk.HBox()
+        switch = Gtk.Switch()
+        switch.set_active(self.settings["hide-label"])
+        switch.connect("notify::active", self.switch_toggled, "hide-label")
+        
+        label = Gtk.Label("<b>" + _("Hide sidebar label") + "</b>")
+        label.set_use_markup(True)
+        
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(switch, False, False, 5)
+        
+        page3.pack_start(hbox, False, False, 10)
+        
+        # switch for left-sidebar
+        hbox = Gtk.HBox()
+        switch = Gtk.Switch()
+        switch.set_active(self.settings["left-sidebar"])
+        switch.connect("notify::active", self.switch_toggled, "left-sidebar")
+        
+        label = Gtk.Label("<b>" + _("Show lyrics in left sidebar instead of right one") + "</b>")
+        label.set_use_markup(True)
+        
+        descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
+                                    "to apply the new position") + "</i>")
         descr.set_alignment(0, 0)
         descr.set_margin_left(15)
         descr.set_line_wrap(True)

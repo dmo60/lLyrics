@@ -14,6 +14,14 @@
 			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
 		</key>
 		
+		<key name="show-first" type="b">
+			<default>true</default>
+			<summary>Show sidebar on first playback</summary>
+			<description>
+				Whether to automatically show the sidebar when playback starts
+			</description>
+		</key>
+		
 		<key name="cache-lyrics" type="b">
 			<default>true</default>
 			<summary>Whether lyrics are saved or not</summary>
@@ -76,6 +84,22 @@ Set to False to disable this (note that in this case, lyrics sources have to be 
 			<summary>Show menu as toplevel menu</summary>
 			<description>
 				Whether to show lyrics menu as own toplevel menu or as submenu of 'Control'
+			</description>
+		</key>
+		
+		<key name="left-sidebar" type="b">
+			<default>false</default>
+			<summary>Show lyrics in left sidebar</summary>
+			<description>
+				Whether to show lyrics in the left sidebar instead of the default right sidebar
+			</description>
+		</key>
+		
+		<key name="hide-label" type="b">
+			<default>false</default>
+			<summary>Hide the sidebar label</summary>
+			<description>
+				Whether to show or hide the sidebar label
 			</description>
 		</key>
 

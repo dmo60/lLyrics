@@ -145,12 +145,17 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Watch for setting changes
         self.skc_id = self.settings.connect('changed', self.get_user_preferences, config)
         
-        # Initialize the UI
+        self.position = RB.ShellUILocation.RIGHT_SIDEBAR
+        if self.left_sidebar:
+            self.position = RB.ShellUILocation.SIDEBAR
+        
+        # Initialize the UI 
         self.init_sidebar()
         self.init_menu()
         
         # Create flag, used to pop out sidebar on initial start of playback
         self.first = True
+        self.visible = False
         
         # Event flag indicates whether the user is currently editing lyrics
         self.edit_event = threading.Event()
@@ -180,9 +185,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
 
-    def do_deactivate(self):    
+    def do_deactivate(self):
         if self.visible:
-            self.shell.remove_widget (self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
+            self.shell.remove_widget (self.vbox, self.position)
         
         self.settings.disconnect(self.skc_id)
         self.player.disconnect(self.psc_id)
@@ -220,6 +225,18 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.lyrics_before_edit = None
         self.edit_event = None
         self.path_before_edit = None
+        self.sources = None
+        self.cache = None
+        self.lyrics_folder = None
+        self.ignore_brackets = None
+        self.show_icon = None
+        self.icon_path = None
+        self.separators = None
+        self.toplevel_menu = None
+        self.left_sidebar = None
+        self.hide_label = None
+        self.show_first = None
+        self.position = None
         
         self.shell = None
 
@@ -242,6 +259,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     def get_user_preferences(self, settings, key, config):
         self.sources = config.get_lyrics_sources()
+        self.show_first = config.get_show_first()
         self.cache = config.get_cache_lyrics()
         self.lyrics_folder = config.get_lyrics_folder()
         self.ignore_brackets = config.get_ignore_brackets()
@@ -249,10 +267,22 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.icon_path = config.get_icon_path()
         self.separators = config.get_toolbar_separators()
         self.toplevel_menu = config.get_toplevel_menu()
+        self.left_sidebar = config.get_left_sidebar()
+        self.hide_label = config.get_hide_label()
+        
+        # if this is called in do_activate, return here
+        if key is None:
+            return
         
         # reload ui if ui settings changed
         if key in ["show-toolbar-icon", "icon-path", "separator-left", "separator-right", "toplevel-menu"]:
             self.reload_ui()
+        
+        if key == "hide-label":
+            if self.hide_label:
+                self.label.hide()
+            else:
+                self.label.show()
 
         
            
@@ -362,6 +392,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.show_icon:
             sep_left, sep_right = self.separators
         control_menu1, control_menu2 = "", ""
+        
         if not self.toplevel_menu:
             control_menu1 = """<menu name="ControlMenu" action="Control">"""
             control_menu2 = "</menu>"
@@ -371,18 +402,24 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.ui_id = self.uim.add_ui_from_string(ui)
         self.uim.ensure_update()
         
+        # hide menu on startup not working?! -> do it in do_activate
+#        menu_path = "/MenuBar/lLyrics"
+#        if not self.toplevel_menu:
+#            menu_path = "/MenuBar/ControlMenu/lLyrics"
+#        self.uim.get_widget(menu_path).hide()
+        
         if not self.show_icon:
             self.uim.get_widget("/ToolBar/lLyrics").hide()
         
         
-       
+               
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
                 
-        label = Gtk.Label(_("Lyrics"))
-        label.set_use_markup(True)
-        label.set_padding(3, 11)
-        label.set_alignment(0, 0)
+        self.label = Gtk.Label(_("Lyrics"))
+        self.label.set_use_markup(True)
+        self.label.set_padding(3, 11)
+        self.label.set_alignment(0, 0)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -419,12 +456,16 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.hbox.pack_start(cancel_button, True, True, 3)
         
         # pack everything into side pane
-        self.vbox.pack_start(label, False, False, 0)
+        self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
 
         self.vbox.show_all()
         self.hbox.hide()
+        
+        if self.hide_label:
+            self.label.hide()
+            
         self.vbox.set_size_request(200, -1)
         self.visible = False
         
@@ -434,14 +475,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
         menu_path = "/MenuBar/lLyrics"
         if not self.toplevel_menu:
             menu_path = "/MenuBar/ControlMenu/lLyrics"
-        
+        print self.uim.get_widget(menu_path)
         if action.get_active():
-            self.shell.add_widget(self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, True, True)
+            self.shell.add_widget(self.vbox, self.position, True, True)
             self.visible = True
             self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
             self.uim.get_widget(menu_path).show()
+            self.search_lyrics(self.player, self.player.get_playing_entry())
         else:
-            self.shell.remove_widget(self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
+            self.shell.remove_widget(self.vbox, self.position)
             self.visible = False
             self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
             self.uim.get_widget(menu_path).hide()
@@ -462,9 +504,16 @@ class lLyrics(GObject.Object, Peas.Activatable):
             return
         
         # pop out sidebar at first playback
-        if self.first and not self.visible:
-            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+        if self.first:
             self.first = False
+            if not self.visible and self.show_first:
+                self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+                # toggling the sidebar will start lyrics search again, so we can return here
+                return
+        
+        # only do something if visible
+        if not self.visible:
+            return
             
         # get the song data
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
