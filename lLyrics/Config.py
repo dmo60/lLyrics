@@ -173,7 +173,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         switch.set_active(self.settings["cache-lyrics"])
         switch.connect("notify::active", self.switch_toggled, "cache-lyrics")
         
-        label = Gtk.Label("<b>" + _("Save lyrics") + "</b>")
+        label = Gtk.Label("<b>" + _("Save lyrics ") + "</b>")
         label.set_use_markup(True)
         
         descr = Gtk.Label("<i>" + _("Whether to automatically save retrieved lyrics in the folder specified below") + "</i>")

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-26 16:18+0100\n"
+"POT-Creation-Date: 2013-03-31 17:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,121 +17,190 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lLyrics.py:242 ../lLyrics.py:250 ../lLyrics.py:308
+#: ../lLyrics.py:295 ../lLyrics.py:303 ../lLyrics.py:382
 msgid "Lyrics"
 msgstr ""
 
-#: ../lLyrics.py:243
+#: ../lLyrics.py:296
 msgid "Display lyrics for the current playing song"
 msgstr ""
 
-#: ../lLyrics.py:253
+#: ../lLyrics.py:306
 msgid "Source"
 msgstr ""
 
-#: ../lLyrics.py:262
+#: ../lLyrics.py:319
 msgid "External"
 msgstr ""
 
-#: ../lLyrics.py:263
+#: ../lLyrics.py:320
 msgid "From cache file"
 msgstr ""
 
-#: ../lLyrics.py:276
+#: ../lLyrics.py:335
 msgid "Scan next source"
 msgstr ""
 
-#: ../lLyrics.py:277
+#: ../lLyrics.py:336
 msgid "Scan next lyrics source"
 msgstr ""
 
-#: ../lLyrics.py:278
+#: ../lLyrics.py:337
 msgid "Scan all sources"
 msgstr ""
 
-#: ../lLyrics.py:279
+#: ../lLyrics.py:338
 msgid "Rescan all lyrics sources"
 msgstr ""
 
-#: ../lLyrics.py:280
+#: ../lLyrics.py:339
 msgid "Search online"
 msgstr ""
 
-#: ../lLyrics.py:281
+#: ../lLyrics.py:340
 msgid "Search lyrics for the current song online"
 msgstr ""
 
-#: ../lLyrics.py:282
+#: ../lLyrics.py:341
 msgid "Mark as instrumental"
 msgstr ""
 
-#: ../lLyrics.py:283
+#: ../lLyrics.py:342
 msgid "Mark this song as instrumental"
 msgstr ""
 
-#: ../lLyrics.py:284
+#: ../lLyrics.py:343
 msgid "Save lyrics"
 msgstr ""
 
-#: ../lLyrics.py:285
+#: ../lLyrics.py:344
 msgid "Save current lyrics to the cache file"
 msgstr ""
 
-#: ../lLyrics.py:286
+#: ../lLyrics.py:345
 msgid "Clear lyrics"
 msgstr ""
 
-#: ../lLyrics.py:287
+#: ../lLyrics.py:346
 msgid "Delete current lyrics"
 msgstr ""
 
-#: ../lLyrics.py:288
+#: ../lLyrics.py:347
 msgid "Edit lyrics"
 msgstr ""
 
-#: ../lLyrics.py:289
+#: ../lLyrics.py:348
 msgid "Edit current lyrics"
 msgstr ""
 
 #. create save and cancel buttons for edited lyrics
-#: ../lLyrics.py:339
+#: ../lLyrics.py:413
 msgid "Save"
 msgstr ""
 
-#: ../lLyrics.py:341
+#: ../lLyrics.py:415
 msgid "Cancel"
 msgstr ""
 
-#: ../lLyrics.py:555 ../lLyrics.py:580 ../lLyrics.py:592 ../lLyrics.py:622
+#: ../lLyrics.py:642 ../lLyrics.py:667 ../lLyrics.py:679 ../lLyrics.py:709
 msgid "searching lyrics..."
 msgstr ""
 
-#: ../lLyrics.py:732
+#: ../lLyrics.py:825
 msgid "No lyrics found"
 msgstr ""
 
-#: ../Config.py:129
+#: ../Config.py:176
 msgid "Save lyrics "
 msgstr ""
 
-#: ../Config.py:142
+#: ../Config.py:179
+msgid ""
+"Whether to automatically save retrieved lyrics in the folder specified below"
+msgstr ""
+
+#: ../Config.py:199
 msgid "default"
 msgstr ""
 
-#: ../Config.py:145
+#: ../Config.py:202
 msgid "Folder for lyrics"
 msgstr ""
 
+#: ../Config.py:216
+msgid "Always ignore parentheses in song title"
+msgstr ""
+
+#: ../Config.py:219
+msgid ""
+"When turned off, only parentheses containing specific strings (e.g. 'remix', "
+"'live', 'edit', etc) are filtered"
+msgstr ""
+
 #. check buttons for lyric sources
-#: ../Config.py:153
+#: ../Config.py:238
 msgid "Sources:"
 msgstr ""
 
-#: ../Config.py:181
+#: ../Config.py:269
 msgid ""
 "Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
 "I can not guarantee that the provided engines work properly! They might have "
 "bugs or make the plugin crash!\n"
-"If you experience any problems, try to deselect some lyrics sites in the "
+"If you experience any problems, try to unselect some lyrics sites in the "
 "'lyrics' plugin's preference dialog or deactivate the 'External' source."
+msgstr ""
+
+#: ../Config.py:296
+msgid "Show toolbar icon"
+msgstr ""
+
+#: ../Config.py:299
+msgid ""
+"When turned off, the lyrics sidebar can only be toggled using the 'View' "
+"menu or by pressing 'Ctrl+L'"
+msgstr ""
+
+#: ../Config.py:321
+msgid "Image files"
+msgstr ""
+
+#: ../Config.py:326
+msgid "default icon"
+msgstr ""
+
+#: ../Config.py:329
+msgid "Toolbar icon"
+msgstr ""
+
+#: ../Config.py:340
+msgid "Show toolbar separators"
+msgstr ""
+
+#: ../Config.py:343
+msgid "left"
+msgstr ""
+
+#: ../Config.py:347
+msgid "right"
+msgstr ""
+
+#: ../Config.py:362
+msgid "Show lyrics menu as toplevel menu"
+msgstr ""
+
+#: ../Config.py:365
+msgid "When turned off, the lyrics menu is moved to the 'Control' menu"
+msgstr ""
+
+#: ../Config.py:381
+msgid "General"
+msgstr ""
+
+#: ../Config.py:382
+msgid "Sources"
+msgstr ""
+
+#: ../Config.py:383
+msgid "Appearance"
 msgstr ""
