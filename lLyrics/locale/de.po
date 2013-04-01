@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-10 16:02+0200\n"
+"POT-Creation-Date: 2013-04-01 14:12+0200\n"
 "PO-Revision-Date: 2012-08-05 12:01+0200\n"
 "Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
 "Language-Team: German\n"
@@ -17,130 +17,251 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lLyrics.py:220
-#: ../lLyrics.py:228
-#: ../lLyrics.py:287
+#: ../lLyrics.py:385 ../lLyrics.py:398 ../lLyrics.py:475
 msgid "Lyrics"
 msgstr "Liedtexte"
 
-#: ../lLyrics.py:221
+#: ../lLyrics.py:386
 msgid "Display lyrics for the current playing song"
 msgstr "Zeige Liedtext für den gerade gespielten Titel"
 
-#: ../lLyrics.py:231
+#: ../lLyrics.py:392
+msgid "Show lyrics"
+msgstr "Liedtext anzeigen"
+
+#: ../lLyrics.py:393
+msgid "Search and display lyrics for this song"
+msgstr "Suche und zeige Liedtext für diesen Titel"
+
+#: ../lLyrics.py:401
 msgid "Source"
 msgstr "Quelle"
 
-#: ../lLyrics.py:240
+#: ../lLyrics.py:414
+msgid "External"
+msgstr "Extern"
+
+#: ../lLyrics.py:415
 msgid "From cache file"
 msgstr "Aus Cache Datei"
 
-#: ../lLyrics.py:252
+#: ../lLyrics.py:430
 msgid "Scan next source"
 msgstr "Durchsuche nächste Quelle"
 
-#: ../lLyrics.py:253
+#: ../lLyrics.py:431
 msgid "Scan next lyrics source"
 msgstr "Die nächste Liedtext Quelle durchsuchen"
 
-#: ../lLyrics.py:254
+#: ../lLyrics.py:432
 msgid "Scan all sources"
 msgstr "Durchsuche alle Quellen"
 
-#: ../lLyrics.py:255
+#: ../lLyrics.py:433
 msgid "Rescan all lyrics sources"
 msgstr "Alle Liedtext Quellen erneut durchsuchen"
 
-#: ../lLyrics.py:256
+#: ../lLyrics.py:434
 msgid "Search online"
 msgstr "Online suchen"
 
-#: ../lLyrics.py:257
+#: ../lLyrics.py:435
 msgid "Search lyrics for the current song online"
 msgstr "Sucht online nach Liedtexten für den gerade gespielten Titel"
 
-#: ../lLyrics.py:258
-msgid "Look up song meanings"
-msgstr "Bedeutung des Liedes nachschlagen"
-
-#: ../lLyrics.py:259
-msgid "Search song meanings for the current title online on songmeanings.net"
-msgstr "Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
-
-#: ../lLyrics.py:261
+#: ../lLyrics.py:436
 msgid "Mark as instrumental"
 msgstr "Als instrumental markieren"
 
-#: ../lLyrics.py:262
+#: ../lLyrics.py:437
 msgid "Mark this song as instrumental"
 msgstr "Markiert diesen Titel als instrumental"
 
-#: ../lLyrics.py:263
+#: ../lLyrics.py:438
 msgid "Save lyrics"
 msgstr "Liedtext speichern"
 
-#: ../lLyrics.py:264
+#: ../lLyrics.py:439
 msgid "Save current lyrics to the cache file"
 msgstr "Speichert aktuellen Liedtext in die Cache Datei"
 
-#: ../lLyrics.py:265
+#: ../lLyrics.py:440
 msgid "Clear lyrics"
 msgstr "Liedtext löschen"
 
-#: ../lLyrics.py:266
+#: ../lLyrics.py:441
 msgid "Delete current lyrics"
 msgstr "Löscht aktuellen Liedtext"
 
-#: ../lLyrics.py:267
+#: ../lLyrics.py:442
 msgid "Edit lyrics"
 msgstr "Liedtext bearbeiten"
 
-#: ../lLyrics.py:268
+#: ../lLyrics.py:443
 msgid "Edit current lyrics"
 msgstr "Löscht aktuellen Liedtext"
 
-#: ../lLyrics.py:316
 #. create save and cancel buttons for edited lyrics
+#: ../lLyrics.py:506
 msgid "Save"
 msgstr "Speichern"
 
-#: ../lLyrics.py:318
+#: ../lLyrics.py:508
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: ../lLyrics.py:527
-#: ../lLyrics.py:552
-#: ../lLyrics.py:564
-#: ../lLyrics.py:594
+#. button for closing on demand lyrics
+#: ../lLyrics.py:515
+msgid "Back to playing song"
+msgstr "Zurück zum aktuellen Titel"
+
+#: ../lLyrics.py:794 ../lLyrics.py:819 ../lLyrics.py:852 ../lLyrics.py:882
 msgid "searching lyrics..."
 msgstr "suche Liedtexte..."
 
-#: ../lLyrics.py:694
+#: ../lLyrics.py:998
 msgid "No lyrics found"
 msgstr "Keine Liedtexte gefunden"
 
-#: ../lLyrics.py:716
-msgid "No song meanings found"
-msgstr "Keine Liedbedeutungen gefunden"
+#: ../Config.py:185
+msgid "Show sidebar on first playback"
+msgstr "Seitenleiste bei Wiedergabestart einblenden"
 
-#: ../lLyrics.py:717
-msgid "You can try to search manually on"
-msgstr "Du kannst versuchen manuell zu suchen auf"
-
-#: ../Config.py:129
+#: ../Config.py:198
 msgid "Save lyrics "
 msgstr "Liedtexte speichern"
 
-#: ../Config.py:142
+#: ../Config.py:201
+msgid ""
+"Whether to automatically save retrieved lyrics in the folder specified below"
+msgstr ""
+"Speichert gefundene Liedtexte automatisch im nachfolgend ausgewählten Ordner"
+
+#: ../Config.py:221
 msgid "default"
 msgstr "Standardeinstellung"
 
-#: ../Config.py:145
+#: ../Config.py:224
 msgid "Folder for lyrics"
 msgstr "Ordner für Liedtexte"
 
-#: ../Config.py:153
+#: ../Config.py:238
+msgid "Always ignore parentheses in song title"
+msgstr "Klammern im Song Titel immer ignorieren"
+
+#: ../Config.py:241
+msgid ""
+"When turned off, only parentheses containing specific strings (e.g. 'remix', "
+"'live', 'edit', etc) are filtered"
+msgstr ""
+"Falls ausgeschaltet, werden nur Klammern mit bestimmten Zeichenketten (z.B. "
+"'remix', 'live', 'edit', etc) gefiltert"
+
 #. check buttons for lyric sources
+#: ../Config.py:260
 msgid "Sources:"
 msgstr "Quellen:"
 
+#: ../Config.py:291
+msgid ""
+"Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
+"I can not guarantee that the provided engines work properly! They might have "
+"bugs or make the plugin crash!\n"
+"If you experience any problems, try to unselect some lyrics sites in the "
+"'lyrics' plugin's preference dialog or deactivate the 'External' source."
+msgstr ""
+"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin.\n"
+"Ich kann nicht garantieren, dass die darin bereitgestellten Parser richtig "
+"funktionieren! Sie können Fehler enthalten oder das Plugin zum Abstürzen "
+"bringen!\n"
+"Falls Sie auf Probleme treffen, versuchen Sie im Einstellungsdialog des "
+"'Liedtexte' Plugins Seiten zu deselektieren oder deaktivieren Sie 'Externe' "
+"Quellen."
+
+#: ../Config.py:318
+msgid "Show toolbar icon"
+msgstr "Zeige Werkzeugleisten-Symbol"
+
+#: ../Config.py:321
+msgid ""
+"When turned off, the lyrics sidebar can only be toggled using the 'View' "
+"menu or by pressing 'Ctrl+L'"
+msgstr ""
+"Falls ausgeschaltet, kann die Seitenleiste mit den Liedtexten nur im "
+"'Ansicht' Menü oder durch Drücken von 'Strg+L' ein- und ausgeblendet werden"
+
+#: ../Config.py:343
+msgid "Image files"
+msgstr "Bilddateien"
+
+#: ../Config.py:348
+msgid "default icon"
+msgstr "Standard-Symbol"
+
+#: ../Config.py:351
+msgid "Toolbar icon"
+msgstr "Werkzeugleisten-Symbol"
+
+#: ../Config.py:354 ../Config.py:435
+msgid ""
+"You have to disable and re-enable this plugin or restart Rhythmbox to apply "
+"changes here"
+msgstr ""
+"Zum Anwenden der Änderung muss das Plugin de- und reaktiviert oder Rhythmbox "
+"neu gestartet werden"
+
+#: ../Config.py:373
+msgid "Show toolbar separators"
+msgstr "Zeige Trennlinien in der Werkzeugleiste"
+
+#: ../Config.py:376
+msgid "left"
+msgstr "links"
+
+#: ../Config.py:380
+msgid "right"
+msgstr "rechts"
+
+#: ../Config.py:395
+msgid "Show lyrics menu as toplevel menu"
+msgstr "Zeige das Liedtexte Menü als eigenen Hauptmenüpunkt"
+
+#: ../Config.py:398
+msgid "When turned off, the lyrics menu is moved to the 'Control' menu"
+msgstr ""
+"Falls ausgeschaltet, ist wird das Liedtexte-Menü in das 'Steuerung'-Menü "
+"verschoben"
+
+#: ../Config.py:418
+msgid "Hide sidebar label"
+msgstr "Verstecke die Überschrift der Seitenleiste"
+
+#: ../Config.py:432
+msgid "Show lyrics in left sidebar instead of right one"
+msgstr "Zeige Liedtexte in der linken statt der rechten Seitenleiste"
+
+#: ../Config.py:452
+msgid "General"
+msgstr "Allgemein"
+
+#: ../Config.py:453
+msgid "Sources"
+msgstr "Quellen"
+
+#: ../Config.py:454
+msgid "Appearance"
+msgstr "Erscheinungsbild"
+
+#~ msgid "Look up song meanings"
+#~ msgstr "Bedeutung des Liedes nachschlagen"
+
+#~ msgid ""
+#~ "Search song meanings for the current title online on songmeanings.net"
+#~ msgstr ""
+#~ "Sucht online auf songmeanings.net nach Bedeutungen für den aktuellen Titel"
+
+#~ msgid "No song meanings found"
+#~ msgstr "Keine Liedbedeutungen gefunden"
+
+#~ msgid "You can try to search manually on"
+#~ msgstr "Du kannst versuchen manuell zu suchen auf"

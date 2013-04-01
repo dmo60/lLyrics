@@ -1,4 +1,4 @@
-# Parser for letras.terra.com.br
+# Parser for lyricsmania.com
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-import re
 import string
+
+import Util
 
 class Parser(object):
     
@@ -25,36 +26,22 @@ class Parser(object):
         self.lyrics = ""
         
     def parse(self):
-        # remove punctuation from artist
+        # remove unwanted characters from artist and title strings
         clean_artist = self.artist
-        clean_artist = clean_artist.replace("+", "and")
-        for c in string.punctuation:
-            clean_artist = clean_artist.replace(c, "")
-        clean_artist = clean_artist.replace(" ", "-")
+        clean_artist = Util.remove_punctuation(clean_artist)
+        clean_artist = clean_artist.replace(" ", "_")
+        
+        clean_title = self.title
+        clean_title = Util.remove_punctuation(clean_title)
+        clean_title = clean_title.replace(" ", "_")
             
-        # create artist Url
-        url = "http://letras.terra.com.br/" + clean_artist
-        print "letras.terra.com.br artist Url " + url
-        try:
-            resp = urllib2.urlopen(url, None, 3).read()
-        except:
-            print "could not connect to letras.terra.com.br"
-            return ""
-        
-        # find title id
-        match = re.search("\<li\>\<a class\=\"elemsug\" href\=\"/" + clean_artist + "/([0-9]*)/\"\>" + re.escape(self.title) + "\</a\>\</li\>", resp, re.I)
-        if match is None:
-            print "could not find title"
-            return ""
-        lyricsid = match.group(1)
-        
         # create lyrics Url
-        url = url + "/" + lyricsid
-        print "letras.terra.com.br Url " + url
+        url = "http://www.lyricsmania.com/" + clean_title + "_lyrics_" + clean_artist + ".html"
+        print "lyricsmania Url " + url
         try:
             resp = urllib2.urlopen(url, None, 3).read()
         except:
-            print "could not connect to letras.terra.com.br"
+            print "could not connect to lyricsmania.com"
             return ""
         
         self.lyrics = self.get_lyrics(resp)
@@ -64,21 +51,20 @@ class Parser(object):
         
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<p>")
+        start_string = """<div id='songlyrics_h' class='dn'>"""
+        start = resp.find(start_string)
         if start == -1:
             print "lyrics start not found"
             return ""
-        resp = resp[(start+3):]
-        end = resp.find("</p></div>")
+        resp = resp[(start+len(start_string)+1):]
+        end = resp.find("</div>")
         if end == -1:
             print "lyrics end not found "
             return ""
-        resp = resp[:(end-1)]
+        resp = resp[:(end)]
         
         # replace unwanted parts
-        resp = resp.replace("<br/>", "")
-        resp = resp.replace("</p>", "")
-        resp = resp.replace("<p>", "\n")
+        resp = resp.replace("<br />", "")
                 
         return resp
         
