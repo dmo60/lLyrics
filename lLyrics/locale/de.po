@@ -147,7 +147,7 @@ msgstr "Ordner für Liedtexte"
 
 #: ../Config.py:238
 msgid "Always ignore parentheses in song title"
-msgstr "Klammern im Song Titel immer ignorieren"
+msgstr "Klammern im Songtitel immer ignorieren"
 
 #: ../Config.py:241
 msgid ""
@@ -229,7 +229,7 @@ msgstr "Zeige das Liedtexte Menü als eigenen Hauptmenüpunkt"
 #: ../Config.py:398
 msgid "When turned off, the lyrics menu is moved to the 'Control' menu"
 msgstr ""
-"Falls ausgeschaltet, ist wird das Liedtexte-Menü in das 'Steuerung'-Menü "
+"Falls ausgeschaltet, wird das Liedtexte-Menü in das 'Steuerung'-Menü "
 "verschoben"
 
 #: ../Config.py:418
