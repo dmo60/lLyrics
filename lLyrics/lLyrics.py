@@ -107,7 +107,33 @@ toolbar_ui = """
     </toolbar>
 </ui>
 """
+context_ui = """
+<ui>
+    <popup name="BrowserSourceViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+      </popup>
 
+    <popup name="PlaylistViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+
+    <popup name="QueuePlaylistViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+    
+    <popup name="PodcastViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+</ui>
+"""
 
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
@@ -176,6 +202,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.current_source = None
         self.tags = None
         self.current_tag = None
+        self.showing_on_demand = False
         
         # Search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
@@ -202,20 +229,23 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.shell.remove_widget (self.vbox, self.position)
         
         self.settings.disconnect(self.skc_id)
-        self.player.disconnect(self.psc_id)
-        self.player.disconnect(self.pec_id)
+        if self.psc_id is not None:
+            self.player.disconnect(self.psc_id)
+            self.player.disconnect(self.pec_id)
         try:
             self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
         except:
             pass
         
         self.uim.remove_ui(self.vmui_id)
+        self.uim.remove_ui(self.cmui_id)
         if self.tbui_id is not None:
             self.uim.remove_ui(self.tbui_id)
         if self.lmui_id is not None:
             self.uim.remove_ui(self.lmui_id)
         self.uim.remove_action_group(self.action_group)
         self.uim.remove_action_group(self.toggle_action_group)
+        self.uim.remove_action_group(self.context_action_group)
         
         self.uim = None
         self.vbox = None
@@ -253,6 +283,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.hide_label = None
         self.show_first = None
         self.position = None
+        self.hbox = None
+        self.back_button = None
         
         self.shell = None
 
@@ -355,9 +387,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
                         self.toggle_visibility, False)
         self.toggle_action_group.add_toggle_actions([toggle_action])
         
-        # Actions used by the lyrics menu
-        self.action_group = Gtk.ActionGroup(name='lLyricsPluginActions')
+        # Action for right click context menu
+        self.context_action_group = Gtk.ActionGroup(name='lLyricsPluginPopupActions')
+        context_action = ("lLyricsPopupAction", None, _("Show lyrics"),
+                            None, _("Search and display lyrics for this song"), self.context_action_callback)
+        self.context_action_group.add_actions([context_action])
         
+        # Actions used by the lyrics menu
+        self.action_group = Gtk.ActionGroup(name='lLyricsPluginMenuActions')
         menu_action = Gtk.Action("lLyricsMenuAction", _("Lyrics"), None, None)
         self.action_group.add_action(menu_action)
         
@@ -406,17 +443,22 @@ class lLyrics(GObject.Object, Peas.Activatable):
                        _("Edit current lyrics"), self.edit_action_callback)
         
         self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action,
-                                       instrumental_action, save_to_cache_action, clear_action, edit_action])
+                                       instrumental_action, save_to_cache_action, clear_action, 
+                                       edit_action])
         
         # Make action group insensitive as long as there are no lyrics displayed
         self.action_group.set_sensitive(False)
         
         # Insert the UI
-        self.uim.insert_action_group (self.toggle_action_group, 0)
-        self.uim.insert_action_group (self.action_group, 0)
+        self.uim.insert_action_group(self.toggle_action_group, 0)
+        self.uim.insert_action_group(self.action_group, 0)
+        self.uim.insert_action_group(self.context_action_group, 0)
         
         # add view menu ui
         self.vmui_id = self.uim.add_ui_from_string(view_menu_ui)
+        
+        # add context menu ui
+        self.cmui_id = self.uim.add_ui_from_string(context_ui)
         
         # add toolbar ui
         if self.show_icon:
@@ -469,13 +511,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.hbox.pack_start(save_button, True, True, 3)
         self.hbox.pack_start(cancel_button, True, True, 3)
         
+        # button for closing on demand lyrics
+        self.back_button = Gtk.Button.new_with_label(_("Back to playing song"))
+        self.back_button.connect("clicked", self.back_button_callback)
+        
         # pack everything into side pane
         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
+        self.vbox.pack_end(self.back_button, False, False, 3)
 
         self.vbox.show_all()
         self.hbox.hide()
+        self.back_button.hide()
         
         if self.hide_label:
             self.label.hide()
@@ -504,14 +552,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if action.get_active():
             self.shell.add_widget(self.vbox, self.position, True, True)
             self.visible = True
-#            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
             self.uim.get_widget(menu_path).show()
-            if not self.first:
+            if not self.first and not self.showing_on_demand:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
         else:
             self.shell.remove_widget(self.vbox, self.position)
             self.visible = False
-#            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
             self.uim.get_widget(menu_path).hide()
                     
             
@@ -528,7 +574,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             return
         
         # pop out sidebar at first playback
-        if self.first:
+        if self.first and not self.showing_on_demand:
             self.first = False
             if not self.visible and self.show_first:
                 self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
@@ -699,6 +745,36 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
     
+    def context_action_callback(self, action):
+        page = self.shell.props.selected_page
+        if not hasattr(page, "get_entry_view"):
+            return
+        
+        selected = page.get_entry_view().get_selected_entries()
+        if not selected:
+            print "nothing selected"
+            return
+        
+        # if multiple selections, take first
+        entry = selected[0]
+        
+        self.showing_on_demand = True
+        self.back_button.show()
+        
+        # Disconnect from song-changed and elapsed-change signals
+        if self.psc_id:
+            self.player.disconnect(self.psc_id)
+            self.player.disconnect(self.pec_id)
+            self.psc_id = None
+            self.pec_id = None
+        
+        if not self.visible:
+            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+        
+        self.search_lyrics(self.player, entry)
+    
+    
+    
     def save_button_callback(self, button):
         self.textview.set_cursor_visible(False)
         self.textview.set_editable(False)
@@ -747,6 +823,27 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
         self.edit_event.set()
+    
+    
+    
+    def back_button_callback(self, button):
+        # reconnect to signals
+        self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
+        self.pec_id = self.player.connect('elapsed-changed', self.elapsed_changed)
+        
+        self.back_button.hide()
+        self.showing_on_demand = False
+        
+        playing_entry = self.player.get_playing_entry()
+        
+        # if nothing is playing, clear lyrics and return
+        if not playing_entry:
+            self.textbuffer.set_text("")
+            self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+            return
+        
+        # otherwise search lyrics
+        self.search_lyrics(self.player, playing_entry)
         
         
     
