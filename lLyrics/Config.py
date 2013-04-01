@@ -351,10 +351,21 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label = Gtk.Label("<b>" + _("Toolbar icon") + "</b>")
         label.set_use_markup(True)
         
+        descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
+                                    "to apply changes here") + "</i>")
+        descr.set_alignment(0, 0)
+        descr.set_margin_left(15)
+        descr.set_line_wrap(True)
+        descr.set_use_markup(True)
+        
         hbox.pack_start(label, False, False, 5)
         hbox.pack_start(file_chooser, True, True, 5)
         hbox.pack_start(default_button, False, False, 5)
-        page3.pack_start(hbox, False, False, 10)
+        vbox = Gtk.VBox()
+        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(descr, False, False, 0)
+        
+        page3.pack_start(vbox, False, False, 10)
         
         # checkbuttons for toolbar separators
         hbox = Gtk.HBox()
@@ -422,7 +433,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label.set_use_markup(True)
         
         descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
-                                    "to apply the new position") + "</i>")
+                                    "to apply changes here") + "</i>")
         descr.set_alignment(0, 0)
         descr.set_margin_left(15)
         descr.set_line_wrap(True)

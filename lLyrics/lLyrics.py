@@ -51,12 +51,18 @@ import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
 
-llyrics_ui = """
+view_menu_ui = """
 <ui>
     <menubar name="MenuBar">
         <menu name="ViewMenu" action="View">
             <menuitem name="lLyrics" action="ToggleLyricSideBar" />
         </menu>
+    </menubar>
+</ui>
+"""
+lyrics_menu_ui = """
+<ui>
+    <menubar name="MenuBar">
         %s
         <menu name="lLyrics" action="lLyricsMenuAction">
             <menu name="ScanSource" action="ScanSourceAction">
@@ -90,6 +96,10 @@ llyrics_ui = """
         </menu>
         %s
     </menubar>
+</ui>
+"""
+toolbar_ui = """
+<ui>
     <toolbar name="ToolBar">
         %s    
         <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
@@ -149,7 +159,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.left_sidebar:
             self.position = RB.ShellUILocation.SIDEBAR
         
-        # Initialize the UI 
+        # Initialize the UI
+        self.lmui_id = None
+        self.tbui_id = None 
         self.init_sidebar()
         self.init_menu()
         
@@ -197,7 +209,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         except:
             pass
         
-        self.uim.remove_ui(self.ui_id)
+        self.uim.remove_ui(self.vmui_id)
+        if self.tbui_id is not None:
+            self.uim.remove_ui(self.tbui_id)
+        if self.lmui_id is not None:
+            self.uim.remove_ui(self.lmui_id)
         self.uim.remove_action_group(self.action_group)
         self.uim.remove_action_group(self.toggle_action_group)
         
@@ -270,38 +286,50 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.left_sidebar = config.get_left_sidebar()
         self.hide_label = config.get_hide_label()
         
-        # if this is called in do_activate, return here
-        if key is None:
+        # if this is called in do_activate or we need a reload to apply, return here
+        if key is None or key in ["icon-path", "left-sidebar"]:
             return
-        
-        # reload ui if ui settings changed
-        if key in ["show-toolbar-icon", "icon-path", "separator-left", "separator-right", "toplevel-menu"]:
-            self.reload_ui()
         
         if key == "hide-label":
             if self.hide_label:
                 self.label.hide()
             else:
                 self.label.show()
+            return
+        
+        # reload ui if ui settings changed
+        self.reload_ui(key)      
 
         
            
-    def reload_ui(self):
-        sensitive = self.action_group.get_sensitive()
-        save_sensitive = self.action_group.get_action("SaveToCacheAction").get_sensitive()
+    def reload_ui(self, key):
+        print key
+        # reload toolbar ui
+        if key in ["show-toolbar-icon", "separator-left", "separator-right"]:
+            print "key in"
+            print self.tbui_id
+            if self.tbui_id is not None:
+                print "remove icon"
+                self.uim.remove_ui(self.tbui_id)
+                
+            if self.show_icon:
+                sep_left, sep_right = "", ""
+                sep_left, sep_right = self.separators
+                toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
+                self.tbui_id = self.uim.add_ui_from_string(toolbar_ui_final)
         
-        self.uim.remove_ui(self.ui_id)
-        self.uim.remove_action_group(self.action_group)
-        self.uim.remove_action_group(self.toggle_action_group)
-        
-        self.init_menu()
-        
-        self.action_group.set_sensitive(sensitive)
-        if sensitive and self.current_source is not None:
-            self.action_group.get_action(self.current_source).set_active(True)
-            self.action_group.get_action("SaveToCacheAction").set_sensitive(save_sensitive)
-        
-        self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(self.visible)
+        # reload lyrics menu ui
+        if key == "toplevel-menu" and self.lmui_id is not None:
+            self.uim.remove_ui(self.lmui_id)
+            
+            control_menu1, control_menu2 = "", ""
+            if not self.toplevel_menu:
+                control_menu1 = """<menu name="ControlMenu" action="Control">"""
+                control_menu2 = "</menu>"
+            lyrics_menu_ui_final = lyrics_menu_ui % (control_menu1, control_menu2)
+            self.lmui_id = self.uim.add_ui_from_string(lyrics_menu_ui_final)
+            
+        self.uim.ensure_update()
         
         print "reloaded ui"
     
@@ -387,29 +415,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.uim.insert_action_group (self.toggle_action_group, 0)
         self.uim.insert_action_group (self.action_group, 0)
         
+        # add view menu ui
+        self.vmui_id = self.uim.add_ui_from_string(view_menu_ui)
+        
         # add toolbar ui
-        sep_left, sep_right = "", ""
         if self.show_icon:
+            sep_left, sep_right = "", ""
             sep_left, sep_right = self.separators
-        control_menu1, control_menu2 = "", ""
-        
-        if not self.toplevel_menu:
-            control_menu1 = """<menu name="ControlMenu" action="Control">"""
-            control_menu2 = "</menu>"
-            
-        ui = llyrics_ui % (control_menu1, control_menu2, sep_left, sep_right)
-        
-        self.ui_id = self.uim.add_ui_from_string(ui)
-        self.uim.ensure_update()
-        
-        # hide menu on startup not working?! -> do it in do_activate
-#        menu_path = "/MenuBar/lLyrics"
-#        if not self.toplevel_menu:
-#            menu_path = "/MenuBar/ControlMenu/lLyrics"
-#        self.uim.get_widget(menu_path).hide()
-        
-        if not self.show_icon:
-            self.uim.get_widget("/ToolBar/lLyrics").hide()
+            toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
+            self.tbui_id = self.uim.add_ui_from_string(toolbar_ui_final)
         
         
                
@@ -472,24 +486,34 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def toggle_visibility(self, action):
+        if not self.lmui_id:
+            # add lyrics menu ui
+            control_menu1, control_menu2 = "", ""
+            if not self.toplevel_menu:
+                control_menu1 = """<menu name="ControlMenu" action="Control">"""
+                control_menu2 = "</menu>"
+            lyrics_menu_ui_final = lyrics_menu_ui % (control_menu1, control_menu2)
+            self.lmui_id = self.uim.add_ui_from_string(lyrics_menu_ui_final)
+            
+            self.uim.ensure_update()
+            
         menu_path = "/MenuBar/lLyrics"
         if not self.toplevel_menu:
             menu_path = "/MenuBar/ControlMenu/lLyrics"
-        print self.uim.get_widget(menu_path)
+
         if action.get_active():
             self.shell.add_widget(self.vbox, self.position, True, True)
             self.visible = True
-            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+#            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
             self.uim.get_widget(menu_path).show()
-            self.search_lyrics(self.player, self.player.get_playing_entry())
+            if not self.first:
+                self.search_lyrics(self.player, self.player.get_playing_entry())
         else:
             self.shell.remove_widget(self.vbox, self.position)
             self.visible = False
-            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
+#            self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
             self.uim.get_widget(menu_path).hide()
-        
-        self.uim.ensure_update()
-            
+                    
             
         
     def search_lyrics(self, player, entry):
@@ -566,17 +590,20 @@ class lLyrics(GObject.Object, Peas.Activatable):
         menu_path = "/MenuBar/lLyrics"
         if not self.toplevel_menu:
             menu_path = "/MenuBar/ControlMenu/lLyrics"
-                
-        menubar_item = self.uim.get_widget(menu_path)
-        toolbar_item = self.uim.get_widget("/ToolBar/lLyrics")
+            
+        if self.lmui_id:
+            menubar_item = self.uim.get_widget(menu_path)
+        
+        if self.tbui_id:
+            toolbar_item = self.uim.get_widget("/ToolBar/lLyrics")
         
         if (toggle_widget.get_active()):
-            toolbar_item.hide()
-            menubar_item.hide()
+            if toolbar_item: toolbar_item.hide()
+            if menubar_item: menubar_item.hide()
             
         else:
-            toolbar_item.show()
-            menubar_item.show()
+            if toolbar_item: toolbar_item.show()
+            if menubar_item: menubar_item.show()
             
             
             
