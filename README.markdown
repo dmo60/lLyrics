@@ -27,7 +27,7 @@ Lyrics sources
   - Leoslyrics.com
   - Lyrdb.com
   - Sogou.com (only activate this source, if you want to test the synchronized lyrics support)
-  
+  - lrc123.com 
 It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has many bugs and may cause instabilities.
 
 
