@@ -24,11 +24,11 @@ from gi.repository import RB
 import lLyrics
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
-
+_DEBUG = True 
 class Config(object):
     
     def __init__(self):
-        self.settings = Gio.Settings(DCONF_DIR)
+        self.settings = Gio.Settings (DCONF_DIR)
     
     def check_active_sources(self):        
         # remove invalid entries
@@ -66,9 +66,14 @@ class Config(object):
             self.settings["scanning-order"] = entries
             
     def check_lyrics_folder(self):
-        folder = self.settings["lyrics-folder"]
+        folder = self.settings["lyrics-folder-change"]
         changed = False
-        
+        if _DEBUG == True:
+            import sys
+            func_name = sys._getframe().f_code.co_name
+            debug_file = open ( "debug_file", "a+" )
+            debug_file.write ( func_name + ": " + folder + '\n'); 
+            debug_file.close()
         # expand user directory
         if "~" in folder:
             folder = os.path.expanduser(folder)
@@ -81,10 +86,10 @@ class Config(object):
             if not os.path.exists(folder):
                 os.mkdir(folder)
             changed = True
-            print "invalid path in lyrics-folder, set to default"
+            print "invalid path in lyrics-folder-change, set to default"
         
         if changed:
-            self.settings["lyrics-folder"] = folder
+            self.settings["lyrics-folder-change"] = folder
         
     def check_icon_path(self):
         path = self.settings["icon-path"]
@@ -126,7 +131,7 @@ class Config(object):
     
     def get_lyrics_folder(self):
         self.check_lyrics_folder()
-        return self.settings["lyrics-folder"]
+        return self.settings["lyrics-folder-change"]
     
     def get_ignore_brackets(self):
         return self.settings["ignore-brackets"]
@@ -211,11 +216,11 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         vbox.pack_start(descr, False, False, 0)
         page1.pack_start(vbox, False, False, 10)
         
-        # file chooser for lyrics-folder
+        # file chooser for lyrics-folder-change
         hbox = Gtk.HBox()
         file_chooser = Gtk.FileChooserButton()
         file_chooser.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
-        file_chooser.set_current_folder(self.settings["lyrics-folder"])
+        file_chooser.set_current_folder(self.settings["lyrics-folder-change"])
         file_chooser.connect("current-folder-changed", self.folder_set)
         
         default_button = Gtk.Button(_("default"))
@@ -498,9 +503,9 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         
     def folder_set(self, file_chooser):
         new_folder = file_chooser.get_current_folder()
-        if self.settings["lyrics-folder"] != new_folder:
+        if self.settings["lyrics-folder-change"] != new_folder:
             print "folder changed"
-            self.settings["lyrics-folder"] = new_folder
+            self.settings["lyrics-folder-change"] = new_folder
     
     def set_folder_default(self, button, file_chooser):
         file_chooser.set_current_folder(os.path.join(RB.user_cache_dir(), "lyrics"))

@@ -3,15 +3,15 @@
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
 		<key name="active-sources" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com']</default>
+			<default>['lrc123.com', 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com']</default>
 			<summary>List of lyrics sources to be scanned</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External' 'lrc123.com'</description>
 		</key>
 		
 		<key name="scanning-order" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External']</default>
+			<default>['lrc123.com', 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External']</default>
 			<summary>Sources are scanned in this order</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External', 'lrc123.com'</description>
 		</key>
 		
 		<key name="show-first" type="b">
@@ -26,16 +26,23 @@
 			<default>true</default>
 			<summary>Whether lyrics are saved or not</summary>
 			<description>
-				If set to True, lyrics are stored in 'lyrics-folder' (default is "~/.cache/rhythmbox/lyrics/"). 
+				If set to True, lyrics are stored in 'lyrics-folder' (default is "~/.lyrics/"). 
 Set to False to disable this (note that in this case, lyrics sources have to be rescanned everytime).
+			</description>
+		</key>
+		<key name="lyrics-folder-change" type="s">
+			<default>"~/.lyrics/"</default>
+			<summary>Folder where fetched lyrics are saved</summary>
+			<description>
+				the system Default is "~/.lyrics/". can not change . it will be back later. So , make a new iterm .Folder must exist, otherwise key is reset to default.
 			</description>
 		</key>
 		
 		<key name="lyrics-folder" type="s">
-			<default>"~/.cache/rhythmbox/lyrics"</default>
+			<default>"/home/anzizhao/.lyrics/"</default>
 			<summary>Folder where fetched lyrics are saved</summary>
 			<description>
-				Default is "~/.cache/rhythmbox/lyrics/". Folder must exist, otherwise key is reset to default.
+				Default is "~/.lyrics/". Folder must exist, otherwise key is reset to default.
 			</description>
 		</key>
 		

@@ -43,6 +43,7 @@ import LyricsmaniaParser
 import DarklyricsParser
 import External
 import Util
+import lrc123Parser
 
 from Config import Config
 from Config import ConfigDialog
@@ -50,6 +51,7 @@ from Config import ConfigDialog
 import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
+_DEBUG = True 
 
 view_menu_ui = """
 <ui>
@@ -66,6 +68,7 @@ lyrics_menu_ui = """
         %s
         <menu name="lLyrics" action="lLyricsMenuAction">
             <menu name="ScanSource" action="ScanSourceAction">
+                 <menuitem name="lrc123.com" action="lrc123.com"/>             
                 <menuitem name="ScanLyricwiki" action="Lyricwiki.org"/>
                 <menuitem name="ScanTerra" action="Letras.terra.com.br"/>
                 <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
@@ -76,8 +79,10 @@ lyrics_menu_ui = """
                 <menuitem name="ScanLeoslyrics" action="Leoslyrics.com"/>
                 <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
                 <menuitem name="ScanSogou" action="Sogou.com"/>
-                <separator/>
+             
+               <separator/>
                 <menuitem name="External" action="External"/>
+                
                 <separator/>
                 <menuitem name="FromCacheFile" action="From cache file"/>
                 <menuitem action="SelectNothing"/>
@@ -137,11 +142,11 @@ context_ui = """
 
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
-LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
-LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
+LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
+LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and "), (" ", "_")]
 
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
-               "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External"]
+               "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External", "lrc123.com"]
 
 STOCK_IMAGE = "stock-llyrics-button"
 
@@ -171,7 +176,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                          "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
                          "Lyrdb.com": LyrdbParser, "Leoslyrics.com": LeoslyricsParser, 
                          "Darklyrics.com": DarklyricsParser, "Sogou.com": SogouParser, 
-                         "External": External})
+                         "External": External , "lrc123.com": lrc123Parser})
         self.add_builtin_lyrics_sources()
         
         # Get the user preferences
@@ -401,6 +406,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         source_action = Gtk.Action("ScanSourceAction", _("Source"), None, None)
         self.action_group.add_action(source_action)
         
+        scan_lrc123_action =  ("lrc123.com", None, "lrc123.com", None, None)
         scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org", None, None)
         scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br", None, None)
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
@@ -415,7 +421,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         scan_cache_action = ("From cache file", None, _("From cache file"), None, None)
         select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
-        self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
+        self.action_group.add_radio_actions([scan_lrc123_action, scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
                                              scan_chartlyrics_action, scan_lyrdb_action, scan_azlyrics_action,
                                              scan_leoslyrics_action, scan_lyricsmania_action, scan_sogou_action, 
                                              scan_darklyrics_action, scan_external_action, scan_cache_action, 
@@ -587,9 +593,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
         # get the song data
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
+          # if the fill the space with _, 
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
         print "search lyrics for " + self.artist + " - " + self.title
-   
+        
         (self.clean_artist, self.clean_title) = self.clean_song_data(self.artist, self.title)
         self.path = self.build_cache_path(self.clean_artist, self.clean_title)
         
@@ -599,8 +606,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
     def clean_song_data(self, artist, title):
         # convert to lowercase
-        artist = artist.lower()
-        title = title.lower()
+        # artist = artist.lower()
+        # title = title.lower()
         
         if self.ignore_brackets:
             LYRICS_TITLE_STRIP.append("\(.*\)")
@@ -624,11 +631,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def build_cache_path(self, artist, title):
-        artist_folder = os.path.join(self.lyrics_folder, artist[:128])
-        if not os.path.exists (artist_folder):
-            os.mkdir (artist_folder)
-    
-        return os.path.join(artist_folder, title[:128] + '.lyric')
+        lrc_path_name = os.path.join(self.lyrics_folder, artist[:128] + '-' + title[:128] + '.lrc' )
+        return lrc_path_name
     
     
     
@@ -925,6 +929,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     def get_lyrics_from_cache(self, path):        
         # try to load lyrics from cache
+        if _DEBUG == True:
+            import sys
+            func_name = sys._getframe().f_code.co_name
+            debug_file = open ("debug_file","a+" )
+            debug_file.write(func_name + ": " + path + '\n')
+            debug_file.close()
         if os.path.exists (path):
             try:
                 cachefile = open(path, "r")
