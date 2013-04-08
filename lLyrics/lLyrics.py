@@ -44,7 +44,7 @@ import DarklyricsParser
 import External
 import Util
 import lrc123Parser
-
+import bzmtvParser 
 from Config import Config
 from Config import ConfigDialog
 
@@ -68,17 +68,13 @@ lyrics_menu_ui = """
         %s
         <menu name="lLyrics" action="lLyricsMenuAction">
             <menu name="ScanSource" action="ScanSourceAction">
-                 <menuitem name="lrc123.com" action="lrc123.com"/>             
-                <menuitem name="ScanLyricwiki" action="Lyricwiki.org"/>
-                <menuitem name="ScanTerra" action="Letras.terra.com.br"/>
+                 <menuitem name="lrc123.com" action="lrc123.com"/>                         <menuitem name="bzmtv.com" action="bzmtv.com"/> 
+                 <menuitem name="ScanLyricwiki" action="Lyricwiki.org"/>
+              
                 <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
-                <menuitem name="ScanAZLyrics" action="AZLyrics.com"/>
-                <menuitem name="ScanLyricsmania" action="Lyricsmania.com"/>
-                <menuitem name="ScanDarklyrics" action="Darklyrics.com"/>
-                <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
+                              
                 <menuitem name="ScanLeoslyrics" action="Leoslyrics.com"/>
-                <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
-                <menuitem name="ScanSogou" action="Sogou.com"/>
+
              
                <separator/>
                 <menuitem name="External" action="External"/>
@@ -146,7 +142,7 @@ LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
 LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and "), (" ", "_")]
 
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
-               "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External", "lrc123.com"]
+               "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External", "lrc123.com", "bzmtv.com"]
 
 STOCK_IMAGE = "stock-llyrics-button"
 
@@ -176,7 +172,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                          "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
                          "Lyrdb.com": LyrdbParser, "Leoslyrics.com": LeoslyricsParser, 
                          "Darklyrics.com": DarklyricsParser, "Sogou.com": SogouParser, 
-                         "External": External , "lrc123.com": lrc123Parser})
+                         "External": External , "lrc123.com": lrc123Parser, "bzmtv.com": bzmtvParser })
         self.add_builtin_lyrics_sources()
         
         # Get the user preferences
@@ -407,26 +403,18 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.action_group.add_action(source_action)
         
         scan_lrc123_action =  ("lrc123.com", None, "lrc123.com", None, None)
+        scan_bzmtv_action =   ("bzmtv.com", None,"bzmtv.com" , None, None)
         scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org", None, None)
-        scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br", None, None)
+     
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
-        scan_azlyrics_action = ("AZLyrics.com", None, "AZLyrics.com", None, None)
-        scan_lyricsmania_action = ("Lyricsmania.com", None, "Lyricsmania.com", None, None)
-        scan_darklyrics_action = ("Darklyrics.com", None, "Darklyrics.com", None, None)
-        scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
+     
         scan_leoslyrics_action = ("Leoslyrics.com", None, "Leoslyrics.com", None, None)
-        scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
-        scan_sogou_action = ("Sogou.com", None, "Sogou.com", None, None)
+        
         scan_external_action = ("External", None, _("External"), None, None)
         scan_cache_action = ("From cache file", None, _("From cache file"), None, None)
         select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
         
-        self.action_group.add_radio_actions([scan_lrc123_action, scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                             scan_chartlyrics_action, scan_lyrdb_action, scan_azlyrics_action,
-                                             scan_leoslyrics_action, scan_lyricsmania_action, scan_sogou_action, 
-                                             scan_darklyrics_action, scan_external_action, scan_cache_action, 
-                                             select_nothing_action],
-                                             -1, self.scan_source_action_callback, None)
+        self.action_group.add_radio_actions([scan_lrc123_action,scan_bzmtv_action,  scan_lyricwiki_action, scan_metrolyrics_action, scan_leoslyrics_action,  scan_external_action, scan_cache_action,  select_nothing_action], -1, self.scan_source_action_callback, None)
         
         # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
         # so I use an invisible action for that
@@ -892,6 +880,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def _scan_all_sources_thread(self, artist, title, cache):
+        if _DEBUG == True:
+            # check the artist title code
+            import chardet
+            check_char_code = open ("check_charcode", "a+") ;
+            save_str =  artist + ": " + chardet.detect(artist)['encoding'] + " " +  title + ": " + chardet.detect(title)['encoding'] + "\n"
+            check_char_code.write  ( save_str )
+            check_char_code.close() 
+            
         self.action_group.set_sensitive(False)
         
         if cache:
