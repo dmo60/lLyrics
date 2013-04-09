@@ -41,29 +41,77 @@ def remove_punctuation(data):
 
 
 
+# def parse_lrc(data):
+#     tag_regex = r"(\[\d+\:\d+\.*\d*])"   # [xx:xx] or [xx:xx.xx]
+#     match = re.search(tag_regex, data)
+    
+#     # no tags
+#     if match is None:
+#         return (data, None)
+    
+#    # data = data[match.start():]
+#    # re.sub(r'\n\r$', r'\n$', data )
+#    # print data 
+#     splitted = re.split(tag_regex, data)[1:]
+    
+#     tags = []
+#     lyrics = ''
+#     for i in range(len(splitted)):
+#         if i % 2 == 0:
+#             # tag
+#             tags.append((time_to_seconds(splitted[i]), splitted[i+1]))
+#         else:
+#             # lyrics
+#             lyrics += splitted[i]
+    
+#     return (lyrics, tags)
+    
+    
 def parse_lrc(data):
-    tag_regex = "(\[\d+\:\d+\.\d*])"
-    match = re.search(tag_regex, data)
+    tag_regex = r"(\[\d+\:\d+\.*\d*\])"   # [xx:xx] or [xx:xx.xx]
+    lyric_start_tag = re.search(tag_regex, data)
     
     # no tags
-    if match is None:
+    if lyric_start_tag is None:
         return (data, None)
-    
-    data = data[match.start():]
-    splitted = re.split(tag_regex, data)[1:]
-    
+   
     tags = []
+    linsta_i  = lyric_start_tag.start()
+    linend_i  = data.find('\n', linsta_i )
+    while linend_i != -1:
+        # song 
+        song_i = data.rfind(']', linsta_i, linend_i)
+        song_i += 1
+        if song_i != 0 and song_i < linend_i and data[song_i] != '\r':
+            # no song content and space line situation remove 
+            timsta_i = linsta_i ; 
+
+            while timsta_i < song_i:
+                timsta_i  = data.find('[', timsta_i, linend_i)
+                if timsta_i == -1:
+                    print  "no time start tag"
+                    return (None, None )
+                timend_i  = data.find(']', timsta_i, linend_i )
+                if timend_i == -1:
+                    print  "no time end tag"
+                    return (None, None )
+            
+                tags.append((time_to_seconds( data[timsta_i:timend_i+1]), data[song_i:linend_i]) )
+               
+                timsta_i = timend_i+1
+        
+        
+        
+        linsta_i = linend_i + 1 
+        linend_i  = data.find('\n', linsta_i )
+        
+        
+  # sort 
+    tags.sort() 
     lyrics = ''
-    for i in range(len(splitted)):
-        if i % 2 == 0:
-            # tag
-            tags.append((time_to_seconds(splitted[i]), splitted[i+1]))
-        else:
-            # lyrics
-            lyrics += splitted[i]
-    
+    for _,song in tags:
+        lyrics += song + '\n'
     return (lyrics, tags)
-    
     
     
 def time_to_seconds(time):

@@ -47,11 +47,11 @@ import lrc123Parser
 import bzmtvParser 
 from Config import Config
 from Config import ConfigDialog
-
+from Config import _DEBUG
 import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
-_DEBUG = True 
+
 
 view_menu_ui = """
 <ui>
@@ -494,7 +494,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.tag = self.textbuffer.create_tag(None, underline=Pango.Underline.SINGLE, weight=600, 
                                               pixels_above_lines=10, pixels_below_lines=20)
         # tag to highlight synchronized lyrics
-        self.sync_tag = self.textbuffer.create_tag(None, weight=600)
+        self.sync_tag = self.textbuffer.create_tag(None, weight=800)
         
         # create save and cancel buttons for edited lyrics
         save_button = Gtk.Button.new_with_label(_("Save"))
@@ -880,7 +880,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def _scan_all_sources_thread(self, artist, title, cache):
-        if _DEBUG == True:
+        if Config._DEBUG == True:
             # check the artist title code
             import chardet
             check_char_code = open ("check_charcode", "a+") ;
@@ -925,12 +925,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     def get_lyrics_from_cache(self, path):        
         # try to load lyrics from cache
-        if _DEBUG == True:
+        if Config._DEBUG == True:
             import sys
             func_name = sys._getframe().f_code.co_name
             debug_file = open ("debug_file","a+" )
             debug_file.write(func_name + ": " + path + '\n')
             debug_file.close()
+
         if os.path.exists (path):
             try:
                 cachefile = open(path, "r")
@@ -1023,18 +1024,18 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def elapsed_changed(self, player, seconds):
         if not self.tags or not self.edit_event.is_set():
             return
+        index = 0
+        tags_size = len(self.tags)
+        for index in range(tags_size):
+            time = self.tags[index][0]
+            if time > seconds  :
+                break 
+            
+        if  self.current_tag != None and self.current_tag[0] == self.tags[index-1][0]:
+            return 
         
-        matching_tag = None
-        for tag in self.tags:
-            time, _ = tag
-            if time > seconds:
-                break
-            matching_tag = tag
         
-        if matching_tag is None or self.current_tag == matching_tag:
-            return
-        
-        self.current_tag = matching_tag
+        self.current_tag = self.tags[index-1]
         
         Gdk.threads_enter()
         
@@ -1043,7 +1044,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textbuffer.remove_tag(self.sync_tag, start, end)
         
         # highlight next line
-        line = self.tags.index(self.current_tag) + 1
+        line = index + 1 
         start = self.textbuffer.get_iter_at_line(line)
         end = start.copy()
         end.forward_to_line_end()
