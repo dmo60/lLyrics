@@ -47,12 +47,12 @@ import lrc123Parser
 import bzmtvParser 
 from Config import Config
 from Config import ConfigDialog
-from Config import _DEBUG
+#from Config import _DEBUG
 import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
 
-
+_DEBUG = True
 view_menu_ui = """
 <ui>
     <menubar name="MenuBar">
@@ -406,6 +406,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         scan_bzmtv_action =   ("bzmtv.com", None,"bzmtv.com" , None, None)
         scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org", None, None)
      
+
         scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
      
         scan_leoslyrics_action = ("Leoslyrics.com", None, "Leoslyrics.com", None, None)
@@ -880,7 +881,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def _scan_all_sources_thread(self, artist, title, cache):
-        if Config._DEBUG == True:
+        if _DEBUG == True:
             # check the artist title code
             import chardet
             check_char_code = open ("check_charcode", "a+") ;
@@ -912,7 +913,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if artist != self.clean_artist or title != self.clean_title:
             print "song changed"
             return
-            
+        
         if lyrics == "":
             self.action_group.get_action("SelectNothing").set_active(True)
             self.current_source = None  
@@ -925,7 +926,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     def get_lyrics_from_cache(self, path):        
         # try to load lyrics from cache
-        if Config._DEBUG == True:
+        if _DEBUG == True:
             import sys
             func_name = sys._getframe().f_code.co_name
             debug_file = open ("debug_file","a+" )
@@ -944,7 +945,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.current_source = "From cache file"
             self.action_group.get_action("From cache file").set_active(True)
             return lyrics
-            
+        
         return ""
     
     
@@ -1019,32 +1020,30 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         Gdk.threads_leave()
     
-    
-    
     def elapsed_changed(self, player, seconds):
         if not self.tags or not self.edit_event.is_set():
             return
-        index = 0
-        tags_size = len(self.tags)
-        for index in range(tags_size):
-            time = self.tags[index][0]
-            if time > seconds  :
-                break 
+        
+        matching_tag = None
+        for tag in self.tags:
+            time, _ = tag
+            if time > seconds:
+                break
+            matching_tag = tag
             
-        if  self.current_tag != None and self.current_tag[0] == self.tags[index-1][0]:
-            return 
-        
-        
-        self.current_tag = self.tags[index-1]
-        
-        Gdk.threads_enter()
-        
+            if matching_tag is None or self.current_tag == matching_tag:
+                return
+            
+            self.current_tag = matching_tag
+            
+            Gdk.threads_enter()
+            
         # remove old tag
         start, end = self.textbuffer.get_bounds()
         self.textbuffer.remove_tag(self.sync_tag, start, end)
         
         # highlight next line
-        line = index + 1 
+        line = self.tags.index(self.current_tag) + 1
         start = self.textbuffer.get_iter_at_line(line)
         end = start.copy()
         end.forward_to_line_end()
@@ -1053,3 +1052,37 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         Gdk.threads_leave()
 
+    
+    # def elapsed_changed(self, player, seconds):
+    #     if not self.tags or not self.edit_event.is_set():
+    #         return
+    #     index = 0
+    #     tags_size = len(self.tags)
+    #     for index in range(tags_size):
+    #         time = self.tags[index][0]
+    #         if time > seconds  :
+    #             break 
+            
+    #     if  self.current_tag != None and self.current_tag[0] == self.tags[index-1][0]:
+    #         return 
+        
+        
+    #     self.current_tag = self.tags[index-1]
+        
+    #     Gdk.threads_enter()
+        
+    #     # remove old tag
+    #     start, end = self.textbuffer.get_bounds()
+    #     self.textbuffer.remove_tag(self.sync_tag, start, end)
+        
+    #     # highlight next line
+    #     line = index + 1 
+    #     start = self.textbuffer.get_iter_at_line(line)
+    #     end = start.copy()
+    #     end.forward_to_line_end()
+    #     self.textbuffer.apply_tag(self.sync_tag, start, end)
+    #     self.textview.scroll_to_iter(start, 0.1, False, 0, 0)
+        
+    #     Gdk.threads_leave()
+
+ 
