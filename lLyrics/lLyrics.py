@@ -139,7 +139,8 @@ context_ui = """
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
 LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
-LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and "), (" ", "_")]
+LYRICS_ARTIST_REPLACE_ENGLISH=[(" ", "_"),  ("\+", "&")]
+LYRICS_ARTIST_REPLACE_CHINESE=[(" ", "&"), (",", "&"), ("\+", "&") ]
 
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
                "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External", "lrc123.com", "bzmtv.com"]
@@ -594,22 +595,41 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
 
     def clean_song_data(self, artist, title):
-        # convert to lowercase
-        # artist = artist.lower()
-        # title = title.lower()
-        
+      
+        if not Util.is_english (title):
+            # chinese song 
+            # filter the title to just stay the chinese
+            title = Util.filter_to_chinese(title)
+            
+            # it is probably a chinese singer.
+            if not Util.is_english (artist):
+            # chinese singer
+                for exp in LYRICS_ARTIST_REPLACE_CHINESE:
+                    artist = re.sub(exp[0], exp[1], artist)
+            else :
+                # but may be it is not.
+                for exp in LYRICS_ARTIST_REPLACE_CHINESE:
+                    artist = re.sub(exp[0], exp[1], artist) 
+
+        else :
+            # english song 
+            for exp in LYRICS_TITLE_REPLACE:
+                title = re.sub(exp[0], exp[1], title)
+            for exp in LYRICS_TITLE_STRIP:
+                title = re.sub (exp, '', title)
+            # if it is a english song , it will stand a good chance to foreigners ,space replace by underline , so use the english singer format to deal with 
+            for exp in LYRICS_ARTIST_REPLACE_ENGLISH:
+                artist = re.sub(exp[0], exp[1], artist)    
+
+     
+         
         if self.ignore_brackets:
             LYRICS_TITLE_STRIP.append("\(.*\)")
     
-        # replace ampersands and the like
-        for exp in LYRICS_ARTIST_REPLACE:
-            artist = re.sub(exp[0], exp[1], artist)
-        for exp in LYRICS_TITLE_REPLACE:
-            title = re.sub(exp[0], exp[1], title)
+     
     
         # strip things like "(live at Somewhere)", "(acoustic)", etc
-        for exp in LYRICS_TITLE_STRIP:
-            title = re.sub (exp, '', title)
+       
     
         # compress spaces
         title = title.strip()

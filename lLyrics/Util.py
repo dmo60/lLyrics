@@ -120,3 +120,20 @@ def time_to_seconds(time):
     return 60 * int(t[0]) + int(t[1])
     
     
+def is_english(to_check_str):
+    for ci in to_check_str:
+        if ord( eval (repr(ci))) > 128:
+            return False
+        
+    return True 
+        
+
+def filter_to_chinese (to_filter_str):
+    # change to unicode 
+    to_filter_str = to_filter_str.decode('utf-8')
+    filtered_str = u''
+    for uci in to_filter_str:
+        if  0x4e00<=ord( eval (repr(uci)))<=0x9fa6:
+            filtered_str += uci 
+  
+    return filtered_str.encode('utf-8') 
