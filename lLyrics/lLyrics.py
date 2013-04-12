@@ -201,8 +201,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.edit_event = threading.Event()
         self.edit_event.set()
         
+        # current_source is where the lyric file come from .
         self.current_source = None
+        
         self.tags = None
+        self.lyric_dict = None
+
         self.current_tag = None
         self.showing_on_demand = False
         
@@ -562,6 +566,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # clear sync stuff
         if self.tags is not None:
             self.tags = None
+            self.lyric_dict = None 
             self.current_tag = None
             start, end = self.textbuffer.get_bounds()
             self.textbuffer.remove_tag(self.sync_tag, start, end)
@@ -797,9 +802,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         start, end = self.textbuffer.get_bounds()
         start.forward_lines(1)
         lyrics = self.textbuffer.get_text(start, end, False)
-        
+        lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
         # save edited lyrics to cache file
-        self.write_lyrics_to_cache(self.path_before_edit, lyrics)
+        if lrc_content != "":
+            self.write_lyrics_to_cache(self.path_before_edit, lrc_content )
         
         # If playing song changed, set "searching lyrics..." (might be overwritten
         # immediately, if thread for the new song already found lyrics)
@@ -1027,10 +1033,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
         else:        
             self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
-            lyrics, self.tags = Util.parse_lrc(lyrics)
+            self.lyric_dict, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()
-        
+        lyrics = ""
+        for item in self.tags:
+            lyrics += self.lyric_dict[ item[1] ]  + '\n'
+
         self.textbuffer.set_text("%s - %s\n%s" % (artist, title, lyrics))
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()
@@ -1040,37 +1049,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         Gdk.threads_leave()
     
-    # def elapsed_changed(self, player, seconds):
-    #     if not self.tags or not self.edit_event.is_set():
-    #         return
-        
-    #     matching_tag = None
-    #     for tag in self.tags:
-    #         time, _ = tag
-    #         if time > seconds:
-    #             break
-    #         matching_tag = tag
-            
-    #         if matching_tag is None or self.current_tag == matching_tag:
-    #             return
-            
-    #         self.current_tag = matching_tag
-            
-    #         Gdk.threads_enter()
-            
-    #     remove old tag
-    #     start, end = self.textbuffer.get_bounds()
-    #     self.textbuffer.remove_tag(self.sync_tag, start, end)
-        
-    #     highlight next line
-    #     line = self.tags.index(self.current_tag) + 1
-    #     start = self.textbuffer.get_iter_at_line(line)
-    #     end = start.copy()
-    #     end.forward_to_line_end()
-    #     self.textbuffer.apply_tag(self.sync_tag, start, end)
-    #     self.textview.scroll_to_iter(start, 0.1, False, 0, 0)
-        
-    #     Gdk.threads_leave()
+  
 
     
     def elapsed_changed(self, player, seconds):

@@ -19,7 +19,7 @@
 
 import re
 import string
-
+import os 
 
 def decode_chars(resp):
     chars = resp.split(";")
@@ -39,33 +39,22 @@ def remove_punctuation(data):
     
     return data
 
+def lrcfile_head_info ( filepath ):
+    # the lrc file is ordinary code utf-8 ,so suppose it is .
+    lyrics = ''
+    if os.path.exists (filepath):
+        try:
+            lrcfile = open(filepath, "r")
+            lyrics = lrcfile.read()
+            lrcfile.close()
+        except:
+            print "error reading cache file"
+            return ""
 
-
-# def parse_lrc(data):
-#     tag_regex = r"(\[\d+\:\d+\.*\d*])"   # [xx:xx] or [xx:xx.xx]
-#     match = re.search(tag_regex, data)
-    
-#     # no tags
-#     if match is None:
-#         return (data, None)
-    
-#    # data = data[match.start():]
-#    # re.sub(r'\n\r$', r'\n$', data )
-#    # print data 
-#     splitted = re.split(tag_regex, data)[1:]
-    
-#     tags = []
-#     lyrics = ''
-#     for i in range(len(splitted)):
-#         if i % 2 == 0:
-#             # tag
-#             tags.append((time_to_seconds(splitted[i]), splitted[i+1]))
-#         else:
-#             # lyrics
-#             lyrics += splitted[i]
-    
-#     return (lyrics, tags)
-    
+    tag_regex = r"(\[\d+\:\d+\.*\d*\])"   # [xx:xx] or [xx:xx.xx]
+    head_end  = re.search(tag_regex, lyrics)    
+  
+    return lyrics[ : head_end.start() ]
     
 def parse_lrc(data):
     tag_regex = r"(\[\d+\:\d+\.*\d*\])"   # [xx:xx] or [xx:xx.xx]
@@ -76,6 +65,8 @@ def parse_lrc(data):
         return (data, None)
    
     tags = []
+    lyric_dict = {}
+    lyric_id = 0 
     linsta_i  = lyric_start_tag.start()
     linend_i  = data.find('\n', linsta_i )
     while linend_i != -1:
@@ -84,8 +75,10 @@ def parse_lrc(data):
         song_i += 1
         if song_i != 0 and song_i < linend_i and data[song_i] != '\r':
             # no song content and space line situation remove 
+            # fill the dictionary 
+            lyric_dict[lyric_id] =  data[song_i:linend_i]
             timsta_i = linsta_i ; 
-
+            
             while timsta_i < song_i:
                 timsta_i  = data.find('[', timsta_i, linend_i)
                 if timsta_i == -1:
@@ -96,10 +89,11 @@ def parse_lrc(data):
                     print  "no time end tag"
                     return (None, None )
             
-                tags.append((time_to_seconds( data[timsta_i:timend_i+1]), data[song_i:linend_i]) )
-               
+                tags.append((time_to_seconds( data[timsta_i:timend_i+1]),lyric_id ) )
+                
                 timsta_i = timend_i+1
-        
+            # lyric_id self add 
+            lyric_id += 1
         
         
         linsta_i = linend_i + 1 
@@ -108,17 +102,59 @@ def parse_lrc(data):
         
   # sort 
     tags.sort() 
-    lyrics = ''
-    for _,song in tags:
-        lyrics += song + '\n'
-    return (lyrics, tags)
+
+    return (lyric_dict , tags)
     
-    
+def make_lrc_file ( original_file_path, edited_lyric,  time_tags ):
+    "make the "
+    if len(edited_lyric) == 0:
+        return ""
+    head_info = lrcfile_head_info ( original_file_path )
+   
+    # this is a dictionary.
+    lrc_content = {}
+  
+    linsta_i = 0; 
+    time_id = 0 
+    for item in time_tags:
+        linend_i = edited_lyric.find( '\n', linsta_i )
+        if linend_i == -1:
+            continue 
+        lyric_line = edited_lyric[linsta_i:linend_i+1]
+        # if has this key , add the time 
+        if lrc_content.has_key( lyric_line ):
+            lrc_content[lyric_line].append ( item[0])
+        else :
+            lrc_content[lyric_line] = [ item[0] ]
+        linsta_i = linend_i + 1 
+        time_id += 1 
+
+    list_lrc_content = lrc_content.items()
+    list_lrc_content.sort( lrc_dict_compare ) 
+
+    str_lrc_content = ""
+    for item in list_lrc_content:
+        num_time_id = len(item[1])
+        while num_time_id > 0:
+            str_lrc_content += time_to_lrc ( item[1][num_time_id -1])
+            num_time_id -= 1
+        str_lrc_content += item[0]
+      
+    return head_info + str_lrc_content 
+    # lrcfile = open(filepath, "w")
+    # lrcfile.write( head_info )
+    # lrcfile.write ( str_lrc_content )
+    # lrcfile.close() 
+       
 def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
     
+def time_to_lrc( time):
+    minute = time / 60
+    second  = time % 60 
+    return "[%d:%.2f]" %  (minute, second)  
     
 def is_english(to_check_str):
     for ci in to_check_str:
@@ -137,3 +173,10 @@ def filter_to_chinese (to_filter_str):
             filtered_str += uci 
   
     return filtered_str.encode('utf-8') 
+
+def lrc_dict_compare ( first, second ):
+    """ the first and second is the tuple
+        the format is :
+        ( key, [time list])
+    """
+    return cmp( first[1][0], second[1][0] )

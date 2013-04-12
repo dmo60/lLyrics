@@ -24,10 +24,22 @@ if __name__ == '__main__':
     # b = u'PYTHON酷'
     # print Util.filter_to_chinese(b)
     
-    lyric = lLyrics.lLyrics()
-    artist, title = lyric.clean_song_data ( u'许志安+梅艳芳'.encode('utf-8'), u'女人之苦'.encode('utf-8'))
-    print artist, title 
+    # lyric = lLyrics.lLyrics()
+    # artist, title = lyric.clean_song_data ( u'许志安+梅艳芳'.encode('utf-8'), u'女人之苦'.encode('utf-8'))
+    # print artist, title 
 
-    artist, title = lyric.clean_song_data ( u'泰勒 史薇芙特'.encode('utf-8'), u'Christmases When You Were Mine'.encode('utf-8'))
-    print artist, title 
- 
+    # artist, title = lyric.clean_song_data ( u'泰勒 史薇芙特'.encode('utf-8'), u'Christmases When You Were Mine'.encode('utf-8'))
+    # print artist, title 
+    filename = u'/home/anzizhao/.lyrics/蔡琴-你的眼神.lrc'.encode('utf-8')
+    fp = open (filename , "r+" )
+    context = fp.read()
+    fp.close()
+    print "orginal lrc file: \n %s" , context 
+    lyric_dict , tags = Util.parse_lrc(context)
+    lyrics = ""
+    for item in tags:
+        lyrics += lyric_dict[ item[1] ]  + '\n'
+        
+    print "read the lrc file , get lyric: \n %s" % lyrics 
+
+    print Util.make_lrc_file (filename , lyrics, tags )
