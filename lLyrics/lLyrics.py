@@ -702,10 +702,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         start, end = self.textbuffer.get_bounds()
         # remove sync tag
         self.textbuffer.remove_tag(self.sync_tag, start, end)
-        # lyrics_file = open ( self.path, "r+", 'utf-8')
-        # self.lyrics_before_edit = lyrics_file.read() 
-        # lyric_file.close ()
-        self.textbuffer.set_text ( "what is the matter ". encode('utf-8'))
+     
+        self.lyrics_before_edit = self.textbuffer.get_text(start, end, False)
    #     self.textbuffer.set_text ( self.lyrics_before_edit[:-2])
    
    
@@ -729,42 +727,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
       #  self.textbuffer.set_text( self.lyrics_before_edit )
         
 
-    #def edit_action_callback(self, action):
-        # # Unset event flag to indicate editing and so block all other threads which 
-        # # want to display new lyrics until editing is finished.
-        # lyrics_file = open ( self.path, "r+")
-        # self.lyrics_before_edit = lyrics_file.read() 
-        # lyric_file.close () 
-        # if _DEBUG == True :
-        #     import sys
-        #     func_name = sys._getframe().f_code.co_name
-        #     debug_file = open ("debug_file","a+" )
-        #     debug_file.write(func_name + ':' + self.path + '\n' + self.lyrics_before_edit)
-        #     debug_file.close()
-
-        # self.edit_event.clear()
-        
-        # # Conserve lyrics in order to restore original lyrics when editing is canceled 
-        
-        # # remove sync tag
-        # start, end = self.textbuffer.get_bounds()
-        # self.textbuffer.get_text(start, end, False)
-        # self.textbuffer.remove_tag(self.sync_tag, start, end)
-        # self.textbuffer.set_text( self.lyrics_before_edit )
-        # # Conserve cache path in order to be able to correctly save edited lyrics although
-        # # the playing song might have changed during editing.
-        # self.path_before_edit = self.path
-        
-        # self.action_group.set_sensitive(False)
-        
-        # # Enable editing and set cursor
-        # self.textview.set_cursor_visible(True)
-        # self.textview.set_editable(True)
-        # cursor = self.textbuffer.get_iter_at_line(1)
-        # self.textbuffer.place_cursor(cursor)
-        # self.textview.grab_focus()
-        
-        # self.hbox.show()
+  
         
     
     def context_action_callback(self, action):
@@ -806,7 +769,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         start, end = self.textbuffer.get_bounds()
       #  start.forward_lines(1)
         lyrics = self.textbuffer.get_text(start, end, False)
-      #  lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
+        lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
         # save edited lyrics to cache file
         if lrc_content != "":
             self.write_lyrics_to_cache(self.path_before_edit, lyrics)
@@ -815,8 +778,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # immediately, if thread for the new song already found lyrics)
         if self.path != self.path_before_edit:
             self.textbuffer.set_text(_("searching lyrics..."))
-        else :
-            self.show_lyrics ( self.artist, self.title, lyrics )
+      #  else :
+       #     self.show_lyrics ( self.artist, self.title, lyrics )
             
         self.action_group.set_sensitive(True)
         
