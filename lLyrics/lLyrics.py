@@ -47,12 +47,12 @@ import lrc123Parser
 import bzmtvParser 
 from Config import Config
 from Config import ConfigDialog
-#from Config import _DEBUG
+from Config import _DEBUG
 import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
 
-_DEBUG = True
+#_DEBUG = True
 view_menu_ui = """
 <ui>
     <menubar name="MenuBar">
@@ -136,11 +136,7 @@ context_ui = """
 </ui>
 """
 
-LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
-                   "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
-LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
-LYRICS_ARTIST_REPLACE_ENGLISH=[(" ", "_"),  ("\+", "&")]
-LYRICS_ARTIST_REPLACE_CHINESE=[(" ", "&"), (",", "&"), ("\+", "&") ]
+
 
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
                "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External", "lrc123.com", "bzmtv.com"]
@@ -565,6 +561,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def search_lyrics(self, player, entry):
         # clear sync stuff
         if self.tags is not None:
+            # it means the first time to search this song 
+        
             self.tags = None
             self.lyric_dict = None 
             self.current_tag = None
@@ -592,56 +590,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
         print "search lyrics for " + self.artist + " - " + self.title
         
-        (self.clean_artist, self.clean_title) = self.clean_song_data(self.artist, self.title)
+        (self.clean_artist, self.clean_title) = Util.clean_song_data(self.artist, self.title)
         self.path = self.build_cache_path(self.clean_artist, self.clean_title)
         
         self.scan_all_sources(self.clean_artist, self.clean_title, True)
         
-        
-
-    def clean_song_data(self, artist, title):
-      
-        if not Util.is_english (title):
-            # chinese song 
-            # filter the title to just stay the chinese
-            title = Util.filter_to_chinese(title)
-            
-            # it is probably a chinese singer.
-            if not Util.is_english (artist):
-            # chinese singer
-                for exp in LYRICS_ARTIST_REPLACE_CHINESE:
-                    artist = re.sub(exp[0], exp[1], artist)
-            else :
-                # but may be it is not.
-                for exp in LYRICS_ARTIST_REPLACE_CHINESE:
-                    artist = re.sub(exp[0], exp[1], artist) 
-
-        else :
-            # english song 
-            for exp in LYRICS_TITLE_REPLACE:
-                title = re.sub(exp[0], exp[1], title)
-            for exp in LYRICS_TITLE_STRIP:
-                title = re.sub (exp, '', title)
-            # if it is a english song , it will stand a good chance to foreigners ,space replace by underline , so use the english singer format to deal with 
-            for exp in LYRICS_ARTIST_REPLACE_ENGLISH:
-                artist = re.sub(exp[0], exp[1], artist)    
-
-     
-         
-        if self.ignore_brackets:
-            LYRICS_TITLE_STRIP.append("\(.*\)")
     
-     
-    
-        # strip things like "(live at Somewhere)", "(acoustic)", etc
-       
-    
-        # compress spaces
-        title = title.strip()
-        artist = artist.strip()
-                
-        return (artist, title)
-    
+  
     
     
     def build_cache_path(self, artist, title):
@@ -742,12 +697,22 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.edit_event.clear()
         
         # Conserve lyrics in order to restore original lyrics when editing is canceled 
+     
+      
         start, end = self.textbuffer.get_bounds()
-        self.lyrics_before_edit = self.textbuffer.get_text(start, end, False)
         # remove sync tag
         self.textbuffer.remove_tag(self.sync_tag, start, end)
+        # lyrics_file = open ( self.path, "r+", 'utf-8')
+        # self.lyrics_before_edit = lyrics_file.read() 
+        # lyric_file.close ()
+        self.textbuffer.set_text ( "what is the matter ". encode('utf-8'))
+   #     self.textbuffer.set_text ( self.lyrics_before_edit[:-2])
+   
+   
+        # # Conserve cache path in order to be able to correc
         # Conserve cache path in order to be able to correctly save edited lyrics although
         # the playing song might have changed during editing.
+      
         self.path_before_edit = self.path
         
         self.action_group.set_sensitive(False)
@@ -755,12 +720,51 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Enable editing and set cursor
         self.textview.set_cursor_visible(True)
         self.textview.set_editable(True)
+        
         cursor = self.textbuffer.get_iter_at_line(1)
         self.textbuffer.place_cursor(cursor)
         self.textview.grab_focus()
-        
+       
         self.hbox.show()
+      #  self.textbuffer.set_text( self.lyrics_before_edit )
         
+
+    #def edit_action_callback(self, action):
+        # # Unset event flag to indicate editing and so block all other threads which 
+        # # want to display new lyrics until editing is finished.
+        # lyrics_file = open ( self.path, "r+")
+        # self.lyrics_before_edit = lyrics_file.read() 
+        # lyric_file.close () 
+        # if _DEBUG == True :
+        #     import sys
+        #     func_name = sys._getframe().f_code.co_name
+        #     debug_file = open ("debug_file","a+" )
+        #     debug_file.write(func_name + ':' + self.path + '\n' + self.lyrics_before_edit)
+        #     debug_file.close()
+
+        # self.edit_event.clear()
+        
+        # # Conserve lyrics in order to restore original lyrics when editing is canceled 
+        
+        # # remove sync tag
+        # start, end = self.textbuffer.get_bounds()
+        # self.textbuffer.get_text(start, end, False)
+        # self.textbuffer.remove_tag(self.sync_tag, start, end)
+        # self.textbuffer.set_text( self.lyrics_before_edit )
+        # # Conserve cache path in order to be able to correctly save edited lyrics although
+        # # the playing song might have changed during editing.
+        # self.path_before_edit = self.path
+        
+        # self.action_group.set_sensitive(False)
+        
+        # # Enable editing and set cursor
+        # self.textview.set_cursor_visible(True)
+        # self.textview.set_editable(True)
+        # cursor = self.textbuffer.get_iter_at_line(1)
+        # self.textbuffer.place_cursor(cursor)
+        # self.textview.grab_focus()
+        
+        # self.hbox.show()
         
     
     def context_action_callback(self, action):
@@ -800,17 +804,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         # get lyrics without artist-title header
         start, end = self.textbuffer.get_bounds()
-        start.forward_lines(1)
+      #  start.forward_lines(1)
         lyrics = self.textbuffer.get_text(start, end, False)
-        lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
+      #  lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
         # save edited lyrics to cache file
         if lrc_content != "":
-            self.write_lyrics_to_cache(self.path_before_edit, lrc_content )
+            self.write_lyrics_to_cache(self.path_before_edit, lyrics)
         
         # If playing song changed, set "searching lyrics..." (might be overwritten
         # immediately, if thread for the new song already found lyrics)
         if self.path != self.path_before_edit:
             self.textbuffer.set_text(_("searching lyrics..."))
+        else :
+            self.show_lyrics ( self.artist, self.title, lyrics )
             
         self.action_group.set_sensitive(True)
         
@@ -860,7 +866,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.textbuffer.set_text("")
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
             return
-        
+       
         # otherwise search lyrics
         self.search_lyrics(self.player, playing_entry)
         
@@ -888,7 +894,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if artist != self.clean_artist or title != self.clean_title:
             print "song changed"
             return
-                
+        
+        self.lyrics_before_edit = lyrics 
         self.show_lyrics(self.artist, self.title, lyrics)          
         
         self.action_group.set_sensitive(True)
@@ -939,6 +946,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if artist != self.clean_artist or title != self.clean_title:
             print "song changed"
             return
+        
+        if _DEBUG == True :
+            import sys
+            func_name = sys._getframe().f_code.co_name
+            debug_file = open ("debug_file","a+" )
+            debug_file.write(func_name + ": " +  lyrics + '\n')
+            debug_file.close()
         
         if lyrics == "":
             self.action_group.get_action("SelectNothing").set_active(True)
@@ -1031,15 +1045,20 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print "no lyrics found"
             lyrics = _("No lyrics found")
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+
         else:        
             self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
             self.lyric_dict, self.tags = Util.parse_lrc(lyrics)
-        
-        Gdk.threads_enter()
-        lyrics = ""
-        for item in self.tags:
-            lyrics += self.lyric_dict[ item[1] ]  + '\n'
+            if self.tags != None:
+                lyrics = ""
+                for item in self.tags:
+                    lyrics += self.lyric_dict[ item[1] ]  + '\n'
+            else :
+                lyrics = self.lyric_dict 
+                self.lyric_dict = None 
 
+
+        Gdk.threads_enter()
         self.textbuffer.set_text("%s - %s\n%s" % (artist, title, lyrics))
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()

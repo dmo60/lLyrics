@@ -180,3 +180,90 @@ def lrc_dict_compare ( first, second ):
         ( key, [time list])
     """
     return cmp( first[1][0], second[1][0] )
+
+
+# change title and singer format for send http request
+LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
+                   "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
+LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
+LYRICS_ARTIST_REPLACE_ENGLISH=[(" ", "_"),  ("\+", "&")]
+LYRICS_ARTIST_REPLACE_CHINESE=[(" ", "&"), (",", "&"), ("\+", "&") ]
+
+def clean_song_data ( artist, title ):
+      
+    if not is_english (title):
+        # chinese song 
+        title = chinese_title( title ) 
+    else :
+        # english song 
+        title = english_title ( title )
+
+    if not is_english ( artist ):
+        artist = chinese_name_singer ( artist )
+    else :
+        artist = english_name_singer ( artist )
+            
+    # compress spaces
+    title = title.strip()
+    artist = artist.strip()
+    return (artist, title)
+
+def english_name_singer ( artist ):
+    artist = artist.lower()
+    for exp in LYRICS_ARTIST_REPLACE_ENGLISH:
+        artist = re.sub(exp[0], exp[1], artist)
+    return artist 
+
+def chinese_name_singer ( artist ):
+     for exp in LYRICS_ARTIST_REPLACE_CHINESE:
+         artist = re.sub(exp[0], exp[1], artist)
+     return artist 
+
+def english_title ( title ):
+    title = title.lower()
+    for exp in LYRICS_TITLE_REPLACE:
+        title = re.sub(exp[0], exp[1], title)
+    for exp in LYRICS_TITLE_STRIP:
+        title = re.sub (exp, '', title)
+    return title 
+
+
+def chinese_title ( title ):
+    "filter the title to just stay the chinese"
+    title = re.sub(r'\(.*\)', '', title )
+    return filter_to_chinese(title)
+
+def original_title ( title ):
+    'the web station ordinary have no difference to compare english'
+    if is_english(title):
+        title = re.sub( r'\+', ' ', title)
+    return title 
+
+def original_singer ( singer):
+    singer_group = []
+    english_tag = False 
+    if is_english ( singer ):
+        singer = re.sub(r'_', ' ', singer)
+        english_tag = True 
+
+    start_i = 0; 
+    end_i = singer.find( '&', start_i )
+    while end_i != -1 :
+        singer = singer[start_i : end_i ]
+        if english_tag == True:
+            singer_group.append (singer.title() )
+
+        singer_group.append( singer)        
+        start_i = end_i +1 
+        end_i = singer.find( '&', start_i )
+    
+    singer = singer[start_i:]
+    if english_tag == True:
+        singer_group.append (singer.title() )
+
+    singer_group.append( singer)        
+    
+    return singer_group 
+
+   
+        

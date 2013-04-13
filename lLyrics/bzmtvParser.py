@@ -18,6 +18,8 @@ import urllib2
 import string
 import re 
 import chardet 
+import Util 
+
 class Parser(object):
     
     def __init__(self, artist, title):
@@ -26,11 +28,14 @@ class Parser(object):
         self.title = title
         self.lyrics = ""
         self.url_home = "http://lrc.bzmtv.com/"
+
+
     def parse(self):
         # create lyrics Url
-    
-        #url = "http://lrc.bzmtv.com/so.asp?key=" + urllib2.quote(self.title) +  "&go=go&y=1"  #go=(go|so) go为精确搜索 so模糊搜索  y=(1|2|3)(歌名|歌手|专辑)
-        url = "http://lrc.bzmtv.com/so.asp?key=" + self.title.decode('utf-8').encode('gb2312') +  "&go=go&y=1"  
+        ori_title = Util.original_title ( self.title )
+        ori_singer_group = Util.original_singer ( self.artist )
+
+        url = "http://lrc.bzmtv.com/so.asp?key=" + urllib2.quote(ori_title.decode('utf-8').encode('gb2312') ) +  "&go=go&y=1"  
 #go=(go|so) go为精确搜索 so模糊搜索  y=(1|2|3)(歌名|歌手|专辑)   网站的比较是使用gb2312编码, 所以title需要编码
   
     
@@ -41,25 +46,36 @@ class Parser(object):
             return ""
         resp = resp.decode( 'gb2312', 'ignore').encode('utf-8')
     
-        partern1 = r'.*class="slmc".*' + self.title  + r'.*\n.*class="acll".*' + self.artist
-        result = re.search ( partern1, resp )
+        result = None 
+        for artist in ori_singer_group :
+            partern1 = r'.*class="slmc".*' + ori_title.title()  + r'.*\n.*class="acll".*' + artist
+            result = re.search ( partern1, resp )
+            if result != None:
+                break 
+
+
         if result == None:
+            print "no answer in the resultlist page"
             return ""
         
         partern2 = r'lrc/.*htm'
         result_url = re.search ( partern2, result.group(0) )
+
         if result_url == None:
+            print "no download file "
             return ""
+
         url = self.url_home + result_url.group(0)
         try:
             self.lyrics = urllib2.urlopen( url, None, 3).read()
         except:
             print "could not download lrc"
             return ""
+
         self.lyrics = self.lyrics.decode('gb2312', 'ignore').encode('utf-8')
-        partern =  r'\[ti:' + self.title
+        partern =  r'\[ti:'
         startm = re.search ( partern , self.lyrics )
-        partern =  r'\[.*</pre>'
+        partern =  r'</pre>'
         endm = re.search ( partern , self.lyrics )
         return self.lyrics[startm.start(): endm.end()-len("</pre>")]
       
@@ -68,11 +84,12 @@ class Parser(object):
 
 if __name__  == '__main__':
  #  test = Parser(r'苏打绿', r'无与伦比的美丽')
-    print "Input the artist and title :"
+ #   print "Input the artist and title :"
  #   artist = raw_input () 
  #   title = raw_input () 
  #   art =  unicode( artist, 'utf-8')
  #   tit = unicode ( title, 'utf-8') 
-    test = Parser( u'蔡琴'.encode('utf-8') , u'你的眼神'.encode('utf-8')  )
+    
+    test = Parser( u''.encode('utf-8') , u''.encode('utf-8')  )
     
     print test.parse()

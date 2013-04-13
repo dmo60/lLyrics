@@ -17,33 +17,46 @@
 import urllib2
 import string
 import re 
+import Util 
+
 class Parser(object):
     
     def __init__(self, artist, title):
+        "the artist and the title is the clean data, when compare the result page singer or song name , should use the original the name  "
         self.artist = artist
         self.title = title
         self.lyrics = ""
         self.url_home = "http://www.lrc123.com"
-    def parse(self):
+ 
+    def parse( self ) :
         # create lyrics Url
-      #  url = "http://webservices.lyrdb.com/lookup.php?q=" + urllib2.quote(self.artist) + "|" + urllib2.quote(self.title) + "&for=match&agent=llyrics"
-        url = "http://www.lrc123.com/?keyword=" + urllib2.quote(self.title) +  "&field=song"
-   #     print "call lyrdb API " + url
+        ori_title = Util.original_title ( self.title )
+        ori_singer_list = Util.original_singer ( self.artist )
+
+        url = "http://www.lrc123.com/?keyword=" + urllib2.quote(ori_title) +  "&field=song"
+        # print "call lyrdb API " + url
         try:
             resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not get result list"
             return ""
        
-        partern1 = r'歌手:<a.*' + self.artist + r'.*\n.*\n.*\n.*\n.*\n.*\n.*\n.*\n.*'
-        result = re.search ( partern1, resp )
+       
+        result = None 
+        for artist in ori_singer_list :
+            partern1 = r'歌手:<a.*' + artist + r'.*\n.*\n.*\n.*\n.*\n.*\n.*\n.*\n.*'
+            result = re.search ( partern1, resp )
+            if result != None :
+                break 
+
         if result == None:
-            return self.lyrics                   # no find the result , return none 
+            return ""                 # no find the result , return none 
         
         partern2 = r'/download.*aspx'
         result_url = re.search ( partern2, result.group(0) )
         if result_url == None:
             return ""
+
         url = self.url_home + result_url.group(0)
         try:
             self.lyrics = urllib2.urlopen( url, None, 3).read()

@@ -23,8 +23,12 @@ from gi.repository import RB
 
 import lLyrics
 
-DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
 _DEBUG = True 
+
+DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
+
+
+
 class Config(object):
     
     def __init__(self):
