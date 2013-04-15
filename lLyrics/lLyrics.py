@@ -49,6 +49,10 @@ from Config import Config
 from Config import ConfigDialog
 from Config import _DEBUG
 import gettext
+import codecs
+
+
+
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
 
@@ -694,6 +698,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def edit_action_callback(self, action):
         # Unset event flag to indicate editing and so block all other threads which 
         # want to display new lyrics until editing is finished.
+        ori_fp = codecs.open ( self.path, 'r', 'utf-8' )
+        ori_lrc = ori_fp.read()
+        ori_fp.close()
+       
         self.edit_event.clear()
         
         # Conserve lyrics in order to restore original lyrics when editing is canceled 
@@ -701,11 +709,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
       
         start, end = self.textbuffer.get_bounds()
         # remove sync tag
+        self.textbuffer.remove_tag ( self.tag, start, end )
         self.textbuffer.remove_tag(self.sync_tag, start, end)
+        self.lyrics_before_edit = self.textbuffer.get_text( start, end, False )
+   #     self.lyrics_before_edit = self.textbuffer.get_text(start, end, False)
+       
+        self.textview.get_buffer().set_text( ori_lrc)
      
-        self.lyrics_before_edit = self.textbuffer.get_text(start, end, False)
-   #     self.textbuffer.set_text ( self.lyrics_before_edit[:-2])
-   
    
         # # Conserve cache path in order to be able to correc
         # Conserve cache path in order to be able to correctly save edited lyrics although
@@ -769,11 +779,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         start, end = self.textbuffer.get_bounds()
       #  start.forward_lines(1)
         lyrics = self.textbuffer.get_text(start, end, False)
-        lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
+      #  lrc_content = Util.make_lrc_file ( self.path_before_edit, lyrics, self.tags )
         # save edited lyrics to cache file
-        if lrc_content != "":
-            self.write_lyrics_to_cache(self.path_before_edit, lyrics)
-        
+        if lyrics != "":
+            self.write_lyrics_to_cache(self.path_before_edit, lyrics )
+            self.show_lyrics (self.artist, self.title, lyrics )
+
         # If playing song changed, set "searching lyrics..." (might be overwritten
         # immediately, if thread for the new song already found lyrics)
         if self.path != self.path_before_edit:
@@ -786,6 +797,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
         self.edit_event.set()
+       
         
         
         
@@ -858,7 +870,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print "song changed"
             return
         
-        self.lyrics_before_edit = lyrics 
         self.show_lyrics(self.artist, self.title, lyrics)          
         
         self.action_group.set_sensitive(True)
