@@ -19,7 +19,7 @@
 
 import re
 import string
-
+import os 
 
 def decode_chars(resp):
     chars = resp.split(";")
@@ -39,36 +39,231 @@ def remove_punctuation(data):
     
     return data
 
+def lrcfile_head_info ( filepath ):
+    # the lrc file is ordinary code utf-8 ,so suppose it is .
+    lyrics = ''
+    if os.path.exists (filepath):
+        try:
+            lrcfile = open(filepath, "r")
+            lyrics = lrcfile.read()
+            lrcfile.close()
+        except:
+            print "error reading cache file"
+            return ""
 
-
+    tag_regex = r"(\[\d+\:\d+\.*\d*\])"   # [xx:xx] or [xx:xx.xx]
+    head_end  = re.search(tag_regex, lyrics)    
+  
+    return lyrics[ : head_end.start() ]
+    
 def parse_lrc(data):
-    tag_regex = "(\[\d+\:\d+\.\d*])"
-    match = re.search(tag_regex, data)
+    tag_regex = r"(\[\d+\:\d+\.*\d*\])"   # [xx:xx] or [xx:xx.xx]
+    lyric_start_tag = re.search(tag_regex, data)
     
     # no tags
-    if match is None:
+    if lyric_start_tag is None:
         return (data, None)
-    
-    data = data[match.start():]
-    splitted = re.split(tag_regex, data)[1:]
-    
+   
     tags = []
-    lyrics = ''
-    for i in range(len(splitted)):
-        if i % 2 == 0:
-            # tag
-            tags.append((time_to_seconds(splitted[i]), splitted[i+1]))
-        else:
-            # lyrics
-            lyrics += splitted[i]
+    lyric_dict = {}
+    lyric_id = 0 
+    linsta_i  = lyric_start_tag.start()
+    linend_i  = data.find('\n', linsta_i )
+    while linend_i != -1:
+        # song 
+        song_i = data.rfind(']', linsta_i, linend_i)
+        song_i += 1
+        if song_i != 0 and song_i < linend_i and data[song_i] != '\r':
+            # no song content and space line situation remove 
+            # fill the dictionary 
+            lyric_dict[lyric_id] =  data[song_i:linend_i]
+            timsta_i = linsta_i ; 
+            
+            while timsta_i < song_i:
+                timsta_i  = data.find('[', timsta_i, linend_i)
+                if timsta_i == -1:
+                    print  "no time start tag"
+                    return (None, None )
+                timend_i  = data.find(']', timsta_i, linend_i )
+                if timend_i == -1:
+                    print  "no time end tag"
+                    return (None, None )
+            
+                tags.append((time_to_seconds( data[timsta_i:timend_i+1]),lyric_id ) )
+                
+                timsta_i = timend_i+1
+            # lyric_id self add 
+            lyric_id += 1
+        
+        
+        linsta_i = linend_i + 1 
+        linend_i  = data.find('\n', linsta_i )
+        
+        
+  # sort 
+    tags.sort() 
+
+    return (lyric_dict , tags)
     
-    return (lyrics, tags)
-    
-    
-    
+def make_lrc_file ( original_file_path, edited_lyric,  time_tags ):
+    "make the "
+    if len(edited_lyric) == 0:
+        return ""
+    head_info = lrcfile_head_info ( original_file_path )
+   
+    # this is a dictionary.
+    lrc_content = {}
+  
+    linsta_i = 0; 
+    time_id = 0 
+    for item in time_tags:
+        linend_i = edited_lyric.find( '\n', linsta_i )
+        if linend_i == -1:
+            continue 
+        lyric_line = edited_lyric[linsta_i:linend_i+1]
+        # if has this key , add the time 
+        if lrc_content.has_key( lyric_line ):
+            lrc_content[lyric_line].append ( item[0])
+        else :
+            lrc_content[lyric_line] = [ item[0] ]
+        linsta_i = linend_i + 1 
+        time_id += 1 
+
+    list_lrc_content = lrc_content.items()
+    list_lrc_content.sort( lrc_dict_compare ) 
+
+    str_lrc_content = ""
+    for item in list_lrc_content:
+        num_time_id = len(item[1])
+        while num_time_id > 0:
+            str_lrc_content += time_to_lrc ( item[1][num_time_id -1])
+            num_time_id -= 1
+        str_lrc_content += item[0]
+      
+    return head_info + str_lrc_content 
+    # lrcfile = open(filepath, "w")
+    # lrcfile.write( head_info )
+    # lrcfile.write ( str_lrc_content )
+    # lrcfile.close() 
+       
 def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
     
+def time_to_lrc( time):
+    minute = time / 60
+    second  = time % 60 
+    return "[%d:%.2f]" %  (minute, second)  
     
+def is_english(to_check_str):
+    for ci in to_check_str:
+        if ord( eval (repr(ci))) > 128:
+            return False
+        
+    return True 
+        
+
+def filter_to_chinese (to_filter_str):
+    # change to unicode 
+    to_filter_str = to_filter_str.decode('utf-8')
+    filtered_str = u''
+    for uci in to_filter_str:
+        if  0x4e00<=ord( eval (repr(uci)))<=0x9fa6:
+            filtered_str += uci 
+  
+    return filtered_str.encode('utf-8') 
+
+def lrc_dict_compare ( first, second ):
+    """ the first and second is the tuple
+        the format is :
+        ( key, [time list])
+    """
+    return cmp( first[1][0], second[1][0] )
+
+
+# change title and singer format for send http request
+LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
+                   "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
+LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and "), (" ", "+")]
+LYRICS_ARTIST_REPLACE_ENGLISH=[(" ", "_"),  ("\+", "&")]
+LYRICS_ARTIST_REPLACE_CHINESE=[(" ", "&"), (",", "&"), ("\+", "&") ]
+
+def clean_song_data ( artist, title ):
+      
+    if not is_english (title):
+        # chinese song 
+        title = chinese_title( title ) 
+    else :
+        # english song 
+        title = english_title ( title )
+
+    if not is_english ( artist ):
+        artist = chinese_name_singer ( artist )
+    else :
+        artist = english_name_singer ( artist )
+            
+    # compress spaces
+    title = title.strip()
+    artist = artist.strip()
+    return (artist, title)
+
+def english_name_singer ( artist ):
+    artist = artist.lower()
+    for exp in LYRICS_ARTIST_REPLACE_ENGLISH:
+        artist = re.sub(exp[0], exp[1], artist)
+    return artist 
+
+def chinese_name_singer ( artist ):
+     for exp in LYRICS_ARTIST_REPLACE_CHINESE:
+         artist = re.sub(exp[0], exp[1], artist)
+     return artist 
+
+def english_title ( title ):
+    title = title.lower()
+    for exp in LYRICS_TITLE_REPLACE:
+        title = re.sub(exp[0], exp[1], title)
+    for exp in LYRICS_TITLE_STRIP:
+        title = re.sub (exp, '', title)
+    return title 
+
+
+def chinese_title ( title ):
+    "filter the title to just stay the chinese"
+    title = re.sub(r'\(.*\)', '', title )
+    return filter_to_chinese(title)
+
+def original_title ( title ):
+    'the web station ordinary have no difference to compare english'
+    if is_english(title):
+        title = re.sub( r'\+', ' ', title)
+    return title 
+
+def original_singer ( singer):
+    singer_group = []
+    english_tag = False 
+    if is_english ( singer ):
+        singer = re.sub(r'_', ' ', singer)
+        english_tag = True 
+
+    start_i = 0; 
+    end_i = singer.find( '&', start_i )
+    while end_i != -1 :
+        singer = singer[start_i : end_i ]
+        if english_tag == True:
+            singer_group.append (singer.title() )
+
+        singer_group.append( singer)        
+        start_i = end_i +1 
+        end_i = singer.find( '&', start_i )
+    
+    singer = singer[start_i:]
+    if english_tag == True:
+        singer_group.append (singer.title() )
+
+    singer_group.append( singer)        
+    
+    return singer_group 
+
+   
+        

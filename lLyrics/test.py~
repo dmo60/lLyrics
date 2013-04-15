@@ -1,0 +1,10 @@
+import Util
+
+
+
+if __name__ == '__main__':
+    fp = open (u'许志安-上弦月.lrc'.encode('utf-8'), "r+")
+    context = fp.read()
+    fp.close()
+    lyrics, tags = parse_lrc(context)
+    print lyrics, tags 
