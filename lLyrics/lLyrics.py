@@ -30,6 +30,7 @@ from gi.repository import RB
 from gi.repository import Gtk
 from gi.repository import Pango
 from gi.repository import GdkPixbuf
+from gi.repository import Gio
 
 import ChartlyricsParser
 import LyricwikiParser
@@ -44,6 +45,10 @@ import DarklyricsParser
 import External
 import Util
 
+from lLyrics_rb3compat import ActionGroup
+from lLyrics_rb3compat import Action
+from lLyrics_rb3compat import ApplicationShell
+
 from Config import Config
 from Config import ConfigDialog
 
@@ -51,15 +56,15 @@ import gettext
 gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 
 
-# view_menu_ui = """
-# <ui>
-#     <menubar name="MenuBar">
-#         <menu name="ViewMenu" action="View">
-#             <menuitem name="lLyrics" action="ToggleLyricSideBar" />
-#         </menu>
-#     </menubar>
-# </ui>
-# """
+view_menu_ui = """
+<ui>
+    <menubar name="MenuBar">
+        <menu name="ViewMenu" action="View">
+            <menuitem name="lLyrics" action="ToggleLyricSideBar" />
+        </menu>
+    </menubar>
+</ui>
+"""
 # lyrics_menu_ui = """
 # <ui>
 #     <menubar name="MenuBar">
@@ -107,33 +112,33 @@ gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
 #     </toolbar>
 # </ui>
 # """
-# context_ui = """
-# <ui>
-#     <popup name="BrowserSourceViewPopup">
-#         <placeholder name="PluginPlaceholder">
-#             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
-#         </placeholder>
-#       </popup>
-# 
-#     <popup name="PlaylistViewPopup">
-#         <placeholder name="PluginPlaceholder">
-#             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
-#         </placeholder>
-#     </popup>
-# 
-#     <popup name="QueuePlaylistViewPopup">
-#         <placeholder name="PluginPlaceholder">
-#             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
-#         </placeholder>
-#     </popup>
-#     
-#     <popup name="PodcastViewPopup">
-#         <placeholder name="PluginPlaceholder">
-#             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
-#         </placeholder>
-#     </popup>
-# </ui>
-# """
+context_ui = """
+<ui>
+    <popup name="BrowserSourceViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+      </popup>
+ 
+    <popup name="PlaylistViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+ 
+    <popup name="QueuePlaylistViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+     
+    <popup name="PodcastViewPopup">
+        <placeholder name="PluginPlaceholder">
+            <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
+        </placeholder>
+    </popup>
+</ui>
+"""
 
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
@@ -232,6 +237,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.psc_id is not None:
             self.player.disconnect(self.psc_id)
             self.player.disconnect(self.pec_id)
+        
+        self.appshell.cleanup()
 #         try:
 #             self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
 #         except:
@@ -256,6 +263,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.player = None
 #         self.action_group = None
 #         self.toggle_action_group = None
+        self.toggle_action_group = None
+        self.context_action_group = None
+        self.appshell = None
+        self.menu = None
+        self.button_menu = None
         self.cache = None
         self.dict = None
         self.sources = None
@@ -368,7 +380,26 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def init_menu(self):
-        return
+        self.toggle_action_group = ActionGroup(self.shell, 'lLyricsPluginToggleActions')
+        self.toggle_action_group.add_action(func=self.toggle_visibility,
+            action_name='ToggleLyricSideBar', label=_("Lyrics"), action_state=ActionGroup.TOGGLE,
+            action_type='app', accel="<Ctrl>l", tooltip=_("Display lyrics for the current playing song"))
+#         self.toggle_action_group.get_action('ToggleLyricSideBar').set_active(True)
+
+        self.appshell = ApplicationShell(self.shell)
+        self.appshell.insert_action_group(self.toggle_action_group)
+        self.appshell.add_app_menuitems(view_menu_ui, 'lLyricsPluginToggleActions', 'view')
+        
+        
+        self.context_action_group = ActionGroup(self.shell, 'lLyricsPluginPopupActions')
+        self.context_action_group.add_action(action_name="lLyricsPopupAction", label=_("Show lyrics"),
+                            tooltip=_("Search and display lyrics for this song"), func=self.context_action_callback)
+
+        self.appshell.insert_action_group(self.context_action_group)
+        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
+        
+        
+        
 #         # Create an icon for the toolbar button
 #         icon_factory = Gtk.IconFactory()
 #         try:
@@ -482,9 +513,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         self.menu = self.get_button_menu()
         self.set_menu_sensitive(self.menu, False)
-#         for item in self.menu.get_children():
-#             item.set_sensitive(False)
         self.button_menu = Gtk.Image.new_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.SMALL_TOOLBAR);
+#         self.button_menu = Gtk.ToolButton.new_from_stock(Gtk.STOCK_PREFERENCES);
         eventBox = Gtk.EventBox();
         eventBox.add(self.button_menu);
         eventBox.connect("button-press-event", self.popup_menu, self.menu)
@@ -530,12 +560,47 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.back_button = Gtk.Button.new_with_label(_("Back to playing song"))
         self.back_button.connect("clicked", self.back_button_callback)
         
+        grid = Gtk.Grid()
+        toolbar = Gtk.Toolbar()
+        toolbar.set_style(Gtk.ToolbarStyle.ICONS)
+        toolbar.set_icon_size(Gtk.IconSize.MENU)
+        
+        context = toolbar.get_style_context()
+        context.set_junction_sides(Gtk.JunctionSides.BOTTOM)
+        context.add_class(Gtk.STYLE_CLASS_TOOLBAR)
+        
+        item = Gtk.ToolItem()
+        mbutton = Gtk.MenuButton()
+        icon = Gio.ThemedIcon.new_with_default_fallbacks("preferences-desktop")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.SMALL_TOOLBAR)
+        mbutton.set_image(image)
+        item.add(mbutton)
+        
+        sep = Gtk.SeparatorToolItem()
+        sep.set_expand(True)
+        sep.set_draw(False)
+        
+        itemlabel = Gtk.ToolItem()
+        tblabel = Gtk.Label(_("Lyrics"))
+        tblabel.set_padding(3, 5)
+        itemlabel.add(tblabel)
+        
+        toolbar.insert(itemlabel, -1)
+        toolbar.insert(sep, -1)
+        toolbar.insert(item, -1)
+        toolbar.set_margin_top(7)
+        
+        mbutton.set_popup(self.menu)
+        
         # pack everything into side pane
-        self.vbox.pack_start(hbox_header, False, False, 0);
+#         self.vbox.pack_start(hbox_header, False, False, 0);
+        self.vbox.pack_start(toolbar, False, False, 0)
         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
         self.vbox.pack_end(self.back_button, False, False, 3)
+#         self.vbox.pack_end(toolbar, False, False, 0)
+        
 
         self.vbox.show_all()
         self.hbox.hide()
@@ -634,11 +699,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def popup_menu(self, widget, event, menu):
-        menu.popup(None, None, None, None, event.button, event.time)
+        menu.popup(None, None, lambda x,y: (event.x_root+event.x, event.y_root+event.y, True), None, event.button, event.time)
         
         
     
-    def toggle_visibility(self, action):
+    def toggle_visibility(self, action, param=None, data=None):
 #         if not self.lmui_id:
 #             # add lyrics menu ui
 #             control_menu1, control_menu2 = "", ""
@@ -653,7 +718,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
 #         menu_path = "/MenuBar/lLyrics"
 #         if not self.toplevel_menu:
 #             menu_path = "/MenuBar/ControlMenu/lLyrics"
-
+    
+        action = self.toggle_action_group.get_action('ToggleLyricSideBar')
+        
         if action.get_active():
             self.shell.add_widget(self.vbox, self.position, True, True)
             self.visible = True
@@ -682,11 +749,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.first and not self.showing_on_demand:
             self.first = False
             if not self.visible and self.show_first:
-                self.shell.add_widget(self.vbox, self.position, True, True)
-                self.visible = True
-#                 self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
+                self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(True)
                 # toggling the sidebar will start lyrics search again, so we can return here
-#                 return
+                return
         
         # only do something if visible
         if not self.visible:
@@ -868,7 +933,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
     
-    def context_action_callback(self, action):
+    def context_action_callback(self, action, param=None, data=None):
         page = self.shell.props.selected_page
         if not hasattr(page, "get_entry_view"):
             return
