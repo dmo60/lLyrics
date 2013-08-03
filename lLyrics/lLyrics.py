@@ -471,11 +471,25 @@ class lLyrics(GObject.Object, Peas.Activatable):
                
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
+        
+        hbox_header = Gtk.HBox();
                 
         self.label = Gtk.Label(_("Lyrics"))
         self.label.set_use_markup(True)
         self.label.set_padding(3, 11)
         self.label.set_alignment(0, 0)
+        
+        self.menu = self.get_button_menu()
+        self.set_menu_sensitive(self.menu, False)
+#         for item in self.menu.get_children():
+#             item.set_sensitive(False)
+        self.button_menu = Gtk.Image.new_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.SMALL_TOOLBAR);
+        eventBox = Gtk.EventBox();
+        eventBox.add(self.button_menu);
+        eventBox.connect("button-press-event", self.popup_menu, self.menu)
+        
+        hbox_header.pack_start(self.label, True, True, 0)
+        hbox_header.pack_end(eventBox, False, False, 5)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -516,6 +530,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.back_button.connect("clicked", self.back_button_callback)
         
         # pack everything into side pane
+        self.vbox.pack_start(hbox_header, False, False, 0);
         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
@@ -530,6 +545,95 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
         self.vbox.set_size_request(200, -1)
         self.visible = False
+        
+        
+        
+    def get_button_menu(self):
+        menu = Gtk.Menu();
+        
+        self.radio_sources = Gtk.Menu()
+        
+        item_unselect = Gtk.RadioMenuItem.new_with_label([], "SelectNothing")
+        item_unselect.connect("activate", self.scan_selected_source_callback, "SelectNothing")
+        self.radio_sources.append(item_unselect)
+        
+        last_item = item_unselect
+        
+        for entry in LYRICS_SOURCES:
+            last_item = self.add_radio_menu_item(self.radio_sources, entry, self.scan_selected_source_callback, last_item)
+        
+        self.radio_sources.append(Gtk.SeparatorMenuItem())
+        last_item = self.add_radio_menu_item(self.radio_sources, "External", self.scan_selected_source_callback, last_item)
+        self.radio_sources.append(Gtk.SeparatorMenuItem())
+        self.add_radio_menu_item(self.radio_sources, "From cache file", self.scan_selected_source_callback, last_item)
+        
+#         radio_sources.show_all();
+        
+        item_sources = Gtk.MenuItem(_("Sources"));
+        item_sources.set_submenu(self.radio_sources);
+        menu.append(item_sources)
+        
+        self.add_menu_item(menu, _("Scan next source"), self.scan_next_action_callback)
+        self.add_menu_item(menu, _("Scan all sources"), self.scan_all_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Search online"), self.search_online_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Mark as instrumental"), self.instrumental_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Clear lyrics"), self.clear_action_callback)
+        self.add_menu_item(menu, _("Edit lyrics"), self.edit_action_callback)
+        self.add_menu_item(menu, _("Save lyrics"), self.save_to_cache_action_callback)
+        
+        menu.show_all()
+        
+        # hide the SelectNothing choice
+        item_unselect.hide()
+        
+        return menu
+    
+    
+    
+    def add_menu_item(self, menu, label, callback):
+        item = Gtk.MenuItem(label)
+        item.connect("activate", callback)            
+        menu.append(item)
+    
+    
+    
+    def add_radio_menu_item(self, menu, label, callback, last):
+        group = last.get_group()
+        item = Gtk.RadioMenuItem.new_with_label(group, _(label))
+        item.connect("activate", callback, label)
+        menu.append(item)
+        
+        return item
+            
+    
+    
+    def set_menu_sensitive(self, menu, sensitive):
+        for item in menu:
+            item.set_sensitive(sensitive)
+    
+    
+    
+    def set_menu_item_sensitive(self, menu, itemlabel, sensitive):
+        for item in menu:
+            if item.get_label() == itemlabel:
+                item.set_sensitive(sensitive)
+                break
+    
+    
+    
+    def set_radio_menu_item_active(self, menu, itemlabel):
+        for item in menu:
+            if item.get_label() == itemlabel:
+                item.set_active(True)
+                break
+            
+    
+    
+    def popup_menu(self, widget, event, menu):
+        menu.popup(None, None, None, None, event.button, event.time)
         
         
     
@@ -653,8 +757,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
             
             
-    def scan_source_action_callback(self, action, activated_action):        
+    def scan_source_action_callback(self, action, activated_action):
+        return        
         source = activated_action.get_name()
+        if source == "SelectNothing" or source == self.current_source:
+            return
+        
+        self.scan_source(source, self.clean_artist, self.clean_title)
+    
+    
+    
+    def scan_selected_source_callback(self, action, activated_action): 
+#         print "group: " + str(action.get_group())       
+        source = activated_action
         if source == "SelectNothing" or source == self.current_source:
             return
         
@@ -694,6 +809,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.show_lyrics(self.artist, self.title, lyrics)
         
         self.action_group.get_action("SelectNothing").set_active(True)
+        self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
         self.current_source = None
         
         
@@ -714,6 +830,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         except:
             print "No cache file found to clear"
         self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+        self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
         print "cleared lyrics"
         
         
@@ -733,6 +850,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.path_before_edit = self.path
         
         self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
         
         # Enable editing and set cursor
         self.textview.set_cursor_visible(True)
@@ -794,6 +912,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.textbuffer.set_text(_("searching lyrics..."))
             
         self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -819,6 +938,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             self.textbuffer.set_text(_("searching lyrics..."))
         
         self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -840,6 +960,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if not playing_entry:
             self.textbuffer.set_text("")
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
             return
         
         # otherwise search lyrics
@@ -859,6 +980,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
     def _scan_source_thread(self, source, artist, title):
         self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
              
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
@@ -873,6 +995,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.show_lyrics(self.artist, self.title, lyrics)          
         
         self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         
         
@@ -889,6 +1012,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     def _scan_all_sources_thread(self, artist, title, cache):
         self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
         
         if cache:
             lyrics = self.get_lyrics_from_cache(self.path)
@@ -915,11 +1039,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
         if lyrics == "":
             self.action_group.get_action("SelectNothing").set_active(True)
+            self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
             self.current_source = None  
         
         self.show_lyrics(self.artist, self.title, lyrics)
         
         self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         
         
@@ -936,6 +1062,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print "got lyrics from cache"
             self.current_source = "From cache file"
             self.action_group.get_action("From cache file").set_active(True)
+            self.set_radio_menu_item_active(self.radio_sources, _("From cache file"))
             return lyrics
             
         return ""
@@ -960,7 +1087,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         print "source: " + source        
         self.current_source = source
-        self.action_group.get_action(source).set_active(True)
+#         self.action_group.get_action(source).set_active(True)
+        self.set_radio_menu_item_active(self.radio_sources, source)
         
         parser = self.dict[source].Parser(artist, title)
         try:
@@ -997,8 +1125,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print "no lyrics found"
             lyrics = _("No lyrics found")
             self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
         else:        
             self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), True)
             lyrics, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()
