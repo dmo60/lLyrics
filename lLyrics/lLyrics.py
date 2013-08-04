@@ -513,10 +513,16 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         self.menu = self.get_button_menu()
         self.set_menu_sensitive(self.menu, False)
-        self.button_menu = Gtk.Image.new_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.SMALL_TOOLBAR);
-#         self.button_menu = Gtk.ToolButton.new_from_stock(Gtk.STOCK_PREFERENCES);
+        
+        # menu without toolbar
+        icon_factory = Gtk.IconFactory()
+        pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/menu-arrow.png")
+        icon_factory.add("llyrics_menu", Gtk.IconSet.new_from_pixbuf(pxbf))
+        icon_factory.add_default()
+        
+        menu_button = Gtk.Image.new_from_stock("llyrics_menu", Gtk.IconSize.SMALL_TOOLBAR);
         eventBox = Gtk.EventBox();
-        eventBox.add(self.button_menu);
+        eventBox.add(menu_button);
         eventBox.connect("button-press-event", self.popup_menu, self.menu)
         
         hbox_header.pack_start(self.label, True, True, 0)
@@ -560,41 +566,36 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.back_button = Gtk.Button.new_with_label(_("Back to playing song"))
         self.back_button.connect("clicked", self.back_button_callback)
         
-        grid = Gtk.Grid()
-        toolbar = Gtk.Toolbar()
-        toolbar.set_style(Gtk.ToolbarStyle.ICONS)
-        toolbar.set_icon_size(Gtk.IconSize.MENU)
+        # toolbar menu
+#         toolbar = Gtk.Toolbar()
+#         toolbar.set_style(Gtk.ToolbarStyle.ICONS)
+#         toolbar.set_icon_size(Gtk.IconSize.MENU)
         
-        context = toolbar.get_style_context()
-        context.set_junction_sides(Gtk.JunctionSides.BOTTOM)
-        context.add_class(Gtk.STYLE_CLASS_TOOLBAR)
+#         context = toolbar.get_style_context()
+#         context.set_junction_sides(Gtk.JunctionSides.BOTTOM)
+#         context.add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
         
-        item = Gtk.ToolItem()
-        mbutton = Gtk.MenuButton()
-        icon = Gio.ThemedIcon.new_with_default_fallbacks("preferences-desktop")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.SMALL_TOOLBAR)
-        mbutton.set_image(image)
-        item.add(mbutton)
+#         item = Gtk.ToolItem()
+#         menu_button = Gtk.MenuButton()
+#         icon = Gio.ThemedIcon.new("preferences-desktop")
+#         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.SMALL_TOOLBAR)
+#         menu_button.set_image(image)
+#         menu_button.set_popup(self.menu)
+#         item.add(menu_button)
         
-        sep = Gtk.SeparatorToolItem()
-        sep.set_expand(True)
-        sep.set_draw(False)
+#         sep = Gtk.SeparatorToolItem()
+#         sep.set_expand(True)
+#         sep.set_draw(False)
+#         itemlabel.add(self.label)
+#         
+#         toolbar.insert(itemlabel, -1)
+#         toolbar.insert(sep, -1)
+#         toolbar.insert(item, -1)
         
-        itemlabel = Gtk.ToolItem()
-        tblabel = Gtk.Label(_("Lyrics"))
-        tblabel.set_padding(3, 5)
-        itemlabel.add(tblabel)
         
-        toolbar.insert(itemlabel, -1)
-        toolbar.insert(sep, -1)
-        toolbar.insert(item, -1)
-        toolbar.set_margin_top(7)
-        
-        mbutton.set_popup(self.menu)
         
         # pack everything into side pane
-#         self.vbox.pack_start(hbox_header, False, False, 0);
-        self.vbox.pack_start(toolbar, False, False, 0)
+        self.vbox.pack_start(hbox_header, False, False, 0);
         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
