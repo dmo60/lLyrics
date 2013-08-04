@@ -45,8 +45,8 @@ import DarklyricsParser
 import External
 import Util
 
+import lLyrics_rb3compat as Compat
 from lLyrics_rb3compat import ActionGroup
-from lLyrics_rb3compat import Action
 from lLyrics_rb3compat import ApplicationShell
 
 from Config import Config
@@ -94,6 +94,16 @@ context_ui = """
 </ui>
 """
 
+toolbar_ui = """
+<ui>
+    <toolbar name="ToolBar">
+        %s    
+        <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
+        %s
+    </toolbar>
+</ui>
+"""
+
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
 LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
@@ -122,6 +132,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Get references for the Shell, the Shell-player and the UIManager
         self.shell = self.object
         self.player = self.shell.props.shell_player
+        self.appshell = ApplicationShell(self.shell)
         
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
@@ -270,32 +281,53 @@ class lLyrics(GObject.Object, Peas.Activatable):
             return
         
         # reload ui if ui settings changed
-        self.reload_ui(key)      
+        if key in ["show-toolbar-icon", "separator-left", "separator-right"]:
+            self.appshell.cleanup()
+            self.insert_ui()      
 
         
            
-    def reload_ui(self, key):
-        pass
+    def insert_ui(self):
+        self.appshell.add_app_menuitems(view_menu_ui, 'lLyricsPluginToggleActions', 'view')
+        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
+        
+        # add toolbar ui for RB<2.99
+        if self.show_icon and not Compat.is_rb3(self.shell):
+            sep_left, sep_right = "", ""
+            sep_left, sep_right = self.separators
+            toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
+            self.appshell.add_app_menuitems(toolbar_ui_final, 'lLyricsPluginToggleActions')
+        
     
     
     
     def init_menu(self):
+        # add actions
         self.toggle_action_group = ActionGroup(self.shell, 'lLyricsPluginToggleActions')
         self.toggle_action_group.add_action(func=self.toggle_visibility,
             action_name='ToggleLyricSideBar', label=_("Lyrics"), action_state=ActionGroup.TOGGLE,
             action_type='app', accel="<Ctrl>l", tooltip=_("Display lyrics for the current playing song"))
-
-        self.appshell = ApplicationShell(self.shell)
         self.appshell.insert_action_group(self.toggle_action_group)
-        self.appshell.add_app_menuitems(view_menu_ui, 'lLyricsPluginToggleActions', 'view')
-        
         
         self.context_action_group = ActionGroup(self.shell, 'lLyricsPluginPopupActions')
         self.context_action_group.add_action(action_name="lLyricsPopupAction", label=_("Show lyrics"),
                             tooltip=_("Search and display lyrics for this song"), func=self.context_action_callback)
-
         self.appshell.insert_action_group(self.context_action_group)
-        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
+        
+        # Create an icon for the toolbar button for RB<2.99
+        if not Compat.is_rb3(self.shell): 
+            icon_factory = Gtk.IconFactory()
+            try:
+                pxbf = GdkPixbuf.Pixbuf.new_from_file(self.icon_path)
+                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
+            except:
+                print "could not create icon from " + self.icon_path + ", set default icon"
+                pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/lLyrics-icon.png")
+                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
+            icon_factory.add_default()
+        
+        self.insert_ui()
+        
         
         
                
