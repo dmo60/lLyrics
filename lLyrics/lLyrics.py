@@ -114,7 +114,7 @@ LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLy
 
 STOCK_IMAGE = "stock-llyrics-button"
 
-is_rb3 = True
+is_rb3 = not hasattr(RB.Shell.props, 'ui_manager')
 
 
 class lLyrics(GObject.Object, Peas.Activatable):
@@ -135,9 +135,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.shell = self.object
         self.player = self.shell.props.shell_player
         self.appshell = ApplicationShell(self.shell)
-        
-        is_rb3 = Compat.is_rb3(self.shell)
-        
+                
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
