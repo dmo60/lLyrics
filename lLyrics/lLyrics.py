@@ -621,16 +621,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
             os.mkdir (artist_folder)
     
         return os.path.join(artist_folder, title[:128] + '.lyric')
-            
-            
-            
-    def scan_source_action_callback(self, action, activated_action):
-        return        
-        source = activated_action.get_name()
-        if source == "SelectNothing" or source == self.current_source:
-            return
-        
-        self.scan_source(source, self.clean_artist, self.clean_title)
     
     
     
