@@ -48,7 +48,7 @@ class Parser(object):
             print "no title found"
             return ""
         title = title[(start+7):]
-        end = title.find(" LYRICS</title>")
+        end = title.find(" Lyrics | Rap Genius</title>")
         if end == -1:
             print "no title end found"
             return ""
