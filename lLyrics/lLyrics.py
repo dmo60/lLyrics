@@ -114,6 +114,8 @@ LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLy
 
 STOCK_IMAGE = "stock-llyrics-button"
 
+is_rb3 = True
+
 
 class lLyrics(GObject.Object, Peas.Activatable):
     __gtype_name__ = 'lLyrics'
@@ -129,10 +131,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
 
     def do_activate(self):
-        # Get references for the Shell, the Shell-player and the UIManager
+        # Get references for the Shell and the Shell-player
         self.shell = self.object
         self.player = self.shell.props.shell_player
         self.appshell = ApplicationShell(self.shell)
+        
+        is_rb3 = Compat.is_rb3(self.shell)
         
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
@@ -292,7 +296,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
         
         # add toolbar ui for RB<2.99
-        if self.show_icon and not Compat.is_rb3(self.shell):
+        if self.show_icon and not is_rb3:
             sep_left, sep_right = "", ""
             sep_left, sep_right = self.separators
             toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
@@ -315,7 +319,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.appshell.insert_action_group(self.context_action_group)
         
         # Create an icon for the toolbar button for RB<2.99
-        if not Compat.is_rb3(self.shell): 
+        if not is_rb3: 
             icon_factory = Gtk.IconFactory()
             try:
                 pxbf = GdkPixbuf.Pixbuf.new_from_file(self.icon_path)
