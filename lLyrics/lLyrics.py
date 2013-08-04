@@ -30,6 +30,7 @@ from gi.repository import RB
 from gi.repository import Gtk
 from gi.repository import Pango
 from gi.repository import GdkPixbuf
+from gi.repository import Gio
 
 import ChartlyricsParser
 import LyricwikiParser
@@ -43,6 +44,10 @@ import LyricsmaniaParser
 import DarklyricsParser
 import External
 import Util
+
+import lLyrics_rb3compat as Compat
+from lLyrics_rb3compat import ActionGroup
+from lLyrics_rb3compat import ApplicationShell
 
 from Config import Config
 from Config import ConfigDialog
@@ -60,53 +65,7 @@ view_menu_ui = """
     </menubar>
 </ui>
 """
-lyrics_menu_ui = """
-<ui>
-    <menubar name="MenuBar">
-        %s
-        <menu name="lLyrics" action="lLyricsMenuAction">
-            <menu name="ScanSource" action="ScanSourceAction">
-                <menuitem name="ScanLyricwiki" action="Lyricwiki.org"/>
-                <menuitem name="ScanTerra" action="Letras.terra.com.br"/>
-                <menuitem name="ScanMetrolyrics" action="Metrolyrics.com"/>
-                <menuitem name="ScanAZLyrics" action="AZLyrics.com"/>
-                <menuitem name="ScanLyricsmania" action="Lyricsmania.com"/>
-                <menuitem name="ScanDarklyrics" action="Darklyrics.com"/>
-                <menuitem name="ScanChartlyrics" action="Chartlyrics.com"/>
-                <menuitem name="ScanLeoslyrics" action="Leoslyrics.com"/>
-                <menuitem name="ScanLyrdb" action="Lyrdb.com"/>
-                <menuitem name="ScanSogou" action="Sogou.com"/>
-                <separator/>
-                <menuitem name="External" action="External"/>
-                <separator/>
-                <menuitem name="FromCacheFile" action="From cache file"/>
-                <menuitem action="SelectNothing"/>
-            </menu>
-            <menuitem name="ScanAll" action="ScanAllAction"/>
-            <menuitem name="ScanNext" action="ScanNextAction"/>
-            <separator/>
-            <menuitem name="SearchOnline" action="SearchOnlineAction"/>
-            <separator/>
-            <menuitem name="Instrumental" action="InstrumentalAction"/>
-            <separator/>
-            <menuitem name="Clear" action="ClearAction"/>
-            <menuitem name="SaveToCache" action="SaveToCacheAction"/>
-            <separator/>
-            <menuitem name="Edit" action="EditAction"/>
-        </menu>
-        %s
-    </menubar>
-</ui>
-"""
-toolbar_ui = """
-<ui>
-    <toolbar name="ToolBar">
-        %s    
-        <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
-        %s
-    </toolbar>
-</ui>
-"""
+
 context_ui = """
 <ui>
     <popup name="BrowserSourceViewPopup">
@@ -114,24 +73,34 @@ context_ui = """
             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
         </placeholder>
       </popup>
-
+ 
     <popup name="PlaylistViewPopup">
         <placeholder name="PluginPlaceholder">
             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
         </placeholder>
     </popup>
-
+ 
     <popup name="QueuePlaylistViewPopup">
         <placeholder name="PluginPlaceholder">
             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
         </placeholder>
     </popup>
-    
+     
     <popup name="PodcastViewPopup">
         <placeholder name="PluginPlaceholder">
             <menuitem name="lLyricsPopup" action="lLyricsPopupAction"/>
         </placeholder>
     </popup>
+</ui>
+"""
+
+toolbar_ui = """
+<ui>
+    <toolbar name="ToolBar">
+        %s    
+        <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
+        %s
+    </toolbar>
 </ui>
 """
 
@@ -144,6 +113,8 @@ LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLy
                "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "Sogou.com", "External"]
 
 STOCK_IMAGE = "stock-llyrics-button"
+
+is_rb3 = not hasattr(RB.Shell.props, 'ui_manager')
 
 
 class lLyrics(GObject.Object, Peas.Activatable):
@@ -160,11 +131,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
 
     def do_activate(self):
-        # Get references for the Shell, the Shell-player and the UIManager
+        # Get references for the Shell and the Shell-player
         self.shell = self.object
         self.player = self.shell.props.shell_player
-        self.uim = self.shell.props.ui_manager
-        
+        self.appshell = ApplicationShell(self.shell)
+                
         # Create dictionary which assigns sources to their corresponding modules
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
@@ -211,15 +182,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.psc_id = self.player.connect('playing-song-changed', self.search_lyrics)
         # Connect to elapsed-changed signal to handle synchronized lyrics
         self.pec_id = self.player.connect('elapsed-changed', self.elapsed_changed)
-        
-        # Hide the lLyrics UI elements when in Small Display mode
-        # Since Rhythmbox 2.97 there is no longer a SmallDisplayMode, but for now we keep it for compatibility 
-        try:
-            small_display_toggle = self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu")
-            self.tb_conn_id = small_display_toggle.connect('toggled', self.hide_if_active)
-        except:
-            pass
-        
+               
         print "activated plugin lLyrics"
         
         
@@ -232,30 +195,20 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.psc_id is not None:
             self.player.disconnect(self.psc_id)
             self.player.disconnect(self.pec_id)
-        try:
-            self.uim.get_widget("/MenuBar/ViewMenu/ViewSmallDisplayMenu").disconnect(self.tb_conn_id)
-        except:
-            pass
         
-        self.uim.remove_ui(self.vmui_id)
-        self.uim.remove_ui(self.cmui_id)
-        if self.tbui_id is not None:
-            self.uim.remove_ui(self.tbui_id)
-        if self.lmui_id is not None:
-            self.uim.remove_ui(self.lmui_id)
-        self.uim.remove_action_group(self.action_group)
-        self.uim.remove_action_group(self.toggle_action_group)
-        self.uim.remove_action_group(self.context_action_group)
-        
-        self.uim = None
+        self.appshell.cleanup()
+
         self.vbox = None
         self.textbuffer = None
         self.textview = None
         self.psc_id = None
         self.visible = None
         self.player = None
-        self.action_group = None
         self.toggle_action_group = None
+        self.context_action_group = None
+        self.appshell = None
+        self.menu = None
+        self.button_menu = None
         self.cache = None
         self.dict = None
         self.sources = None
@@ -330,152 +283,82 @@ class lLyrics(GObject.Object, Peas.Activatable):
             return
         
         # reload ui if ui settings changed
-        self.reload_ui(key)      
+        if key in ["show-toolbar-icon", "separator-left", "separator-right"]:
+            self.appshell.cleanup()
+            self.insert_ui()      
 
         
            
-    def reload_ui(self, key):
-        print key
-        # reload toolbar ui
-        if key in ["show-toolbar-icon", "separator-left", "separator-right"]:
-            print "key in"
-            print self.tbui_id
-            if self.tbui_id is not None:
-                print "remove icon"
-                self.uim.remove_ui(self.tbui_id)
-                
-            if self.show_icon:
-                sep_left, sep_right = "", ""
-                sep_left, sep_right = self.separators
-                toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
-                self.tbui_id = self.uim.add_ui_from_string(toolbar_ui_final)
+    def insert_ui(self):
+        self.appshell.add_app_menuitems(view_menu_ui, 'lLyricsPluginToggleActions', 'view')
+        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
         
-        # reload lyrics menu ui
-        if key == "toplevel-menu" and self.lmui_id is not None:
-            self.uim.remove_ui(self.lmui_id)
-            
-            control_menu1, control_menu2 = "", ""
-            if not self.toplevel_menu:
-                control_menu1 = """<menu name="ControlMenu" action="Control">"""
-                control_menu2 = "</menu>"
-            lyrics_menu_ui_final = lyrics_menu_ui % (control_menu1, control_menu2)
-            self.lmui_id = self.uim.add_ui_from_string(lyrics_menu_ui_final)
-            
-        self.uim.ensure_update()
+        # add toolbar ui for RB<2.99
+        if self.show_icon and not is_rb3:
+            sep_left, sep_right = "", ""
+            sep_left, sep_right = self.separators
+            toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
+            self.appshell.add_app_menuitems(toolbar_ui_final, 'lLyricsPluginToggleActions')
         
-        print "reloaded ui"
     
     
     
     def init_menu(self):
-        # Create an icon for the toolbar button
-        icon_factory = Gtk.IconFactory()
-        try:
-            pxbf = GdkPixbuf.Pixbuf.new_from_file(self.icon_path)
-            icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
-        except:
-            print "could not create icon from " + self.icon_path + ", set default icon"
-            pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/lLyrics-icon.png")
-            icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
-        icon_factory.add_default()
+        # add actions
+        self.toggle_action_group = ActionGroup(self.shell, 'lLyricsPluginToggleActions')
+        self.toggle_action_group.add_action(func=self.toggle_visibility, stock_id=STOCK_IMAGE,
+            action_name='ToggleLyricSideBar', label=_("Lyrics"), action_state=ActionGroup.TOGGLE,
+            action_type='app', accel="<Ctrl>l", tooltip=_("Display lyrics for the current playing song"))
+        self.appshell.insert_action_group(self.toggle_action_group)
         
-        # Action to toggle the visibility of the sidebar,
-        # used by the toolbar button and the ViewMenu entry.
-        self.toggle_action_group = Gtk.ActionGroup(name='lLyricsPluginToggleActions')
-        toggle_action = ('ToggleLyricSideBar', STOCK_IMAGE, _("Lyrics"),
-                        "<Ctrl>l", _("Display lyrics for the current playing song"),
-                        self.toggle_visibility, False)
-        self.toggle_action_group.add_toggle_actions([toggle_action])
+        self.context_action_group = ActionGroup(self.shell, 'lLyricsPluginPopupActions')
+        self.context_action_group.add_action(action_name="lLyricsPopupAction", label=_("Show lyrics"),
+                            tooltip=_("Search and display lyrics for this song"), func=self.context_action_callback)
+        self.appshell.insert_action_group(self.context_action_group)
         
-        # Action for right click context menu
-        self.context_action_group = Gtk.ActionGroup(name='lLyricsPluginPopupActions')
-        context_action = ("lLyricsPopupAction", None, _("Show lyrics"),
-                            None, _("Search and display lyrics for this song"), self.context_action_callback)
-        self.context_action_group.add_actions([context_action])
+        # Create an icon for the toolbar button for RB<2.99
+        if not is_rb3: 
+            icon_factory = Gtk.IconFactory()
+            try:
+                pxbf = GdkPixbuf.Pixbuf.new_from_file(self.icon_path)
+                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
+            except:
+                print "could not create icon from " + self.icon_path + ", set default icon"
+                pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/lLyrics-icon.png")
+                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
+            icon_factory.add_default()
         
-        # Actions used by the lyrics menu
-        self.action_group = Gtk.ActionGroup(name='lLyricsPluginMenuActions')
-        menu_action = Gtk.Action("lLyricsMenuAction", _("Lyrics"), None, None)
-        self.action_group.add_action(menu_action)
+        self.insert_ui()
         
-        source_action = Gtk.Action("ScanSourceAction", _("Source"), None, None)
-        self.action_group.add_action(source_action)
-        
-        scan_lyricwiki_action = ("Lyricwiki.org", None, "Lyricwiki.org", None, None)
-        scan_terra_action = ("Letras.terra.com.br", None, "Letras.terra.com.br", None, None)
-        scan_metrolyrics_action = ("Metrolyrics.com", None, "Metrolyrics.com", None, None)
-        scan_azlyrics_action = ("AZLyrics.com", None, "AZLyrics.com", None, None)
-        scan_lyricsmania_action = ("Lyricsmania.com", None, "Lyricsmania.com", None, None)
-        scan_darklyrics_action = ("Darklyrics.com", None, "Darklyrics.com", None, None)
-        scan_chartlyrics_action = ("Chartlyrics.com", None, "Chartlyrics.com", None, None)
-        scan_leoslyrics_action = ("Leoslyrics.com", None, "Leoslyrics.com", None, None)
-        scan_lyrdb_action = ("Lyrdb.com", None, "Lyrdb.com", None, None)
-        scan_sogou_action = ("Sogou.com", None, "Sogou.com", None, None)
-        scan_external_action = ("External", None, _("External"), None, None)
-        scan_cache_action = ("From cache file", None, _("From cache file"), None, None)
-        select_nothing_action = ("SelectNothing", None, "SelectNothing", None, None)
-        
-        self.action_group.add_radio_actions([scan_lyricwiki_action, scan_terra_action, scan_metrolyrics_action,
-                                             scan_chartlyrics_action, scan_lyrdb_action, scan_azlyrics_action,
-                                             scan_leoslyrics_action, scan_lyricsmania_action, scan_sogou_action, 
-                                             scan_darklyrics_action, scan_external_action, scan_cache_action, 
-                                             select_nothing_action],
-                                             -1, self.scan_source_action_callback, None)
-        
-        # This is a quite ugly hack. I couldn't find out how to unselect all radio actions,
-        # so I use an invisible action for that
-        self.action_group.get_action("SelectNothing").set_visible(False)
-        self.action_group.get_action("SelectNothing").set_active(True)
-        
-        scan_next_action = ("ScanNextAction", None, _("Scan next source"),
-                            None, _("Scan next lyrics source"), self.scan_next_action_callback)
-        scan_all_action = ("ScanAllAction", None, _("Scan all sources"),
-                           None, _("Rescan all lyrics sources"), self.scan_all_action_callback)
-        search_online_action = ("SearchOnlineAction", None, _("Search online"),
-                                None, _("Search lyrics for the current song online"), self.search_online_action_callback)
-        instrumental_action = ("InstrumentalAction", None, _("Mark as instrumental"),
-                               None, _("Mark this song as instrumental"), self.instrumental_action_callback)
-        save_to_cache_action = ("SaveToCacheAction", None, _("Save lyrics"),
-                                None, _("Save current lyrics to the cache file"), self.save_to_cache_action_callback)
-        clear_action = ("ClearAction", None, _("Clear lyrics"), None,
-                        _("Delete current lyrics"), self.clear_action_callback)
-        edit_action = ("EditAction", None, _("Edit lyrics"), None,
-                       _("Edit current lyrics"), self.edit_action_callback)
-        
-        self.action_group.add_actions([scan_next_action, scan_all_action, search_online_action,
-                                       instrumental_action, save_to_cache_action, clear_action, 
-                                       edit_action])
-        
-        # Make action group insensitive as long as there are no lyrics displayed
-        self.action_group.set_sensitive(False)
-        
-        # Insert the UI
-        self.uim.insert_action_group(self.toggle_action_group, 0)
-        self.uim.insert_action_group(self.action_group, 0)
-        self.uim.insert_action_group(self.context_action_group, 0)
-        
-        # add view menu ui
-        self.vmui_id = self.uim.add_ui_from_string(view_menu_ui)
-        
-        # add context menu ui
-        self.cmui_id = self.uim.add_ui_from_string(context_ui)
-        
-        # add toolbar ui
-        if self.show_icon:
-            sep_left, sep_right = "", ""
-            sep_left, sep_right = self.separators
-            toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
-            self.tbui_id = self.uim.add_ui_from_string(toolbar_ui_final)
         
         
                
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
+        
+        hbox_header = Gtk.HBox();
                 
         self.label = Gtk.Label(_("Lyrics"))
         self.label.set_use_markup(True)
         self.label.set_padding(3, 11)
         self.label.set_alignment(0, 0)
+        
+        self.menu = self.get_button_menu()
+        self.set_menu_sensitive(self.menu, False)
+        
+        # menu without toolbar
+        icon_factory = Gtk.IconFactory()
+        pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/menu-arrow.png")
+        icon_factory.add("llyrics_menu", Gtk.IconSet.new_from_pixbuf(pxbf))
+        icon_factory.add_default()
+        
+        menu_button = Gtk.Image.new_from_stock("llyrics_menu", Gtk.IconSize.SMALL_TOOLBAR);
+        eventBox = Gtk.EventBox();
+        eventBox.add(menu_button);
+        eventBox.connect("button-press-event", self.popup_menu, self.menu)
+        
+        hbox_header.pack_start(self.label, True, True, 0)
+        hbox_header.pack_end(eventBox, False, False, 5)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -515,11 +398,42 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.back_button = Gtk.Button.new_with_label(_("Back to playing song"))
         self.back_button.connect("clicked", self.back_button_callback)
         
+        # toolbar menu
+#         toolbar = Gtk.Toolbar()
+#         toolbar.set_style(Gtk.ToolbarStyle.ICONS)
+#         toolbar.set_icon_size(Gtk.IconSize.MENU)
+        
+#         context = toolbar.get_style_context()
+#         context.set_junction_sides(Gtk.JunctionSides.BOTTOM)
+#         context.add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
+        
+#         item = Gtk.ToolItem()
+#         menu_button = Gtk.MenuButton()
+#         icon = Gio.ThemedIcon.new("preferences-desktop")
+#         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.SMALL_TOOLBAR)
+#         menu_button.set_image(image)
+#         menu_button.set_popup(self.menu)
+#         item.add(menu_button)
+        
+#         sep = Gtk.SeparatorToolItem()
+#         sep.set_expand(True)
+#         sep.set_draw(False)
+#         itemlabel.add(self.label)
+#         
+#         toolbar.insert(itemlabel, -1)
+#         toolbar.insert(sep, -1)
+#         toolbar.insert(item, -1)
+        
+        
+        
         # pack everything into side pane
-        self.vbox.pack_start(self.label, False, False, 0)
+        self.vbox.pack_start(hbox_header, False, False, 0);
+#         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
         self.vbox.pack_end(self.back_button, False, False, 3)
+#         self.vbox.pack_end(toolbar, False, False, 0)
+        
 
         self.vbox.show_all()
         self.hbox.hide()
@@ -532,33 +446,107 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.visible = False
         
         
+        
+    def get_button_menu(self):
+        menu = Gtk.Menu();
+        
+        self.radio_sources = Gtk.Menu()
+        
+        item_unselect = Gtk.RadioMenuItem.new_with_label([], "SelectNothing")
+        item_unselect.connect("activate", self.scan_selected_source_callback, "SelectNothing")
+        self.radio_sources.append(item_unselect)
+        
+        last_item = item_unselect
+        
+        for entry in LYRICS_SOURCES[:-1]:
+            last_item = self.add_radio_menu_item(self.radio_sources, entry, self.scan_selected_source_callback, last_item)
+        
+        self.radio_sources.append(Gtk.SeparatorMenuItem())
+        last_item = self.add_radio_menu_item(self.radio_sources, "External", self.scan_selected_source_callback, last_item)
+        self.radio_sources.append(Gtk.SeparatorMenuItem())
+        self.add_radio_menu_item(self.radio_sources, "From cache file", self.scan_selected_source_callback, last_item)
+        
+        self.radio_sources.show_all();
+        
+        item_sources = Gtk.MenuItem(_("Sources"));
+        item_sources.set_submenu(self.radio_sources);
+        menu.append(item_sources)
+        
+        self.add_menu_item(menu, _("Scan next source"), self.scan_next_action_callback)
+        self.add_menu_item(menu, _("Scan all sources"), self.scan_all_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Search online"), self.search_online_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Mark as instrumental"), self.instrumental_action_callback)
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Clear lyrics"), self.clear_action_callback)
+        self.add_menu_item(menu, _("Edit lyrics"), self.edit_action_callback)
+        self.add_menu_item(menu, _("Save lyrics"), self.save_to_cache_action_callback)
+        
+        menu.show_all()
+        
+        # hide the SelectNothing choice
+        item_unselect.hide()
+        
+        return menu
     
-    def toggle_visibility(self, action):
-        if not self.lmui_id:
-            # add lyrics menu ui
-            control_menu1, control_menu2 = "", ""
-            if not self.toplevel_menu:
-                control_menu1 = """<menu name="ControlMenu" action="Control">"""
-                control_menu2 = "</menu>"
-            lyrics_menu_ui_final = lyrics_menu_ui % (control_menu1, control_menu2)
-            self.lmui_id = self.uim.add_ui_from_string(lyrics_menu_ui_final)
+    
+    
+    def add_menu_item(self, menu, label, callback):
+        item = Gtk.MenuItem(label)
+        item.connect("activate", callback)            
+        menu.append(item)
+    
+    
+    
+    def add_radio_menu_item(self, menu, label, callback, last):
+        group = last.get_group()
+        item = Gtk.RadioMenuItem.new_with_label(group, _(label))
+        item.connect("toggled", callback, label)
+        menu.append(item)
+        
+        return item
             
-            self.uim.ensure_update()
+    
+    
+    def set_menu_sensitive(self, menu, sensitive):
+        for item in menu:
+            item.set_sensitive(sensitive)
+    
+    
+    
+    def set_menu_item_sensitive(self, menu, itemlabel, sensitive):
+        for item in menu:
+            if item.get_label() == itemlabel:
+                item.set_sensitive(sensitive)
+                break
+    
+    
+    
+    def set_radio_menu_item_active(self, menu, itemlabel):
+        for item in menu:
+            if item.get_label() == itemlabel:
+                item.set_active(True)
+                break
             
-        menu_path = "/MenuBar/lLyrics"
-        if not self.toplevel_menu:
-            menu_path = "/MenuBar/ControlMenu/lLyrics"
-
+    
+    
+    def popup_menu(self, widget, event, menu):
+        menu.popup(None, None, lambda x,y: (event.x_root+event.x, event.y_root+event.y, True), None, event.button, event.time)
+        
+        
+    
+    def toggle_visibility(self, action, param=None, data=None):
+        action = self.toggle_action_group.get_action('ToggleLyricSideBar')
+        
         if action.get_active():
             self.shell.add_widget(self.vbox, self.position, True, True)
             self.visible = True
-            self.uim.get_widget(menu_path).show()
             if not self.first and not self.showing_on_demand:
                 self.search_lyrics(self.player, self.player.get_playing_entry())
         else:
             self.shell.remove_widget(self.vbox, self.position)
             self.visible = False
-            self.uim.get_widget(menu_path).hide()
                     
             
         
@@ -629,32 +617,24 @@ class lLyrics(GObject.Object, Peas.Activatable):
             os.mkdir (artist_folder)
     
         return os.path.join(artist_folder, title[:128] + '.lyric')
-    
-    
-    
-    def hide_if_active (self, toggle_widget):
-        menu_path = "/MenuBar/lLyrics"
-        if not self.toplevel_menu:
-            menu_path = "/MenuBar/ControlMenu/lLyrics"
-            
-        if self.lmui_id:
-            menubar_item = self.uim.get_widget(menu_path)
-        
-        if self.tbui_id:
-            toolbar_item = self.uim.get_widget("/ToolBar/lLyrics")
-        
-        if (toggle_widget.get_active()):
-            if toolbar_item: toolbar_item.hide()
-            if menubar_item: menubar_item.hide()
-            
-        else:
-            if toolbar_item: toolbar_item.show()
-            if menubar_item: menubar_item.show()
             
             
             
-    def scan_source_action_callback(self, action, activated_action):        
+    def scan_source_action_callback(self, action, activated_action):
+        return        
         source = activated_action.get_name()
+        if source == "SelectNothing" or source == self.current_source:
+            return
+        
+        self.scan_source(source, self.clean_artist, self.clean_title)
+    
+    
+    
+    def scan_selected_source_callback(self, action, activated_action):
+        if not action.get_active():
+            return 
+
+        source = activated_action
         if source == "SelectNothing" or source == self.current_source:
             return
         
@@ -693,7 +673,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.write_lyrics_to_cache(self.path, lyrics)
         self.show_lyrics(self.artist, self.title, lyrics)
         
-        self.action_group.get_action("SelectNothing").set_active(True)
+        self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
         self.current_source = None
         
         
@@ -713,7 +693,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
             os.remove(self.path)
         except:
             print "No cache file found to clear"
-        self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+        self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
         print "cleared lyrics"
         
         
@@ -732,7 +712,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # the playing song might have changed during editing.
         self.path_before_edit = self.path
         
-        self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
         
         # Enable editing and set cursor
         self.textview.set_cursor_visible(True)
@@ -745,7 +725,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
     
-    def context_action_callback(self, action):
+    def context_action_callback(self, action, param=None, data=None):
         page = self.shell.props.selected_page
         if not hasattr(page, "get_entry_view"):
             return
@@ -793,7 +773,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.path != self.path_before_edit:
             self.textbuffer.set_text(_("searching lyrics..."))
             
-        self.action_group.set_sensitive(True)
+#         self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -818,7 +799,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         else:
             self.textbuffer.set_text(_("searching lyrics..."))
         
-        self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -839,7 +820,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # if nothing is playing, clear lyrics and return
         if not playing_entry:
             self.textbuffer.set_text("")
-            self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
             return
         
         # otherwise search lyrics
@@ -858,7 +839,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
             
     def _scan_source_thread(self, source, artist, title):
-        self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
              
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
@@ -872,7 +853,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
         self.show_lyrics(self.artist, self.title, lyrics)          
         
-        self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         
         
@@ -888,7 +869,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def _scan_all_sources_thread(self, artist, title, cache):
-        self.action_group.set_sensitive(False)
+        self.set_menu_sensitive(self.menu, False)
         
         if cache:
             lyrics = self.get_lyrics_from_cache(self.path)
@@ -914,12 +895,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
             return
             
         if lyrics == "":
-            self.action_group.get_action("SelectNothing").set_active(True)
+            self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
             self.current_source = None  
         
         self.show_lyrics(self.artist, self.title, lyrics)
         
-        self.action_group.set_sensitive(True)
+        self.set_menu_sensitive(self.menu, True)
         
         
         
@@ -935,7 +916,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
             print "got lyrics from cache"
             self.current_source = "From cache file"
-            self.action_group.get_action("From cache file").set_active(True)
+            self.set_radio_menu_item_active(self.radio_sources, _("From cache file"))
             return lyrics
             
         return ""
@@ -960,7 +941,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         print "source: " + source        
         self.current_source = source
-        self.action_group.get_action(source).set_active(True)
+        self.set_radio_menu_item_active(self.radio_sources, source)
         
         parser = self.dict[source].Parser(artist, title)
         try:
@@ -996,9 +977,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if lyrics == "":
             print "no lyrics found"
             lyrics = _("No lyrics found")
-            self.action_group.get_action("SaveToCacheAction").set_sensitive(False)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), False)
         else:        
-            self.action_group.get_action("SaveToCacheAction").set_sensitive(True)
+            self.set_menu_item_sensitive(self.menu, _("Save lyrics"), True)
             lyrics, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()

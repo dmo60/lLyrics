@@ -22,6 +22,7 @@ from gi.repository import Gtk
 from gi.repository import RB
 
 import lLyrics
+import lLyrics_rb3compat as Compat
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
 
@@ -309,105 +310,107 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         # page 3 for appearance settings
         page3 = Gtk.VBox()
         
-        # switch for show-toolbar-icon
-        hbox = Gtk.HBox()
-        switch = Gtk.Switch()
-        switch.set_active(self.settings["show-toolbar-icon"])
-        switch.connect("notify::active", self.switch_toggled, "show-toolbar-icon")
-        
-        label = Gtk.Label("<b>" + _("Show toolbar icon") + "</b>")
-        label.set_use_markup(True)
-        
-        descr = Gtk.Label("<i>" + _("When turned off, the lyrics sidebar can only be toggled "
-                                    "using the 'View' menu or by pressing 'Ctrl+L'") + "</i>")
-        descr.set_alignment(0, 0)
-        descr.set_margin_left(15)
-        descr.set_line_wrap(True)
-        descr.set_use_markup(True)
-        
-        hbox.pack_start(label, False, False, 5)
-        hbox.pack_start(switch, False, False, 5)
-        vbox = Gtk.VBox()
-        vbox.pack_start(hbox, False, False, 0)
-        vbox.pack_start(descr, False, False, 0)
-        
-        page3.pack_start(vbox, False, False, 10)
-        
-        # file chooser for toolbar icon
-        hbox = Gtk.HBox()
-        file_chooser = Gtk.FileChooserButton()
-        file_chooser.set_action(Gtk.FileChooserAction.OPEN)
-        # only allow images
-        file_filter = Gtk.FileFilter()
-        file_filter.add_pixbuf_formats()
-        file_filter.set_name(_("Image files"))
-        file_chooser.add_filter(file_filter)
-        file_chooser.set_filename(self.settings["icon-path"])
-        file_chooser.connect("file-set", self.icon_set)
-        
-        default_button = Gtk.Button(_("default icon"))
-        default_button.connect("clicked", self.set_icon_default, file_chooser)
-        
-        label = Gtk.Label("<b>" + _("Toolbar icon") + "</b>")
-        label.set_use_markup(True)
-        
-        descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
-                                    "to apply changes here") + "</i>")
-        descr.set_alignment(0, 0)
-        descr.set_margin_left(15)
-        descr.set_line_wrap(True)
-        descr.set_use_markup(True)
-        
-        hbox.pack_start(label, False, False, 5)
-        hbox.pack_start(file_chooser, True, True, 5)
-        hbox.pack_start(default_button, False, False, 5)
-        vbox = Gtk.VBox()
-        vbox.pack_start(hbox, False, False, 0)
-        vbox.pack_start(descr, False, False, 0)
-        
-        page3.pack_start(vbox, False, False, 10)
-        
-        # checkbuttons for toolbar separators
-        hbox = Gtk.HBox()
-        
-        label = Gtk.Label("<b>" + _("Show toolbar separators") + "</b>")
-        label.set_use_markup(True)
-        
-        check = Gtk.CheckButton(_("left"))
-        check.set_active(self.settings["separator-left"])
-        check.connect("toggled", self.switch_toggled, None, "separator-left")
-        
-        check2 = Gtk.CheckButton(_("right"))
-        check2.set_active(self.settings["separator-right"])
-        check2.connect("toggled", self.switch_toggled, None, "separator-right")
-        
-        hbox.pack_start(label, False, False, 5)
-        hbox.pack_start(check, False, False, 5)
-        hbox.pack_start(check2, False, False, 5)
-        page3.pack_start(hbox, False, False, 10)
-        
-        # switch for toplevel-menu
-        hbox = Gtk.HBox()
-        switch = Gtk.Switch()
-        switch.set_active(self.settings["toplevel-menu"])
-        switch.connect("notify::active", self.switch_toggled, "toplevel-menu")
-        
-        label = Gtk.Label("<b>" + _("Show lyrics menu as toplevel menu") + "</b>")
-        label.set_use_markup(True)
-        
-        descr = Gtk.Label("<i>" + _("When turned off, the lyrics menu is moved to the 'Control' menu") + "</i>")
-        descr.set_alignment(0, 0)
-        descr.set_margin_left(15)
-        descr.set_line_wrap(True)
-        descr.set_use_markup(True)
-        
-        hbox.pack_start(label, False, False, 5)
-        hbox.pack_start(switch, False, False, 5)
-        vbox = Gtk.VBox()
-        vbox.pack_start(hbox, False, False, 0)
-        vbox.pack_start(descr, False, False, 0)
-        
-        page3.pack_start(vbox, False, False, 10)
+        # toolbar and menu preferences only for RB<2.99
+        if not lLyrics.is_rb3:
+            # switch for show-toolbar-icon
+            hbox = Gtk.HBox()
+            switch = Gtk.Switch()
+            switch.set_active(self.settings["show-toolbar-icon"])
+            switch.connect("notify::active", self.switch_toggled, "show-toolbar-icon")
+            
+            label = Gtk.Label("<b>" + _("Show toolbar icon") + "</b>")
+            label.set_use_markup(True)
+            
+            descr = Gtk.Label("<i>" + _("When turned off, the lyrics sidebar can only be toggled "
+                                        "using the 'View' menu or by pressing 'Ctrl+L'") + "</i>")
+            descr.set_alignment(0, 0)
+            descr.set_margin_left(15)
+            descr.set_line_wrap(True)
+            descr.set_use_markup(True)
+            
+            hbox.pack_start(label, False, False, 5)
+            hbox.pack_start(switch, False, False, 5)
+            vbox = Gtk.VBox()
+            vbox.pack_start(hbox, False, False, 0)
+            vbox.pack_start(descr, False, False, 0)
+            
+            page3.pack_start(vbox, False, False, 10)
+            
+            # file chooser for toolbar icon
+            hbox = Gtk.HBox()
+            file_chooser = Gtk.FileChooserButton()
+            file_chooser.set_action(Gtk.FileChooserAction.OPEN)
+            # only allow images
+            file_filter = Gtk.FileFilter()
+            file_filter.add_pixbuf_formats()
+            file_filter.set_name(_("Image files"))
+            file_chooser.add_filter(file_filter)
+            file_chooser.set_filename(self.settings["icon-path"])
+            file_chooser.connect("file-set", self.icon_set)
+            
+            default_button = Gtk.Button(_("default icon"))
+            default_button.connect("clicked", self.set_icon_default, file_chooser)
+            
+            label = Gtk.Label("<b>" + _("Toolbar icon") + "</b>")
+            label.set_use_markup(True)
+            
+            descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
+                                        "to apply changes here") + "</i>")
+            descr.set_alignment(0, 0)
+            descr.set_margin_left(15)
+            descr.set_line_wrap(True)
+            descr.set_use_markup(True)
+            
+            hbox.pack_start(label, False, False, 5)
+            hbox.pack_start(file_chooser, True, True, 5)
+            hbox.pack_start(default_button, False, False, 5)
+            vbox = Gtk.VBox()
+            vbox.pack_start(hbox, False, False, 0)
+            vbox.pack_start(descr, False, False, 0)
+            
+            page3.pack_start(vbox, False, False, 10)
+            
+            # checkbuttons for toolbar separators
+            hbox = Gtk.HBox()
+            
+            label = Gtk.Label("<b>" + _("Show toolbar separators") + "</b>")
+            label.set_use_markup(True)
+            
+            check = Gtk.CheckButton(_("left"))
+            check.set_active(self.settings["separator-left"])
+            check.connect("toggled", self.switch_toggled, None, "separator-left")
+            
+            check2 = Gtk.CheckButton(_("right"))
+            check2.set_active(self.settings["separator-right"])
+            check2.connect("toggled", self.switch_toggled, None, "separator-right")
+            
+            hbox.pack_start(label, False, False, 5)
+            hbox.pack_start(check, False, False, 5)
+            hbox.pack_start(check2, False, False, 5)
+            page3.pack_start(hbox, False, False, 10)
+            
+            # switch for toplevel-menu
+            hbox = Gtk.HBox()
+            switch = Gtk.Switch()
+            switch.set_active(self.settings["toplevel-menu"])
+            switch.connect("notify::active", self.switch_toggled, "toplevel-menu")
+            
+            label = Gtk.Label("<b>" + _("Show lyrics menu as toplevel menu") + "</b>")
+            label.set_use_markup(True)
+            
+            descr = Gtk.Label("<i>" + _("When turned off, the lyrics menu is moved to the 'Control' menu") + "</i>")
+            descr.set_alignment(0, 0)
+            descr.set_margin_left(15)
+            descr.set_line_wrap(True)
+            descr.set_use_markup(True)
+            
+            hbox.pack_start(label, False, False, 5)
+            hbox.pack_start(switch, False, False, 5)
+            vbox = Gtk.VBox()
+            vbox.pack_start(hbox, False, False, 0)
+            vbox.pack_start(descr, False, False, 0)
+            
+            page3.pack_start(vbox, False, False, 10)
         
         # switch for hide-label
         hbox = Gtk.HBox()
