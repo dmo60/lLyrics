@@ -460,14 +460,19 @@ class ActionGroup(object):
             if accel:
                 app.add_accelerator(accel, action_type+"."+action_name, None)
         else:
+            if 'stock_id' in args:
+                stock_id = args['stock_id']
+            else:
+                stock_id = Gtk.STOCK_CLEAR
+                
             if state == ActionGroup.TOGGLE:
                 action = Gtk.ToggleAction(label=label,
                     name=action_name,
-                   tooltip='', stock_id=Gtk.STOCK_CLEAR)
+                   tooltip='', stock_id=stock_id)
             else:
                 action = Gtk.Action(label=label,
                     name=action_name,
-                   tooltip='', stock_id=Gtk.STOCK_CLEAR)
+                   tooltip='', stock_id=stock_id)
                    
             if accel:
                 self.actiongroup.add_action_with_accel(action, accel)

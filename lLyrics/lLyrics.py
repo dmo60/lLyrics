@@ -304,7 +304,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def init_menu(self):
         # add actions
         self.toggle_action_group = ActionGroup(self.shell, 'lLyricsPluginToggleActions')
-        self.toggle_action_group.add_action(func=self.toggle_visibility,
+        self.toggle_action_group.add_action(func=self.toggle_visibility, stock_id=STOCK_IMAGE,
             action_name='ToggleLyricSideBar', label=_("Lyrics"), action_state=ActionGroup.TOGGLE,
             action_type='app', accel="<Ctrl>l", tooltip=_("Display lyrics for the current playing song"))
         self.appshell.insert_action_group(self.toggle_action_group)
