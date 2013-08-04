@@ -33,7 +33,7 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://rapgenius.com/" + clean_artist.replace(" ", "-") + clean_title.replace(" ", "-") + "-lyrics"
+        url = "http://rapgenius.com/" + clean_artist.replace(" ", "-") + "-" +clean_title.replace(" ", "-") + "-lyrics"
         print "rapgenius Url " + url
         try:
             resp = urllib2.urlopen(url, None, 3).read()
