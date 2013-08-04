@@ -19,6 +19,11 @@
 
 import re
 import string
+import urllib
+import urllib2
+import xml.dom
+
+LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
 
 def decode_chars(resp):
@@ -70,5 +75,39 @@ def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
+
+
+
+def get_lastfm_correction(artist, title):
+    params = urllib.urlencode({'method':'track.getcorrection',
+                               'api_key':LASTFM_API_KEY,
+                               'artist':artist, 
+                               'track':title})
+    try:
+        result = urllib2.urlopen("http://ws.audioscrobbler.com/2.0/?" + params, None, 3).read()
+    except:
+        print "could not connect to LastFM API"
+        return (artist, title, False)
+    
+    response = xml.dom.minidom.parseString(result)
+    corrections = response.getElementsByTagName("correction")
+    if not corrections:
+        print "no LastFM corrections found"
+        return (artist, title, False)
+    
+    # only consider one correction for now
+    correction = corrections[0]
+    
+    if correction.getAttribute("artistcorrected") == "1":
+        artist = correction.getElementsByTagName("name")[0].firstChild.data
+        print "LastFM artist correction: " + artist
+    
+    
+    if correction.getAttribute("trackcorrected") == "1":
+        title = correction.getElementsByTagName("name")[1].firstChild.data
+        print "LastFM title correction: " + title
+    
+    return (artist, title, True)
+    
     
     

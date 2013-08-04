@@ -174,6 +174,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.tags = None
         self.current_tag = None
         self.showing_on_demand = False
+        self.was_corrected = False
         
         # Search lyrics if already playing (this will be the case if user reactivates plugin during playback)
         if self.player.props.playing:
@@ -581,6 +582,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
         print "search lyrics for " + self.artist + " - " + self.title
+        
+        self.was_corrected = False
    
         (self.clean_artist, self.clean_title) = self.clean_song_data(self.artist, self.title)
         self.path = self.build_cache_path(self.clean_artist, self.clean_title)
@@ -888,7 +891,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print "song changed"
             return
             
-        if lyrics == "":
+        if lyrics == "": 
+            # check for lastfm corrections
+            if not self.was_corrected:
+                self.was_corrected = True  
+                (self.clean_artist, self.clean_title, corrected) = Util.get_lastfm_correction(artist, title) 
+                if corrected:
+                    self._scan_all_sources_thread(self.clean_artist, self.clean_title, False)
+                    return    
+                                       
             self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
             self.current_source = None  
         

@@ -63,6 +63,7 @@ Features
   - Automatically display lyrics on playback or only on-demand
   - Save retrieved lyrics to a file (can be deactivated)
   - Possibility to edit lyrics
+  - Automatic correction of artist and title information by Last.fm API to improve search results
   - Appearance customizable to adapt to your desires or your available screen space
   - Basic support for synchronized lyrics (only Sogou.com can provide them for now)
   - more...
