@@ -895,8 +895,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
             # check for lastfm corrections
             if not self.was_corrected:
                 self.was_corrected = True  
-                (self.clean_artist, self.clean_title, corrected) = Util.get_lastfm_correction(artist, title) 
+                (artist, title, corrected) = Util.get_lastfm_correction(artist, title) 
                 if corrected:
+                    (self.clean_artist, self.clean_title) = self.clean_song_data(artist, title)
                     self._scan_all_sources_thread(self.clean_artist, self.clean_title, False)
                     return    
                                        
