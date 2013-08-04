@@ -462,9 +462,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
             last_item = self.add_radio_menu_item(self.radio_sources, entry, self.scan_selected_source_callback, last_item)
         
         self.radio_sources.append(Gtk.SeparatorMenuItem())
-        last_item = self.add_radio_menu_item(self.radio_sources, "External", self.scan_selected_source_callback, last_item)
+        last_item = self.add_radio_menu_item(self.radio_sources, _("External"), self.scan_selected_source_callback, last_item)
         self.radio_sources.append(Gtk.SeparatorMenuItem())
-        self.add_radio_menu_item(self.radio_sources, "From cache file", self.scan_selected_source_callback, last_item)
+        self.add_radio_menu_item(self.radio_sources, _("From cache file"), self.scan_selected_source_callback, last_item)
         
         self.radio_sources.show_all();
         
@@ -501,7 +501,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     def add_radio_menu_item(self, menu, label, callback, last):
         group = last.get_group()
-        item = Gtk.RadioMenuItem.new_with_label(group, _(label))
+        item = Gtk.RadioMenuItem.new_with_label(group, label)
+        if label == _("External"):
+            label = "External"
+        if label == _("From cache file"):
+            label = "From cache file"
         item.connect("toggled", callback, label)
         menu.append(item)
         
