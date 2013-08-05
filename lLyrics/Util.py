@@ -23,6 +23,12 @@ import urllib
 import urllib2
 import xml.dom
 
+from urlparse import urlparse
+from urllib2 import unquote
+
+from mutagen.id3 import ID3, USLT, ID3NoHeaderError
+from mutagen.oggvorbis import OggVorbis, OggVorbisHeaderError
+
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
 
@@ -108,6 +114,87 @@ def get_lastfm_correction(artist, title):
         print "LastFM title correction: " + title
     
     return (artist, title, True)
+
+
+
+def get_lyrics_from_audio_tag(uri, mime):
+    # get path from uri
+    path = unquote(urlparse(uri).path)
+    
+    # MP3 file
+    if "mpeg" in mime:
+        try: 
+            tags = ID3(path)
+        except ID3NoHeaderError:
+            print "no ID3 header"
+            return ""
+        
+        lyrics = tags.getall("USLT")
+        
+        if not lyrics:
+            print "no USLT tags found"
+            return ""
+        
+        lyrics = lyrics[0].text        
+        return string.capwords(lyrics, "\n").strip()
+    
+    # ogg vorbis file
+    if "vorbis" in mime:
+        comments = OggVorbis(path)
+        
+        # look for lyrics or unsyncedlyrics comments
+        if "lyrics" in comments:
+            lyrics = comments["lyrics"][0]
+            return string.capwords(lyrics, "\n").strip()
+        
+        if "unsyncedlyrics" in comments:
+            lyrics = comments["unsyncedlyrics"][0]
+            return string.capwords(lyrics, "\n").strip()
+
+        print "no lyrics comment field found"
+        return ""
+    
+    
+    
+def write_lyrics_to_audio_tag(uri, mime, lyrics, overwrite):
+    # get path from uri
+    path = unquote(urlparse(uri).path)
+    
+    # MP3 file
+    if "mpeg" in mime:
+        # create ID3 tag if not exists
+        try: 
+            tags = ID3(path)
+        except ID3NoHeaderError:
+            print "adding ID3 header"
+            tags = ID3()
+        
+        # remove existing lyric tags
+        if tags.getall("USLT") and overwrite:
+            tags.delall(u"USLT")
+        
+        tags[u'USLT'] = USLT(encoding=3, lang=u'xxx', desc=u'llyrics', text=unicode(lyrics))
+        tags.save(path)
+        
+        print "wrote lyrics to id3 tag"
+    
+    # ogg vorbis file
+    if "vorbis" in mime:
+        try:
+            comments = OggVorbis(path)
+        except OggVorbisHeaderError:
+            print "adding ogg vorbis header"
+            comments = OggVorbis()
+        
+        # remove existing lyrics
+        if overwrite:
+            comments["lyrics"] = []
+            comments["unsyncedlyrics"] = []
+        
+        comments["lyrics"] = lyrics
+        comments.save()
+        
+        print "wrote lyrics to vorbis comment"
     
     
     
