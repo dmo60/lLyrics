@@ -54,7 +54,7 @@ class Parser(object):
             return ""
         title = title[:end]
         title = HTMLParser().unescape(title)
-        songdata = title.split(" - ")
+        songdata = title.split(" – ")
         try:
             if self.artist != songdata[0].lower() or self.title != songdata[1].lower():
                 print "wrong artist/title! " + songdata[0].lower() + " - " + songdata[1].lower()
