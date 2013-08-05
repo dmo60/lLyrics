@@ -26,8 +26,9 @@ Lyrics sources
   - Chartlyrics.com
   - Leoslyrics.com
   - Lyrdb.com
+  - Rapgenius.com
   - Sogou.com (only activate this source, if you want to test the synchronized lyrics support)
-  
+
 It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has many bugs and may cause instabilities.
 
 
@@ -39,9 +40,9 @@ Installation
 In Ubuntu based distribution, you can install this plugin via [a PPA by fossfreedom](https://launchpad.net/~fossfreedom/+archive/rhythmbox-plugins). Other distributions may provide similar options (e.g. Arch AUR).
 
 To manually install the plugin, download the zip-file by pressing the "ZIP"-button on the upper part of this page and extract it.
-Change to the extracted folder, open a terminal (in the directory where Makefile is located) and run `make install`. 
+Change to the extracted folder, open a terminal (in the directory where Makefile is located) and run `make install`.
 
-This will install the plugin for the current user only which is sufficiant in most of the cases. 
+This will install the plugin for the current user only which is sufficiant in most of the cases.
 It will ask for your sudo password, but don't worry, it is only required to install the schema file that is needed to save your preferences.
 
 To install lLyrics systemwide for all users, run `make install-systemwide`.
