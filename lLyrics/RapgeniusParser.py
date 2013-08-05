@@ -86,9 +86,8 @@ class Parser(object):
         resp = re.sub("<div[^>]*>","",resp)
         resp = re.sub("<a[^>]*>","",resp)
         resp = resp.replace("</a>", "")
-        resp = resp.replace("<br>", "&#10;")
-        resp = resp.replace("<br />", "&#10;")
-        resp = resp.replace("&#", "")
+        resp = resp.replace("<br>", "")
+        resp = resp.replace("<br />", "")
         resp = resp.strip()
 
         # decode characters
