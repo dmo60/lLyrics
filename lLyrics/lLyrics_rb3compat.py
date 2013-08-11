@@ -26,6 +26,7 @@ from gi.repository import Gtk
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
+from gi.repository import RB
 import sys
 import rb
 import lxml.etree as ET
@@ -126,12 +127,11 @@ def quote_plus(uri):
     else:
         return urllib.quote_plus(uri)
 
-        
-def is_rb3(shell):
-    if hasattr( shell.props.window, 'add_action' ):
-        return True
+def is_rb3(*args):
+    if hasattr(RB.Shell.props, 'ui_manager'):
+        return False
     else:
-        return False    
+        return True 
         
 class Menu(object):
     '''
@@ -709,6 +709,7 @@ class Action(object):
     def _activate(self, action, *args):
         if self._do_update_state:
             self._current_state = not self._current_state
+            self.set_state(self._current_state)
         
         self._connect_func(action, None, self._connect_args)
         
@@ -757,6 +758,14 @@ class Action(object):
         else:
             return self.action.get_sensitive()
             
+    def set_state(self, value):
+        ''' 
+        set the state of a stateful action - this is applicable only
+        to RB2.99+
+        '''
+        if is_rb3(self.shell) and self.action.props.state_type:
+            self.action.change_state(GLib.Variant('b', value))
+
     def activate(self):
         ''' 
         invokes the activate signal for the action
