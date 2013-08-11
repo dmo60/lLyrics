@@ -16,10 +16,6 @@ import os
 import threading
 import webbrowser
 import sys
-try:
-    import chardet
-except:
-    print "module chardet not found or not installed!"
 
 from threading import Thread
 
@@ -976,6 +972,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         if lyrics:
             print "got lyrics from audio tag"
+            
+            lyrics = Util.utf8_encode(lyrics)
+            if not lyrics:
+                return ""
+            
+            if self.cache:
+                self.write_lyrics_to_cache(self.path, lyrics)
+                
             self.current_source = "From audio tag"
             self.set_radio_menu_item_active(self.radio_sources, _("From audio tag"))
         
@@ -986,8 +990,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def write_lyrics_to_tag(self, lyrics, location, mime):
         try:
             Util.write_lyrics_to_audio_tag(location, mime, lyrics, self.overwrite)
-        except:
-            print "error writing lyrics to audio tag"
+        except Exception, e:
+            print "error writing lyrics to audio tag", e
                 
             
         
@@ -1012,19 +1016,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         if lyrics != "":
             print "got lyrics from source"
+            print type(lyrics)
             if source != "External":
                 lyrics = "%s\n\n(lyrics from %s)" % (lyrics, source)
-            try:
-                encoding = chardet.detect(lyrics)['encoding']
-            except:
-                print "could not detect lyrics encoding, assume utf-8"
-                encoding = 'utf-8'
-            try:
-                lyrics = lyrics.decode(encoding, 'replace')
-                lyrics = lyrics.encode("utf-8", "replace")
-            except:
-                print "failed to utf8 encode lyrics!"
+                
+            lyrics = Util.utf8_encode(lyrics)
+            if not lyrics:
                 return ""
+            
             if self.cache:
                 self.write_lyrics_to_cache(path, lyrics)
             if self.audio_tag:

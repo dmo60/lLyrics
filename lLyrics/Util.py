@@ -26,6 +26,11 @@ import xml.dom
 from urlparse import urlparse
 from urllib2 import unquote
 
+try:
+    import chardet
+except:
+    print "module chardet not found or not installed!"
+
 from mutagen.id3 import ID3, USLT, ID3NoHeaderError
 from mutagen.oggvorbis import OggVorbis, OggVorbisHeaderError
 
@@ -81,6 +86,29 @@ def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
+
+
+
+def utf8_encode(lyrics):    
+    if isinstance(lyrics, str):    
+        try:
+            encoding = chardet.detect(lyrics)['encoding']
+        except:
+            print "could not detect lyrics encoding, assume utf-8"
+            encoding = 'utf-8'
+        try:
+            lyrics = lyrics.decode(encoding, 'replace')
+        except:
+            print "failed to decode lyrics string!"
+            return ""
+            
+    try:
+        lyrics = lyrics.encode('utf-8', 'replace')
+    except:
+        print "failed to utf8 encode lyrics!"
+        return ""
+    
+    return lyrics
 
 
 
@@ -173,7 +201,7 @@ def write_lyrics_to_audio_tag(uri, mime, lyrics, overwrite):
         if tags.getall("USLT") and overwrite:
             tags.delall(u"USLT")
         
-        tags[u'USLT'] = USLT(encoding=3, lang=u'xxx', desc=u'llyrics', text=unicode(lyrics))
+        tags[u'USLT'] = USLT(encoding=3, lang=u'xxx', desc=u'llyrics', text=unicode(lyrics, 'utf-8', 'replace'))
         tags.save(path)
         
         print "wrote lyrics to id3 tag"
@@ -191,7 +219,7 @@ def write_lyrics_to_audio_tag(uri, mime, lyrics, overwrite):
             comments["lyrics"] = []
             comments["unsyncedlyrics"] = []
         
-        comments["lyrics"] = lyrics
+        comments["lyrics"] = unicode(lyrics, 'utf-8', 'replace')
         comments.save()
         
         print "wrote lyrics to vorbis comment"
