@@ -644,7 +644,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
     def scan_next_action_callback(self, action):
-        if self.current_source is None or self.current_source == "From cache file":
+        if self.current_source == "From cache file":
+            source = "From audio tag"
+            self.scan_source(source, self.clean_artist, self.clean_title)
+            
+        if self.current_source is None or self.current_source == "From audio tag":
             index = 0
         else:
             index = self.sources.index(self.current_source) + 1
