@@ -2,6 +2,7 @@
 Loader=python
 Module=lLyrics
 IAge=2
+Depends=rb
 Name=lLyrics
 Description=Displays lyrics in the right sidebar
 Description[de]=Zeigt Liedtexte in der rechten Seitenleiste an
