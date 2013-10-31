@@ -39,7 +39,7 @@ class Config(object):
             if not source in lLyrics.LYRICS_SOURCES:
                 entries.remove(source)
                 changed = True
-                print "remove invalid entry in active-sources: " + source
+                print("remove invalid entry in active-sources: " + source)
         
         # update key, if changed
         if changed:
@@ -53,14 +53,14 @@ class Config(object):
             if not source in lLyrics.LYRICS_SOURCES:
                 entries.remove(source)
                 changed = True
-                print "remove invalid entry in scanning-order: " + source
+                print("remove invalid entry in scanning-order: " + source)
                 
         # fill up missing keys
         for source in lLyrics.LYRICS_SOURCES:
             if source not in entries:
                 entries.append(source)
                 changed = True
-                print "append missing entry in scanning-order: " + source
+                print("append missing entry in scanning-order: " + source)
         
         # update key, if changed
         if changed:
@@ -82,7 +82,7 @@ class Config(object):
             if not os.path.exists(folder):
                 os.mkdir(folder)
             changed = True
-            print "invalid path in lyrics-folder, set to default"
+            print("invalid path in lyrics-folder, set to default")
         
         if changed:
             self.settings["lyrics-folder"] = folder
@@ -101,7 +101,7 @@ class Config(object):
             path = os.path.join(os.path.dirname(__file__) + "/lLyrics-icon.png")
             path = os.path.expanduser(path)
             changed = True
-            print "file for toolbar icon does not exist, set to default"
+            print("file for toolbar icon does not exist, set to default")
         
         if changed:
             self.settings["icon-path"] = path
@@ -274,13 +274,13 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             check.connect("toggled", self.source_toggled, source)
             hbox.pack_start(check, True, True, 3)
             
-            button_up = Gtk.Button(u'\u2191')
+            button_up = Gtk.Button('\u2191')
             button_up.connect("clicked", self.reorder_sources, source, hbox, vbox, "up")
             hbox.pack_start(button_up, False, False, 3)
             if self.settings["scanning-order"].index(source) == 0:
                 button_up.set_sensitive(False)
             
-            button_down = Gtk.Button(u'\u2193')
+            button_down = Gtk.Button('\u2193')
             button_down.connect("clicked", self.reorder_sources, source, hbox, vbox, "down")
             hbox.pack_start(button_down, False, False, 3)
             if self.settings["scanning-order"].index(source) == len(self.settings["scanning-order"]) - 1:
@@ -502,7 +502,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
     def folder_set(self, file_chooser):
         new_folder = file_chooser.get_current_folder()
         if self.settings["lyrics-folder"] != new_folder:
-            print "folder changed"
+            print("folder changed")
             self.settings["lyrics-folder"] = new_folder
     
     def set_folder_default(self, button, file_chooser):
@@ -511,7 +511,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
     def icon_set(self, file_chooser):
         new_path = file_chooser.get_filename()
         if self.settings["icon-path"] != new_path:
-            print "icon changed"
+            print("icon changed")
             self.settings["icon-path"] = new_path
     
     def set_icon_default(self, button, file_chooser):

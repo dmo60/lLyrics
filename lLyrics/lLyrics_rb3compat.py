@@ -47,31 +47,31 @@ PYVER = sys.version_info[0]
 if PYVER >= 3:
     import urllib.request, urllib.parse, urllib.error
 else:
-    import urllib
-    from urlparse import urlparse as rb2urlparse
+    import urllib.request, urllib.parse, urllib.error
+    from urllib.parse import urlparse as rb2urlparse
 
 if PYVER >= 3:
     import http.client
 else:
-    import httplib
+    import http.client
     
 def responses():
     if PYVER >=3:
         return http.client.responses
     else:
-        return httplib.responses
+        return http.client.responses
 
 def unicodestr(param, charset):
     if PYVER >=3:
         return param#str(param, charset)
     else:
-        return unicode(param, charset)
+        return str(param, charset)
         
 def unicodeencode(param, charset):
     if PYVER >=3:
         return param#str(param).encode(charset)
     else:
-        return unicode(param).encode(charset)
+        return str(param).encode(charset)
         
 def unicodedecode(param, charset):
     if PYVER >=3:
@@ -89,25 +89,25 @@ def url2pathname(url):
     if PYVER >=3:
         return urllib.request.url2pathname(url)
     else:
-        return urllib.url2pathname(url)
+        return urllib.request.url2pathname(url)
 
 def urlopen(filename):
     if PYVER >=3:
         return urllib.request.urlopen(filename)
     else:
-        return urllib.urlopen(filename)
+        return urllib.request.urlopen(filename)
         
 def pathname2url(filename):
     if PYVER >=3:
         return urllib.request.pathname2url(filename)
     else:
-        return urllib.pathname2url(filename)
+        return urllib.request.pathname2url(filename)
 
 def unquote(uri):
     if PYVER >=3:
         return urllib.parse.unquote(uri)
     else:
-        return urllib.unquote(uri)
+        return urllib.parse.unquote(uri)
                 
 def quote(uri, safe=None):
     if PYVER >=3:
@@ -117,15 +117,15 @@ def quote(uri, safe=None):
             return urllib.parse.quote(uri)
     else:
         if safe:
-            return urllib.quote(uri, safe=safe)
+            return urllib.parse.quote(uri, safe=safe)
         else:
-            return urllib.quote(uri)
+            return urllib.parse.quote(uri)
         
 def quote_plus(uri):
     if PYVER >=3:
         return urllib.parse.quote_plus(uri)
     else:
-        return urllib.quote_plus(uri)
+        return urllib.parse.quote_plus(uri)
 
 def is_rb3(*args):
     if hasattr(RB.Shell.props, 'ui_manager'):
@@ -276,7 +276,7 @@ class Menu(object):
             action.set_enabled(True)
             self.shell.props.window.add_action(action)
             
-        for key,value in signals.items():
+        for key,value in list(signals.items()):
             _menu_connect( key, value)
         
     def _connect_rb2_signals(self, signals):
@@ -284,7 +284,7 @@ class Menu(object):
             menu_item = self.builder.get_object(menu_item_name)
             menu_item.connect('activate', func)
             
-        for key,value in signals.items():
+        for key,value in list(signals.items()):
             _menu_connect( key, value)
             
     def connect_signals(self, signals):
@@ -631,7 +631,7 @@ class ApplicationShell(object):
                     elif popup_name == 'PodcastViewPopup':
                         plugin_type = 'podcast-episode-popup'
                     else:
-                        print ("unknown type %s" % plugin_type)
+                        print(("unknown type %s" % plugin_type))
                         
                     index = plugin_type+action_name
                     app.add_plugin_menu_item(plugin_type, index, item)

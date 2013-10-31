@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string
 
 import Util
@@ -37,13 +37,14 @@ class Parser(object):
             
         # create lyrics Url
         url = "http://www.lyricsmania.com/" + clean_title + "_lyrics_" + clean_artist + ".html"
-        print "lyricsmania Url " + url
+        print("lyricsmania Url " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to lyricsmania.com"
+            print("could not connect to lyricsmania.com")
             return ""
         
+        resp = Util.bytes_to_string(resp)
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
         
@@ -54,12 +55,12 @@ class Parser(object):
         start_string = """<div id='songlyrics_h' class='dn'>"""
         start = resp.find(start_string)
         if start == -1:
-            print "lyrics start not found"
+            print("lyrics start not found")
             return ""
         resp = resp[(start+len(start_string)+1):]
         end = resp.find("</div>")
         if end == -1:
-            print "lyrics end not found "
+            print("lyrics end not found ")
             return ""
         resp = resp[:(end)]
         

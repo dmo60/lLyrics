@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string
+
+import Util
 
 class Parser(object):
     
@@ -25,29 +27,31 @@ class Parser(object):
         
     def parse(self):
         # create lyrics Url
-        url = "http://webservices.lyrdb.com/lookup.php?q=" + urllib2.quote(self.artist) + "|" + urllib2.quote(self.title) + "&for=match&agent=llyrics"
-        print "call lyrdb API " + url
+        url = "http://webservices.lyrdb.com/lookup.php?q=" + urllib.parse.quote(self.artist) + "|" + urllib.parse.quote(self.title) + "&for=match&agent=llyrics"
+        print("call lyrdb API " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to lyrdb.com"
+            print("could not connect to lyrdb.com")
             return ""
         
+        resp = Util.bytes_to_string(resp)
         end = resp.find("\\");
         if end == -1:
-            print "no id found"
+            print("no id found")
             return ""
         lyricsid = resp[:end]
-        print lyricsid
+        print(lyricsid)
         
         url = "http://www.lyrdb.com/getlyr.php?q=" + lyricsid
-        print "url " + url
+        print("url " + url)
         try:
-            self.lyrics = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to lyrdb.com"
+            print("could not connect to lyrdb.com")
             return ""
         
-        self.lyrics = string.capwords(self.lyrics, "\n").strip()
+        resp = Util.bytes_to_string(resp)
+        self.lyrics = string.capwords(resp, "\n").strip()
         
         return self.lyrics

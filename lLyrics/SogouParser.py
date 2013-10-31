@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import chardet
 
 class Parser(object):
@@ -24,33 +24,33 @@ class Parser(object):
         self.title = title
 
     def changeUrlToGb(self, info):
-        address = unicode(info, 'utf-8').encode('gb18030')
+        address = str(info, 'utf-8').encode('gb18030')
         return address
 
     def parse(self):
         url1 = 'http://mp3.sogou.com/gecisearch.so?query='
         url2_pre = '%s %s' % (self.changeUrlToGb(self.title), self.changeUrlToGb(self.artist))
-        url2 = urllib2.quote(url2_pre)
+        url2 = urllib.parse.quote(url2_pre)
         url = url1 + url2
-        print "url: " + url
+        print("url: " + url)
 
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except IOError:
-            print "could not open sogou url"
+            print("could not open sogou url")
             return ""
         
-        tmp = unicode(resp, 'gb18030').encode('utf-8')
+        tmp = str(resp, 'gb18030').encode('utf-8')
         tmpList = re.search('href=\"downlrc\.jsp\?tGroupid=.*?\"', tmp)
         if tmpList is None:
             return ""
         
         lrcUrl = 'http://mp3.sogou.com/' + re.sub('href="|"', '', tmpList.group())
-        print "lrcfile: " + lrcUrl
+        print("lrcfile: " + lrcUrl)
         try:
-            lyrics = urllib2.urlopen(lrcUrl, None, 3).read()
+            lyrics = urllib.request.urlopen(lrcUrl, None, 3).read()
         except:
-            print "could not download sogou lrc file"
+            print("could not download sogou lrc file")
             return ""
         
 #        try:
