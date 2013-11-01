@@ -26,9 +26,8 @@ Lyrics sources
   - Chartlyrics.com
   - Leoslyrics.com
   - Lyrdb.com
-  - Sogou.com (only activate this source, if you want to test the synchronized lyrics support)
   
-It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has many bugs and may cause instabilities.
+It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has some bugs and may cause instabilities.
 
 
 
@@ -64,7 +63,7 @@ Features
   - Save retrieved lyrics to a file (can be deactivated)
   - Possibility to edit lyrics
   - Appearance customizable to adapt to your desires or your available screen space
-  - Basic support for synchronized lyrics (only Sogou.com can provide them for now)
+  - Basic support for synchronized lyrics
   - more...
 
 
