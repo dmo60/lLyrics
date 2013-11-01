@@ -20,6 +20,7 @@ Lyrics sources
   - Metrolyrics.com
   - AZLyrics.com
   - Lyricsmania.com
+  - Rapgenius.com
   - Darklyrics.com
   - Chartlyrics.com
   - Leoslyrics.com
