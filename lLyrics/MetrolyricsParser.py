@@ -51,7 +51,7 @@ class Parser(object):
             print("no title found")
             return ""
         title = title[(start+7):]
-        end = title.find(" LYRICS</title>")
+        end = title.find(" Lyrics | MetroLyrics</title>")
         if end == -1:
             print("no title end found")
             return ""
@@ -73,32 +73,22 @@ class Parser(object):
     
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<span class='line line-s' id='line_1'>")
+        start = resp.find("<p class='verse'>")
         if start == -1:
             print("lyrics start not found")
             return ""
         resp = resp[start:]
-        end = resp.find("<link itemprop=\"name\"")
+        end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:(end)]
         
         # replace unwanted parts
-        resp = resp.replace("<span class='line line-s' id='line_1'>", "")
-        resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>\<span style\=\'color:#888888;font-size:0\.75em\'\>\[.+\]\</span\>", "", resp)
-        resp = re.sub("<meta itemprop=\"line\" content=\".*?\" />", "", resp)
-        resp = re.sub("\<span class\=\'line line-s\' id\=\'line_[0-9][0-9]?\'\>", "&#10;", resp)
-        resp = re.sub("\<em class\=\"smline sm\" data-meaningid\=\"[0-9]+\" \>", "", resp)
-        resp = re.sub("(\</em\>)?\</span\>", "", resp)
-        resp = re.sub("(\<br /\>)*\</p\>", "", resp)
-        resp = resp.replace("<br />", "&#10;")
-        resp = resp.replace("&#", "")
+        resp = resp.replace("<p class='verse'>", "")
+        resp = resp.replace("</p>", "\n\n")
+        resp = resp.replace("<br/>", "")
         resp = resp.strip()
-        resp = resp[:-1]
-                
-        # decode characters
-        resp =Util.decode_chars(resp)
         
         return resp
     
