@@ -503,8 +503,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # get the song data
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
-        self.location = entry.get_string(RB.RhythmDBPropType.LOCATION)
-        self.mime = entry.get_string(RB.RhythmDBPropType.MEDIA_TYPE)
 
         print("search lyrics for " + self.artist + " - " + self.title)
         
@@ -638,8 +636,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Conserve cache path in order to be able to correctly save edited lyrics although
         # the playing song might have changed during editing.
         self.path_before_edit = self.path
-        self.location_before_edit = self.location
-        self.mime_before_edit = self.mime
         
         self.set_menu_sensitive(self.menu, False)
         
@@ -889,8 +885,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # Playing song might change during search, so we want to 
         # conserve the correct cache path.
         path = self.path
-        location = self.location
-        mime = self.mime
         
         print("source: " + source)        
         self.current_source = source
