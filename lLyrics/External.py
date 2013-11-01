@@ -32,7 +32,7 @@ class Parser(object):
         try:
             import LyricsParse
         except:
-            print "Error importing LyricsParse module"
+            print("Error importing LyricsParse module")
             return ""
         
         # call the built-in lyrics plugin parser
@@ -69,7 +69,7 @@ class Parser(object):
             title_end = lower.find(self.artist)
             strip_count = len(self.artist)
         if title_end == -1:
-            print "could not remove artist/title, not found"
+            print("could not remove artist/title, not found")
         else:
             lyrics = lyrics[(title_end + strip_count):]
         

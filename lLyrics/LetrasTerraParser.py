@@ -13,9 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 import string
+
+from html.parser import HTMLParser
 
 import Util
 
@@ -26,38 +28,22 @@ class Parser(object):
         self.title = title
         self.lyrics = ""
         
-    def parse(self):
-        # remove punctuation from artist
-        clean_artist = self.artist
-        clean_artist = clean_artist.replace("+", "and")
-        clean_artist = Util.remove_punctuation(clean_artist)
-        clean_artist = clean_artist.replace(" ", "-")
+    def parse(self):        
+        artist = urllib.parse.quote(self.artist)
+        title = urllib.parse.quote(self.title)
+        join = urllib.parse.quote(' - ')
             
         # create artist Url
-        url = "http://letras.terra.com.br/" + clean_artist
-        print "letras.terra.com.br artist Url " + url
+        url = "http://letras.mus.br/winamp.php?t=%s%s%s" % (artist, join, title)
+        
+        print("letras.terra.com.br Url " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to letras.terra.com.br"
+            print("could not connect to letras.terra.com.br")
             return ""
         
-        # find title id
-        match = re.search("\<a itemprop\=\"url\" href\=\"/" + clean_artist + "/([0-9]*)/\"\>\<span itemprop\=\"name\"\>" + re.escape(self.title) + "\</span\>\</a\>", resp, re.I)
-        if match is None:
-            print "could not find title"
-            return ""
-        lyricsid = match.group(1)
-        
-        # create lyrics Url
-        url = url + "/" + lyricsid
-        print "letras.terra.com.br Url " + url
-        try:
-            resp = urllib2.urlopen(url, None, 3).read()
-        except:
-            print "could not connect to letras.terra.com.br"
-            return ""
-        
+        resp = Util.bytes_to_string(resp)
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
         
@@ -67,19 +53,21 @@ class Parser(object):
         # cut HTML source to relevant part
         start = resp.find("<p>")
         if start == -1:
-            print "lyrics start not found"
+            print("lyrics start not found")
             return ""
         resp = resp[(start+3):]
-        end = resp.find("</div>")
+        end = resp.find("</p>")
         if end == -1:
-            print "lyrics end not found "
+            print("lyrics end not found ")
             return ""
-        resp = resp[:(end-4)]
+        resp = resp[:(end)]
         
         # replace unwanted parts
         resp = resp.replace("<br/>", "")
         resp = resp.replace("</p>", "")
         resp = resp.replace("<p>", "\n")
+        
+        resp = HTMLParser().unescape(resp)
                 
         return resp
         

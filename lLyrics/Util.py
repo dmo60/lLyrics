@@ -19,9 +19,18 @@
 
 import re
 import string
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import xml.dom
+
+from urllib.parse import urlparse
+from urllib.parse import unquote
+
+try:
+    import chardet
+except:
+    print("module chardet not found or not installed!")
+
 
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
@@ -31,9 +40,9 @@ def decode_chars(resp):
     resp = ""
     for c in chars:
         try:
-            resp = resp + unichr(int(c))
+            resp = resp + chr(int(c))
         except:
-            print "unknown character " + c
+            print("unknown character " + c)
     return resp
 
 
@@ -78,21 +87,37 @@ def time_to_seconds(time):
 
 
 
+def bytes_to_string(data):
+    try:
+        encoding = chardet.detect(data)['encoding']
+    except:
+        print("could not detect bytes encoding, assume utf-8")
+        encoding = 'utf-8'
+    try:
+        string = data.decode(encoding, 'replace')
+    except:
+        print("failed to decode bytes to string")
+        return ""
+    
+    return string
+
+
+
 def get_lastfm_correction(artist, title):
-    params = urllib.urlencode({'method':'track.getcorrection',
+    params = urllib.parse.urlencode({'method':'track.getcorrection',
                                'api_key':LASTFM_API_KEY,
                                'artist':artist, 
                                'track':title})
     try:
-        result = urllib2.urlopen("http://ws.audioscrobbler.com/2.0/?" + params, None, 3).read()
+        result = urllib.request.urlopen("http://ws.audioscrobbler.com/2.0/?" + params, None, 3).read()
     except:
-        print "could not connect to LastFM API"
+        print("could not connect to LastFM API")
         return (artist, title, False)
     
     response = xml.dom.minidom.parseString(result)
     corrections = response.getElementsByTagName("correction")
     if not corrections:
-        print "no LastFM corrections found"
+        print("no LastFM corrections found")
         return (artist, title, False)
     
     # only consider one correction for now
@@ -100,14 +125,12 @@ def get_lastfm_correction(artist, title):
     
     if correction.getAttribute("artistcorrected") == "1":
         artist = correction.getElementsByTagName("name")[0].firstChild.data
-        print "LastFM artist correction: " + artist
+        print("LastFM artist correction: " + artist)
     
     
     if correction.getAttribute("trackcorrected") == "1":
         title = correction.getElementsByTagName("name")[1].firstChild.data
-        print "LastFM title correction: " + title
+        print("LastFM title correction: " + title)
     
     return (artist, title, True)
-    
-    
     

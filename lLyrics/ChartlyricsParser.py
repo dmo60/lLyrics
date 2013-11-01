@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
+
+import Util
 
 class Parser(HTMLParser):
     
@@ -55,13 +57,15 @@ class Parser(HTMLParser):
         
     def parse(self):
         # API searchLyric request
-        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib2.quote(self.artist) + "&song=" + urllib2.quote(self.title)
-        print "call chartlyrics API: " + url
+        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib.parse.quote(self.artist) + "&song=" + urllib.parse.quote(self.title)
+        print("call chartlyrics API: " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
-            self.feed(resp)
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to chartlyric.com API"
+            print("could not connect to chartlyric.com API")
+        
+        resp = Util.bytes_to_string(resp)
+        self.feed(resp)
         
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
         

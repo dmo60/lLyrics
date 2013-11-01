@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string
 import re
 
@@ -34,25 +34,29 @@ class Parser(object):
             
         # create artist Url
         url = "http://www.darklyrics.com/" + clean_artist[:1] + "/" + clean_artist + ".html"
-        print "darklyrics artist Url " + url
+        print("darklyrics artist Url " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to darklyrics.com"
+            print("could not connect to darklyrics.com")
             return ""
+        
+        resp = Util.bytes_to_string(resp)
         
         # find title with lyrics url
         match = re.search("<a href=\"\.\.(.*?)\">" + self.title + "</a><br />", resp, re.I)
         if match is None:
-            print "could not find title"
+            print("could not find title")
             return ""
         url = "http://www.darklyrics.com" + match.group(1)
-        print "darklyrics Url " + url
+        print("darklyrics Url " + url)
         try:
-            resp = urllib2.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print "could not connect to darklyrics.com"
+            print("could not connect to darklyrics.com")
             return ""
+        
+        resp = Util.bytes_to_string(resp)
         
         self.track_no = url.split("#")[1] 
         
@@ -65,7 +69,7 @@ class Parser(object):
         # search for the relevant lyrics
         match = re.search("<h3><a name=\"" + self.track_no + "\">" + self.track_no + "\. " + self.title + "</a></h3>", resp, re.I)
         if match is None:
-            print "lyrics start not found"
+            print("lyrics start not found")
             return ""
         start = match.end()
         resp = resp[start:]
@@ -75,7 +79,7 @@ class Parser(object):
             # case lyrics are the last ones on the page
             end = resp.find("<div ")
         if end == -1:
-            print "lyrics end not found"
+            print("lyrics end not found")
             return ""
         
         resp = resp[:end]
