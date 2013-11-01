@@ -52,6 +52,14 @@ class Parser(object):
             return ""
         
         resp = Util.bytes_to_string(resp)
+        
+        # strip error messages
+        start = resp.find("</b><br />")
+        if start != -1:
+            resp = resp[(start+11):]
+            end = resp.find("<br />")
+            resp = resp[:end]
+        
         self.lyrics = string.capwords(resp, "\n").strip()
         
         return self.lyrics
