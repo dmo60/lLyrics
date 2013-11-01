@@ -31,8 +31,6 @@ try:
 except:
     print("module chardet not found or not installed!")
 
-#from mutagen.id3 import ID3, USLT, ID3NoHeaderError
-#from mutagen.oggvorbis import OggVorbis, OggVorbisHeaderError
 
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
@@ -89,28 +87,6 @@ def time_to_seconds(time):
 
 
 
-# def utf8_encode(lyrics):    
-#     if isinstance(lyrics, str):    
-#         try:
-#             encoding = chardet.detect(lyrics)['encoding']
-#         except:
-#             print("could not detect lyrics encoding, assume utf-8")
-#             encoding = 'utf-8'
-#         try:
-#             lyrics = lyrics.decode(encoding, 'replace')
-#         except:
-#             print("failed to decode lyrics string!")
-#             return ""
-#             
-#     try:
-#         lyrics = lyrics.encode('utf-8', 'replace')
-#     except:
-#         print("failed to utf8 encode lyrics!")
-#         return ""
-#     
-#     return lyrics
-
-
 def bytes_to_string(data):
     try:
         encoding = chardet.detect(data)['encoding']
@@ -157,87 +133,4 @@ def get_lastfm_correction(artist, title):
         print("LastFM title correction: " + title)
     
     return (artist, title, True)
-
-
-
-# def get_lyrics_from_audio_tag(uri, mime):
-#     # get path from uri
-#     path = unquote(urlparse(uri).path)
-#     
-#     # MP3 file
-#     if "mpeg" in mime:
-#         try: 
-#             tags = ID3(path)
-#         except ID3NoHeaderError:
-#             print("no ID3 header")
-#             return ""
-#         
-#         lyrics = tags.getall("USLT")
-#         
-#         if not lyrics:
-#             print("no USLT tags found")
-#             return ""
-#         
-#         lyrics = lyrics[0].text        
-#         return string.capwords(lyrics, "\n").strip()
-#     
-#     # ogg vorbis file
-#     if "vorbis" in mime:
-#         comments = OggVorbis(path)
-#         
-#         # look for lyrics or unsyncedlyrics comments
-#         if "lyrics" in comments:
-#             lyrics = comments["lyrics"][0]
-#             return string.capwords(lyrics, "\n").strip()
-#         
-#         if "unsyncedlyrics" in comments:
-#             lyrics = comments["unsyncedlyrics"][0]
-#             return string.capwords(lyrics, "\n").strip()
-# 
-#         print("no lyrics comment field found")
-#         return ""
-#     
-#     
-#     
-# def write_lyrics_to_audio_tag(uri, mime, lyrics, overwrite):
-#     # get path from uri
-#     path = unquote(urlparse(uri).path)
-#     
-#     # MP3 file
-#     if "mpeg" in mime:
-#         # create ID3 tag if not exists
-#         try: 
-#             tags = ID3(path)
-#         except ID3NoHeaderError:
-#             print("adding ID3 header")
-#             tags = ID3()
-#         
-#         # remove existing lyric tags
-#         if tags.getall("USLT") and overwrite:
-#             tags.delall("USLT")
-#         
-#         tags['USLT'] = USLT(encoding=3, lang='xxx', desc='llyrics', text=str(lyrics, 'utf-8', 'replace'))
-#         tags.save(path)
-#         
-#         print("wrote lyrics to id3 tag")
-#     
-#     # ogg vorbis file
-#     if "vorbis" in mime:
-#         try:
-#             comments = OggVorbis(path)
-#         except OggVorbisHeaderError:
-#             print("adding ogg vorbis header")
-#             comments = OggVorbis()
-#         
-#         # remove existing lyrics
-#         if overwrite:
-#             comments["lyrics"] = []
-#             comments["unsyncedlyrics"] = []
-#         
-#         comments["lyrics"] = str(lyrics, 'utf-8', 'replace')
-#         comments.save()
-#         
-#         print("wrote lyrics to vorbis comment")
-    
-    
     

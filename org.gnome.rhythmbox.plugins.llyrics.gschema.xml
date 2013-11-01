@@ -47,46 +47,6 @@ Set to False to disable this (note that in this case, lyrics sources have to be 
 			</description>
 		</key>
 		
-		<key name="show-toolbar-icon" type="b">
-			<default>true</default>
-			<summary>Show or hide toolbar icon</summary>
-			<description>
-				Whether to show a toolbar icon for toggling the lyrics sidebar 
-			</description>
-		</key>
-		
-		<key name="icon-path" type="s">
-			<default>"default"</default>
-			<summary>Toolbar icon</summary>
-			<description>
-				File must exist, otherwise key is reset to default.
-			</description>
-		</key>
-		
-		<key name="separator-left" type="b">
-			<default>false</default>
-			<summary>Left toolbar separator</summary>
-			<description>
-				Whether to show a vertical separator on the left side of the toolbar icon
-			</description>
-		</key>
-		
-		<key name="separator-right" type="b">
-			<default>false</default>
-			<summary>Right toolbar separator</summary>
-			<description>
-				Whether to show a vertical separator on the right side of the toolbar icon
-			</description>
-		</key>
-		
-		<key name="toplevel-menu" type="b">
-			<default>true</default>
-			<summary>Show menu as toplevel menu</summary>
-			<description>
-				Whether to show lyrics menu as own toplevel menu or as submenu of 'Control'
-			</description>
-		</key>
-		
 		<key name="left-sidebar" type="b">
 			<default>false</default>
 			<summary>Show lyrics in left sidebar</summary>

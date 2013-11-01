@@ -88,15 +88,6 @@ context_ui = """
 </ui>
 """
 
-toolbar_ui = """
-<ui>
-    <toolbar name="ToolBar">
-        %s    
-        <toolitem name="lLyrics" action="ToggleLyricSideBar"/>
-        %s
-    </toolbar>
-</ui>
-"""
 
 LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\([^\)]*version\)", "\([^\)]*edit\)", 
                    "\(feat[^\)]*\)", "\([^\)]*bonus[^\)]*track[^\)]*\)"]
@@ -106,9 +97,6 @@ LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com", 
                "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "External"]
 
-STOCK_IMAGE = "stock-llyrics-button"
-
-is_rb3 = not hasattr(RB.Shell.props, 'ui_manager')
 
 
 class lLyrics(GObject.Object, Peas.Activatable):
@@ -222,10 +210,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.cache = None
         self.lyrics_folder = None
         self.ignore_brackets = None
-        self.show_icon = None
-        self.icon_path = None
-        self.separators = None
-        self.toplevel_menu = None
         self.left_sidebar = None
         self.hide_label = None
         self.show_first = None
@@ -258,18 +242,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.cache = config.get_cache_lyrics()
         self.lyrics_folder = config.get_lyrics_folder()
         self.ignore_brackets = config.get_ignore_brackets()
-        self.show_icon = config.get_show_toolbar_icon()
-        self.icon_path = config.get_icon_path()
-        self.separators = config.get_toolbar_separators()
-        self.toplevel_menu = config.get_toplevel_menu()
         self.left_sidebar = config.get_left_sidebar()
         self.hide_label = config.get_hide_label()
         
-#         self.audio_tag = True
-#         self.overwrite = False
-        
         # if this is called in do_activate or we need a reload to apply, return here
-        if key is None or key in ["icon-path", "left-sidebar"]:
+        if key is None or key in ["left-sidebar"]:
             return
         
         if key == "hide-label":
@@ -277,33 +254,20 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 self.label.hide()
             else:
                 self.label.show()
-            return
-        
-        # reload ui if ui settings changed
-        if key in ["show-toolbar-icon", "separator-left", "separator-right"]:
-            self.appshell.cleanup()
-            self.insert_ui()      
+            return   
 
         
            
     def insert_ui(self):
         self.appshell.add_app_menuitems(view_menu_ui, 'lLyricsPluginToggleActions', 'view')
-        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')
-        
-        # add toolbar ui for RB<2.99
-        if self.show_icon and not is_rb3:
-            sep_left, sep_right = "", ""
-            sep_left, sep_right = self.separators
-            toolbar_ui_final = toolbar_ui % (sep_left, sep_right)
-            self.appshell.add_app_menuitems(toolbar_ui_final, 'lLyricsPluginToggleActions')
-        
+        self.appshell.add_browser_menuitems(context_ui, 'lLyricsPluginPopupActions')    
     
     
     
     def init_menu(self):
         # add actions
         self.toggle_action_group = ActionGroup(self.shell, 'lLyricsPluginToggleActions')
-        self.toggle_action_group.add_action(func=self.toggle_visibility, stock_id=STOCK_IMAGE,
+        self.toggle_action_group.add_action(func=self.toggle_visibility,
             action_name='ToggleLyricSideBar', label=_("Lyrics"), action_state=ActionGroup.TOGGLE,
             action_type='app', accel="<Ctrl>l", tooltip=_("Display lyrics for the current playing song"))
         self.appshell.insert_action_group(self.toggle_action_group)
@@ -312,18 +276,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.context_action_group.add_action(action_name="lLyricsPopupAction", label=_("Show lyrics"),
                             tooltip=_("Search and display lyrics for this song"), func=self.context_action_callback)
         self.appshell.insert_action_group(self.context_action_group)
-        
-        # Create an icon for the toolbar button for RB<2.99
-        if not is_rb3: 
-            icon_factory = Gtk.IconFactory()
-            try:
-                pxbf = GdkPixbuf.Pixbuf.new_from_file(self.icon_path)
-                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
-            except:
-                print("could not create icon from " + self.icon_path + ", set default icon")
-                pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/lLyrics-icon.png")
-                icon_factory.add(STOCK_IMAGE, Gtk.IconSet.new_from_pixbuf(pxbf))
-            icon_factory.add_default()
         
         self.insert_ui()
         
@@ -394,43 +346,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # button for closing on demand lyrics
         self.back_button = Gtk.Button.new_with_label(_("Back to playing song"))
         self.back_button.connect("clicked", self.back_button_callback)
-        
-        # toolbar menu
-#         toolbar = Gtk.Toolbar()
-#         toolbar.set_style(Gtk.ToolbarStyle.ICONS)
-#         toolbar.set_icon_size(Gtk.IconSize.MENU)
-        
-#         context = toolbar.get_style_context()
-#         context.set_junction_sides(Gtk.JunctionSides.BOTTOM)
-#         context.add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
-        
-#         item = Gtk.ToolItem()
-#         menu_button = Gtk.MenuButton()
-#         icon = Gio.ThemedIcon.new("preferences-desktop")
-#         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.SMALL_TOOLBAR)
-#         menu_button.set_image(image)
-#         menu_button.set_popup(self.menu)
-#         item.add(menu_button)
-        
-#         sep = Gtk.SeparatorToolItem()
-#         sep.set_expand(True)
-#         sep.set_draw(False)
-#         itemlabel.add(self.label)
-#         
-#         toolbar.insert(itemlabel, -1)
-#         toolbar.insert(sep, -1)
-#         toolbar.insert(item, -1)
-        
-        
-        
+                
         # pack everything into side pane
         self.vbox.pack_start(hbox_header, False, False, 0);
-#         self.vbox.pack_start(self.label, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
-        self.vbox.pack_end(self.back_button, False, False, 3)
-#         self.vbox.pack_end(toolbar, False, False, 0)
-        
+        self.vbox.pack_end(self.back_button, False, False, 3)        
 
         self.vbox.show_all()
         self.hbox.hide()
@@ -462,7 +383,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         last_item = self.add_radio_menu_item(self.radio_sources, _("External"), self.scan_selected_source_callback, last_item)
         self.radio_sources.append(Gtk.SeparatorMenuItem())
         self.add_radio_menu_item(self.radio_sources, _("From cache file"), self.scan_selected_source_callback, last_item)
-#         self.add_radio_menu_item(self.radio_sources, _("From audio tag"), self.scan_selected_source_callback, last_item)
         
         self.radio_sources.show_all();
         
@@ -480,7 +400,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.add_menu_item(menu, _("Clear lyrics"), self.clear_action_callback)
         self.add_menu_item(menu, _("Edit lyrics"), self.edit_action_callback)
         self.add_menu_item(menu, _("Save lyrics to cache file"), self.save_to_cache_action_callback)
-#         self.add_menu_item(menu, _("Save lyrics to audio tag"), self.save_to_tag_action_callback)
         
         menu.show_all()
         
@@ -505,8 +424,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
             label = "External"
         if label == _("From cache file"):
             label = "From cache file"
-#         if label == _("From audio tag"):
-#             label = "From audio tag"
         item.connect("toggled", callback, label)
         menu.append(item)
         
@@ -649,11 +566,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         
     def scan_next_action_callback(self, action):
-#         if self.current_source == "From cache file":
-#             source = "From audio tag"
-#             self.scan_source(source, self.clean_artist, self.clean_title)
-#             
-#         if self.current_source is None or self.current_source == "From audio tag":
         if self.current_source is None or self.current_source == "From cache file":
             index = 0
         else:
@@ -682,8 +594,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
         self.write_lyrics_to_cache(self.path, lyrics)
-#         if self.audio_tag:
-#             self.write_lyrics_to_tag(lyrics, self.location, self.mime)
         self.show_lyrics(self.artist, self.title, lyrics)
         
         self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
@@ -697,15 +607,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         lyrics = self.textbuffer.get_text(start, end, False)
         
         self.write_lyrics_to_cache(self.path, lyrics)
-    
-    
-    
-#     def save_to_tag_action_callback(self, action):
-#         start, end = self.textbuffer.get_bounds()
-#         start.forward_lines(1)
-#         lyrics = self.textbuffer.get_text(start, end, False)
-#         
-#         self.write_lyrics_to_tag(lyrics, self.location, self.mime)
         
         
         
@@ -716,7 +617,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         except:
             print("No cache file found to clear")
         self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
-#         self.set_menu_item_sensitive(self.menu, _("Save lyrics to audio tag"), False)
         print("cleared lyrics")
         
         
@@ -792,15 +692,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         # save edited lyrics to cache file and audio tag
         self.write_lyrics_to_cache(self.path_before_edit, lyrics)
-#         if self.audio_tag:
-#             self.write_lyrics_to_tag(lyrics, self.location_before_edit, self.mime_before_edit)
         
         # If playing song changed, set "searching lyrics..." (might be overwritten
         # immediately, if thread for the new song already found lyrics)
         if self.path != self.path_before_edit:
             self.textbuffer.set_text(_("searching lyrics..."))
             
-#         self.action_group.set_sensitive(True)
         self.set_menu_sensitive(self.menu, True)
         
         # Set event flag to indicate end of editing and wake all threads 
@@ -848,7 +745,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if not playing_entry:
             self.textbuffer.set_text("")
             self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
-#             self.set_menu_item_sensitive(self.menu, _("Save lyrics to audio tag"), False)
             return
         
         # otherwise search lyrics
@@ -871,8 +767,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
              
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
-#         elif source == "From audio tag":
-#             lyrics = self.get_lyrics_from_tag()
         else:   
             lyrics = self.get_lyrics_from_source(source, artist, title)
             
@@ -904,8 +798,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         lyrics = ""
         if cache:
             lyrics = self.get_lyrics_from_cache(self.path)
-#         if cache and not lyrics and self.audio_tag:
-#             lyrics = self.get_lyrics_from_tag()
         
         if lyrics == "":
             i = 0
@@ -970,38 +862,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print("wrote lyrics to cache file")
         except:
             print("error writing lyrics to cache file")
-    
-    
-    
-#     def get_lyrics_from_tag(self):
-#         try:
-#             lyrics = Util.get_lyrics_from_audio_tag(self.location, self.mime)
-#         except:
-#             print("error reading audio tag")
-#             return ""
-#         
-#         if lyrics:
-#             print("got lyrics from audio tag")
-#             
-#             lyrics = Util.utf8_encode(lyrics)
-#             if not lyrics:
-#                 return ""
-#             
-#             if self.cache:
-#                 self.write_lyrics_to_cache(self.path, lyrics)
-#                 
-#             self.current_source = "From audio tag"
-#             self.set_radio_menu_item_active(self.radio_sources, _("From audio tag"))
-#         
-#         return lyrics
-#     
-#     
-#     
-#     def write_lyrics_to_tag(self, lyrics, location, mime):
-#         try:
-#             Util.write_lyrics_to_audio_tag(location, mime, lyrics, self.overwrite)
-#         except Exception as e:
-#             print("error writing lyrics to audio tag", e)
                 
             
         
@@ -1026,18 +886,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         if lyrics != "":
             print("got lyrics from source")
-#             print(type(lyrics))
             if source != "External":
                 lyrics = "%s\n\n(lyrics from %s)" % (lyrics, source)
-                
-#             lyrics = Util.utf8_encode(lyrics)
-#             if not lyrics:
-#                 return ""
             
             if self.cache:
                 self.write_lyrics_to_cache(path, lyrics)
-#             if self.audio_tag:
-#                 self.write_lyrics_to_tag(lyrics, location, mime)
             
         return lyrics
     
@@ -1048,10 +901,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print("no lyrics found")
             lyrics = _("No lyrics found")
             self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
-#             self.set_menu_item_sensitive(self.menu, _("Save lyrics to audio tag"), False)
         else:        
             self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), True)
-#             self.set_menu_item_sensitive(self.menu, _("Save lyrics to audio tag"), True)
             lyrics, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()
