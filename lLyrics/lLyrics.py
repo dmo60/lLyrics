@@ -401,7 +401,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         menu.append(Gtk.SeparatorMenuItem())
         self.add_menu_item(menu, _("Clear lyrics"), self.clear_action_callback)
         self.add_menu_item(menu, _("Edit lyrics"), self.edit_action_callback)
-        self.add_menu_item(menu, _("Save lyrics to cache file"), self.save_to_cache_action_callback)
+        
+        # add preferences item
+        menu.append(Gtk.SeparatorMenuItem())
+        self.add_menu_item(menu, _("Preferences"), self.preferences_dialog_action_callback)
         
         menu.show_all()
         
@@ -618,7 +621,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
             os.remove(self.path)
         except:
             print("No cache file found to clear")
-        self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
         print("cleared lyrics")
         
         
@@ -649,6 +651,23 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textview.grab_focus()
         
         self.hbox.show()
+    
+    
+    
+    def preferences_dialog_action_callback(self, action):
+        content = ConfigDialog().do_create_configure_widget()
+        
+        dialog = Gtk.Dialog(_('lLyrics Preferences'), self.shell.get_property('window'),
+                Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
+                
+        content_area = dialog.get_content_area()
+        content_area.pack_start(content, True, True, 0)
+            
+        dialog.show_all()
+        
+        dialog.run()
+        
+        dialog.hide()
         
         
     
@@ -746,7 +765,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # if nothing is playing, clear lyrics and return
         if not playing_entry:
             self.textbuffer.set_text("")
-            self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
             return
         
         # otherwise search lyrics
@@ -902,9 +920,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if lyrics == "":
             print("no lyrics found")
             lyrics = _("No lyrics found")
-            self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), False)
         else:        
-            self.set_menu_item_sensitive(self.menu, _("Save lyrics to cache file"), True)
             lyrics, self.tags = Util.parse_lrc(lyrics)
         
         Gdk.threads_enter()

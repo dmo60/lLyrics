@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 14:15+0100\n"
+"POT-Creation-Date: 2013-11-01 15:04+0100\n"
 "PO-Revision-Date: 2012-08-05 12:01+0200\n"
 "Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
 "Language-Team: German\n"
@@ -47,11 +47,11 @@ msgstr "Abbrechen"
 msgid "Back to playing song"
 msgstr "Zurück zum aktuellen Titel"
 
-#: ../lLyrics.py:385 ../lLyrics.py:425
+#: ../lLyrics.py:385 ../lLyrics.py:428
 msgid "External"
 msgstr "Extern"
 
-#: ../lLyrics.py:387 ../lLyrics.py:427 ../lLyrics.py:852
+#: ../lLyrics.py:387 ../lLyrics.py:430 ../lLyrics.py:870
 msgid "From cache file"
 msgstr "Aus Cache Datei"
 
@@ -83,16 +83,19 @@ msgstr "Liedtext löschen"
 msgid "Edit lyrics"
 msgstr "Liedtext bearbeiten"
 
-#: ../lLyrics.py:404 ../lLyrics.py:621 ../lLyrics.py:749 ../lLyrics.py:905
-#: ../lLyrics.py:907
-msgid "Save lyrics to cache file"
-msgstr "Liedtext in Cache Datei speichern"
+#: ../lLyrics.py:407
+msgid "Preferences"
+msgstr "Einstellungen"
 
-#: ../lLyrics.py:701 ../lLyrics.py:726 ../lLyrics.py:759 ../lLyrics.py:789
+#: ../lLyrics.py:660
+msgid "lLyrics Preferences"
+msgstr "lLyrics Einstellungen"
+
+#: ../lLyrics.py:720 ../lLyrics.py:745 ../lLyrics.py:777 ../lLyrics.py:807
 msgid "searching lyrics..."
 msgstr "suche Liedtexte..."
 
-#: ../lLyrics.py:904
+#: ../lLyrics.py:922
 msgid "No lyrics found"
 msgstr "Keine Liedtexte gefunden"
 
@@ -141,9 +144,9 @@ msgid ""
 "be guaranteed that the provided engines work properly. If you experience any "
 "problems, deactivate this option."
 msgstr ""
-"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin. "
-"Es kann nicht garantiert werden, dass dieses korrekt funktioniert. "
-"Falls Probleme auftreten, deaktivieren Sie diese Option." 
+"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin. Es kann "
+"nicht garantiert werden, dass dieses korrekt funktioniert. Falls Probleme "
+"auftreten, deaktivieren Sie diese Option."
 
 #: ../Config.py:273
 msgid "Hide sidebar label"
@@ -168,4 +171,3 @@ msgstr "Allgemein"
 #: ../Config.py:309
 msgid "Appearance"
 msgstr "Erscheinungsbild"
-

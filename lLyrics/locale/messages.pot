@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 14:15+0100\n"
+"POT-Creation-Date: 2013-11-01 15:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,11 +47,11 @@ msgstr ""
 msgid "Back to playing song"
 msgstr ""
 
-#: ../lLyrics.py:385 ../lLyrics.py:425
+#: ../lLyrics.py:385 ../lLyrics.py:428
 msgid "External"
 msgstr ""
 
-#: ../lLyrics.py:387 ../lLyrics.py:427 ../lLyrics.py:852
+#: ../lLyrics.py:387 ../lLyrics.py:430 ../lLyrics.py:870
 msgid "From cache file"
 msgstr ""
 
@@ -83,16 +83,19 @@ msgstr ""
 msgid "Edit lyrics"
 msgstr ""
 
-#: ../lLyrics.py:404 ../lLyrics.py:621 ../lLyrics.py:749 ../lLyrics.py:905
-#: ../lLyrics.py:907
-msgid "Save lyrics to cache file"
+#: ../lLyrics.py:407
+msgid "Preferences"
 msgstr ""
 
-#: ../lLyrics.py:701 ../lLyrics.py:726 ../lLyrics.py:759 ../lLyrics.py:789
+#: ../lLyrics.py:660
+msgid "lLyrics Preferences"
+msgstr ""
+
+#: ../lLyrics.py:720 ../lLyrics.py:745 ../lLyrics.py:777 ../lLyrics.py:807
 msgid "searching lyrics..."
 msgstr ""
 
-#: ../lLyrics.py:904
+#: ../lLyrics.py:922
 msgid "No lyrics found"
 msgstr ""
 
