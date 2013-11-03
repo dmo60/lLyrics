@@ -23,6 +23,11 @@ import urllib
 import urllib2
 import xml.dom
 
+try:
+    import chardet
+except:
+    print "module chardet not found or not installed!"
+
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
 
@@ -75,6 +80,29 @@ def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
+
+
+
+def utf8_encode(lyrics):    
+    if isinstance(lyrics, str):    
+        try:
+            encoding = chardet.detect(lyrics)['encoding']
+        except:
+            print "could not detect lyrics encoding, assume utf-8"
+            encoding = 'utf-8'
+        try:
+            lyrics = lyrics.decode(encoding, 'replace')
+        except:
+            print "failed to decode lyrics string!"
+            return ""
+            
+    try:
+        lyrics = lyrics.encode('utf-8', 'replace')
+    except:
+        print "failed to utf8 encode lyrics!"
+        return ""
+    
+    return lyrics
 
 
 
