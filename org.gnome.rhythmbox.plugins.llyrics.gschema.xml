@@ -3,15 +3,15 @@
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
 		<key name="active-sources" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com']</default>
 			<summary>List of lyrics sources to be scanned</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com', 'External'</description>
 		</key>
 		
 		<key name="scanning-order" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'External']</default>
 			<summary>Sources are scanned in this order</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Sogou.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'External'</description>
 		</key>
 		
 		<key name="show-first" type="b">
@@ -76,14 +76,6 @@ Set to False to disable this (note that in this case, lyrics sources have to be 
 			<summary>Right toolbar separator</summary>
 			<description>
 				Whether to show a vertical separator on the right side of the toolbar icon
-			</description>
-		</key>
-		
-		<key name="toplevel-menu" type="b">
-			<default>true</default>
-			<summary>Show menu as toplevel menu</summary>
-			<description>
-				Whether to show lyrics menu as own toplevel menu or as submenu of 'Control'
 			</description>
 		</key>
 		

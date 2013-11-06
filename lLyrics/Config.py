@@ -22,7 +22,6 @@ from gi.repository import Gtk
 from gi.repository import RB
 
 import lLyrics
-import lLyrics_rb3compat as Compat
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
 
@@ -153,9 +152,6 @@ class Config(object):
             right = ""
             
         return (left, right)
-    
-    def get_toplevel_menu(self):
-        return self.settings["toplevel-menu"]
     
     def get_left_sidebar(self):
         return self.settings["left-sidebar"]
@@ -289,11 +285,9 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             vbox.pack_start(hbox, False, False, 0)
         
         warn = Gtk.Label("<i>" + 
-                           _("Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
-                             "I can not guarantee that the provided engines work properly! "
-                             "They might have bugs or make the plugin crash!\n"
-                             "If you experience any problems, try to unselect some lyrics sites "
-                             "in the 'lyrics' plugin's preference dialog or deactivate the 'External' source.") 
+                           _("Warning: 'External' calls the Rhythmbox built-in lyrics plugin. "
+                             "It can not be guaranteed that the provided engines work properly. "
+                             "If you experience any problems, deactivate this option.") 
                            + "</i>")
         warn.set_alignment(0, 0)
         warn.set_margin_left(15)
@@ -388,29 +382,6 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             hbox.pack_start(check, False, False, 5)
             hbox.pack_start(check2, False, False, 5)
             page3.pack_start(hbox, False, False, 10)
-            
-            # switch for toplevel-menu
-            hbox = Gtk.HBox()
-            switch = Gtk.Switch()
-            switch.set_active(self.settings["toplevel-menu"])
-            switch.connect("notify::active", self.switch_toggled, "toplevel-menu")
-            
-            label = Gtk.Label("<b>" + _("Show lyrics menu as toplevel menu") + "</b>")
-            label.set_use_markup(True)
-            
-            descr = Gtk.Label("<i>" + _("When turned off, the lyrics menu is moved to the 'Control' menu") + "</i>")
-            descr.set_alignment(0, 0)
-            descr.set_margin_left(15)
-            descr.set_line_wrap(True)
-            descr.set_use_markup(True)
-            
-            hbox.pack_start(label, False, False, 5)
-            hbox.pack_start(switch, False, False, 5)
-            vbox = Gtk.VBox()
-            vbox.pack_start(hbox, False, False, 0)
-            vbox.pack_start(descr, False, False, 0)
-            
-            page3.pack_start(vbox, False, False, 10)
         
         # switch for hide-label
         hbox = Gtk.HBox()

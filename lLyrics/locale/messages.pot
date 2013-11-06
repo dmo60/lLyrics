@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-04 13:47+0200\n"
+"POT-Creation-Date: 2013-11-06 18:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,190 +17,183 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lLyrics.py:310 ../lLyrics.py:341
+#: ../lLyrics.py:303 ../lLyrics.py:334
 msgid "Lyrics"
 msgstr ""
 
-#: ../lLyrics.py:311
+#: ../lLyrics.py:304
 msgid "Display lyrics for the current playing song"
 msgstr ""
 
-#: ../lLyrics.py:315
+#: ../lLyrics.py:308
 msgid "Show lyrics"
 msgstr ""
 
-#: ../lLyrics.py:316
+#: ../lLyrics.py:309
 msgid "Search and display lyrics for this song"
 msgstr ""
 
 #. create save and cancel buttons for edited lyrics
-#: ../lLyrics.py:389
+#: ../lLyrics.py:382
 msgid "Save"
 msgstr ""
 
-#: ../lLyrics.py:391
+#: ../lLyrics.py:384
 msgid "Cancel"
 msgstr ""
 
 #. button for closing on demand lyrics
-#: ../lLyrics.py:398
+#: ../lLyrics.py:391
 msgid "Back to playing song"
 msgstr ""
 
-#: ../lLyrics.py:465 ../lLyrics.py:505
+#: ../lLyrics.py:427 ../lLyrics.py:470
 msgid "External"
 msgstr ""
 
-#: ../lLyrics.py:467 ../lLyrics.py:507 ../lLyrics.py:923
+#: ../lLyrics.py:429 ../lLyrics.py:472 ../lLyrics.py:902
 msgid "From cache file"
 msgstr ""
 
-#: ../lLyrics.py:471 ../Config.py:456
+#: ../lLyrics.py:433 ../Config.py:427
 msgid "Sources"
 msgstr ""
 
-#: ../lLyrics.py:475
+#: ../lLyrics.py:437
 msgid "Scan next source"
 msgstr ""
 
-#: ../lLyrics.py:476
+#: ../lLyrics.py:438
 msgid "Scan all sources"
 msgstr ""
 
-#: ../lLyrics.py:478
+#: ../lLyrics.py:440
 msgid "Search online"
 msgstr ""
 
-#: ../lLyrics.py:480
+#: ../lLyrics.py:442
 msgid "Mark as instrumental"
 msgstr ""
 
-#: ../lLyrics.py:482
+#: ../lLyrics.py:444
 msgid "Clear lyrics"
 msgstr ""
 
-#: ../lLyrics.py:483
+#: ../lLyrics.py:445
 msgid "Edit lyrics"
 msgstr ""
 
-#: ../lLyrics.py:484 ../lLyrics.py:700 ../lLyrics.py:827 ../lLyrics.py:984
-#: ../lLyrics.py:986
-msgid "Save lyrics"
+#: ../lLyrics.py:449
+msgid "Preferences"
 msgstr ""
 
-#: ../lLyrics.py:778 ../lLyrics.py:804 ../lLyrics.py:837 ../lLyrics.py:867
+#: ../lLyrics.py:691
+msgid "lLyrics Preferences"
+msgstr ""
+
+#: ../lLyrics.py:751 ../lLyrics.py:776 ../lLyrics.py:808 ../lLyrics.py:838
 msgid "searching lyrics..."
 msgstr ""
 
-#: ../lLyrics.py:983
+#: ../lLyrics.py:955
 msgid "No lyrics found"
 msgstr ""
 
-#: ../Config.py:186
+#: ../Config.py:182
 msgid "Show sidebar on first playback"
 msgstr ""
 
-#: ../Config.py:199
+#: ../Config.py:195
 msgid "Save lyrics "
 msgstr ""
 
-#: ../Config.py:202
+#: ../Config.py:198
 msgid ""
 "Whether to automatically save retrieved lyrics in the folder specified below"
 msgstr ""
 
-#: ../Config.py:222
+#: ../Config.py:218
 msgid "default"
 msgstr ""
 
-#: ../Config.py:225
+#: ../Config.py:221
 msgid "Folder for lyrics"
 msgstr ""
 
-#: ../Config.py:239
+#: ../Config.py:235
 msgid "Always ignore parentheses in song title"
 msgstr ""
 
-#: ../Config.py:242
+#: ../Config.py:238
 msgid ""
 "When turned off, only parentheses containing specific strings (e.g. 'remix', "
 "'live', 'edit', etc) are filtered"
 msgstr ""
 
 #. check buttons for lyric sources
-#: ../Config.py:261
+#: ../Config.py:257
 msgid "Sources:"
 msgstr ""
 
-#: ../Config.py:292
+#: ../Config.py:288
 msgid ""
-"Warning: 'External' calls the Rhythmbox built-in lyrics plugin.\n"
-"I can not guarantee that the provided engines work properly! They might have "
-"bugs or make the plugin crash!\n"
-"If you experience any problems, try to unselect some lyrics sites in the "
-"'lyrics' plugin's preference dialog or deactivate the 'External' source."
+"Warning: 'External' calls the Rhythmbox built-in lyrics plugin. It can not "
+"be guaranteed that the provided engines work properly. If you experience any "
+"problems, deactivate this option."
 msgstr ""
 
-#: ../Config.py:321
+#: ../Config.py:315
 msgid "Show toolbar icon"
 msgstr ""
 
-#: ../Config.py:324
+#: ../Config.py:318
 msgid ""
 "When turned off, the lyrics sidebar can only be toggled using the 'View' "
 "menu or by pressing 'Ctrl+L'"
 msgstr ""
 
-#: ../Config.py:346
+#: ../Config.py:340
 msgid "Image files"
 msgstr ""
 
-#: ../Config.py:351
+#: ../Config.py:345
 msgid "default icon"
 msgstr ""
 
-#: ../Config.py:354
+#: ../Config.py:348
 msgid "Toolbar icon"
 msgstr ""
 
-#: ../Config.py:357 ../Config.py:438
+#: ../Config.py:351 ../Config.py:409
 msgid ""
 "You have to disable and re-enable this plugin or restart Rhythmbox to apply "
 "changes here"
 msgstr ""
 
-#: ../Config.py:376
+#: ../Config.py:370
 msgid "Show toolbar separators"
 msgstr ""
 
-#: ../Config.py:379
+#: ../Config.py:373
 msgid "left"
 msgstr ""
 
-#: ../Config.py:383
+#: ../Config.py:377
 msgid "right"
 msgstr ""
 
-#: ../Config.py:398
-msgid "Show lyrics menu as toplevel menu"
-msgstr ""
-
-#: ../Config.py:401
-msgid "When turned off, the lyrics menu is moved to the 'Control' menu"
-msgstr ""
-
-#: ../Config.py:421
+#: ../Config.py:392
 msgid "Hide sidebar label"
 msgstr ""
 
-#: ../Config.py:435
+#: ../Config.py:406
 msgid "Show lyrics in left sidebar instead of right one"
 msgstr ""
 
-#: ../Config.py:455
+#: ../Config.py:426
 msgid "General"
 msgstr ""
 
-#: ../Config.py:457
+#: ../Config.py:428
 msgid "Appearance"
 msgstr ""

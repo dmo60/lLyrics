@@ -43,11 +43,20 @@ class Parser(object):
         url = "http://www.lyrdb.com/getlyr.php?q=" + lyricsid
         print "url " + url
         try:
-            self.lyrics = urllib2.urlopen(url, None, 3).read()
+            resp = urllib2.urlopen(url, None, 3).read()
         except:
             print "could not connect to lyrdb.com"
             return ""
         
-        self.lyrics = string.capwords(self.lyrics, "\n").strip()
+        resp = Util.bytes_to_string(resp)
+        
+        # strip error messages
+        start = resp.find("</b><br />")
+        if start != -1:
+            resp = resp[(start+11):]
+            end = resp.find("<br />")
+            resp = resp[:end]
+        
+        self.lyrics = string.capwords(resp, "\n").strip()
         
         return self.lyrics
