@@ -3,6 +3,7 @@ Loader=python
 Module=lLyrics
 IAge=2
 Name=lLyrics
+Depends=rb
 Description=Displays lyrics in the sidebar
 Description[de]=Zeigt Liedtexte in der Seitenleiste an
 Authors=Timo Loewe <timoloewe91@gmail.com>
