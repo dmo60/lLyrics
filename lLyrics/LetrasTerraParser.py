@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib.request, urllib.error, urllib.parse
-import re
+import urllib.request, urllib.parse
 import string
 
 from html.parser import HTMLParser
@@ -56,7 +55,7 @@ class Parser(object):
             print("lyrics start not found")
             return ""
         resp = resp[(start+3):]
-        end = resp.find("</p>")
+        end = resp.find("<div id=")
         if end == -1:
             print("lyrics end not found ")
             return ""
