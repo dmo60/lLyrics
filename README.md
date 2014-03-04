@@ -38,6 +38,8 @@ The 'master' branch supports Rhythmbox 3.0 and above. **It is incompatible with 
 
 To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will quite certainly not be updated or developed any further.
 
+To install lLyrics from source you will need the package gettext.
+
 #### Dependencies ####
 
 lLyrics can be run without the need of any additional packages, but it is recommended to install the python module **"chardet"** for better handling of different encodings.
@@ -70,7 +72,7 @@ It will ask for your sudo password, but don't worry, it is only required to inst
 
 To uninstall, run `make uninstall`.
 
-Note that Rhythmbox version 2.90 or higher is required to run lLyrics!
+Note that you need Rhythmbox version 2.90 or higher to run lLyrics!
 
 
 
