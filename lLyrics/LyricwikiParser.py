@@ -13,43 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib.request, urllib.error, urllib.parse
+import urllib.request, urllib.parse
+import json
 import string
-
-from html.parser import HTMLParser
 
 import Util
 
-class Parser(HTMLParser):
+class Parser():
     
     def __init__(self, artist, title):
-        HTMLParser.__init__(self)
         self.artist = artist
         self.title = title
-        self.tag = None
-        self.found = True
-        self.lyric_url = None
         self.lyrics = ""
-    
-    # define handler for parsing             
-    def handle_starttag(self, tag, attrs):
-        self.tag = tag
-    
-    # definde handler for parsing    
-    def handle_endtag(self, tag):
-        self.tag = None
-    
-    # definde handler for parsing               
-    def handle_data(self, data):
-        if self.tag == "lyrics":
-            if data == "Not found":
-                self.found = False
-        if self.found and self.tag == "url":
-            self.lyric_url = data
         
     def parse(self):
         # API getSong request
-        url = "http://lyrics.wikia.com/api.php?func=getSong&artist=" + urllib.parse.quote(self.artist) + "&song=" + urllib.parse.quote(self.title) + "&fmt=xml"
+        url = "http://lyrics.wikia.com/api.php?func=getSong&artist=" + urllib.parse.quote(self.artist) + "&song=" + urllib.parse.quote(self.title) + "&fmt=realjson"
         print("call lyrikwiki API: " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -58,16 +37,20 @@ class Parser(HTMLParser):
             return ""
         
         resp = Util.bytes_to_string(resp)
-        self.feed(resp)
-        
-        if self.lyric_url is None:
+        if resp == "":
             return ""
         
-        print("url: " + self.lyric_url)
+        resp = json.loads(resp)
+        
+        if resp["lyrics"] == "Not found":
+            return ""
+        
+        lyrics_url = resp["url"]
+        print("url: " + lyrics_url)
         
         # open lyrics-URL
         try:
-            resp = urllib.request.urlopen(self.lyric_url, None, 3).read()
+            resp = urllib.request.urlopen(lyrics_url, None, 3).read()
         except:
             print("could not open lyricwiki url")
             return ""
@@ -80,13 +63,13 @@ class Parser(HTMLParser):
     
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("</a></div>&")
+        start = resp.find("</span></div>&")
         if start == -1:
-            start = resp.find("</a></div><i>&")
+            start = resp.find("</span></div><i>&")
             if start == -1:
                 print("lyrics start not found")
                 return ""
-        resp = resp[(start+10):]
+        resp = resp[(start+13):]
         end = resp.find("<!--")
         if end == -1:
             print("lyrics end not found")
