@@ -17,8 +17,10 @@ Lyrics sources
 
   - Lyricwiki.org
   - Letras.terra.com.br
+  - Vagalume.com.br
   - Metrolyrics.com
   - AZLyrics.com
+  - Lyricsnmusic.com
   - Lyricsmania.com
   - Rapgenius.com
   - Darklyrics.com
