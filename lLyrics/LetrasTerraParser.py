@@ -43,6 +43,10 @@ class Parser(object):
             return ""
         
         resp = Util.bytes_to_string(resp)
+        
+        if not self.verify(resp):
+            return ""
+        
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
         
@@ -69,4 +73,49 @@ class Parser(object):
         resp = HTMLParser().unescape(resp)
                 
         return resp
+    
+    def verify(self, resp):
+        # verify song artitst/title
+        title = resp
+        start = title.find("<h1>")
+        if start == -1:
+            print("no title found")
+            return False
+        title = title[(start+4):]
         
+        start = title.find(">")
+        if start == -1:
+            print("no title start found")
+            return False
+        title = title[(start+1):]
+        
+        end = title.find("</a>")
+        if end == -1:
+            print("no title end found")
+            return False
+        title = HTMLParser().unescape(title[:end]).lower()
+        
+        artist = resp
+        start = artist.find("<h2>")
+        if start == -1:
+            print("no artist found")
+            return False
+        artist = artist[(start+4):]
+        
+        start = artist.find(">")
+        if start == -1:
+            print("no artist start found")
+            return False
+        artist = artist[(start+1):]
+        
+        end = artist.find("</a>")
+        if end == -1:
+            print("no artist end found")
+            return False
+        artist = HTMLParser().unescape(artist[:end]).lower()
+        
+        if self.artist != artist or self.title != title:
+            print("wrong artist/title! " + artist + " - " + title)
+            return False
+        
+        return True
