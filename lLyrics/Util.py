@@ -21,7 +21,7 @@ import re
 import string
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
-import xml.dom
+import xml.dom.minidom
 
 from urllib.parse import urlparse
 from urllib.parse import unquote
