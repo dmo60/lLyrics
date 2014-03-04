@@ -21,7 +21,7 @@ import re
 import string
 import urllib
 import urllib2
-import xml.dom
+import xml.dom.minidom
 
 try:
     import chardet

@@ -77,13 +77,13 @@ class Parser(HTMLParser):
     
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("</a></div>&")
+        start = resp.find("</span></div>&")
         if start == -1:
-            start = resp.find("</a></div><i>&")
+            start = resp.find("</span></div><i>&")
             if start == -1:
                 print "lyrics start not found"
                 return ""
-        resp = resp[(start+10):]
+        resp = resp[(start+13):]
         end = resp.find("<!--")
         if end == -1:
             print "lyrics end not found"
