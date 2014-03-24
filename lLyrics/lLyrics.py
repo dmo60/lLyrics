@@ -490,6 +490,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
         if entry is None:
             return
+
+        # don't show lyrics for podcasts etc.
+        if(entry.get_entry_type().get_name() != 'song'):
+            if not self.first and self.visible:
+                self.first = True
+                print('removing the sidebar')
+                self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)
+            return
         
         # pop out sidebar at first playback
         if self.first and not self.showing_on_demand:
