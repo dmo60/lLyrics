@@ -26,9 +26,10 @@ from gi.repository import Gtk
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
+from gi.repository import RB
 import sys
 import rb
-import lxml.etree as ET
+import xml.etree.ElementTree as ET
 
 def pygobject_version():
     ''' 
@@ -40,7 +41,27 @@ def pygobject_version():
     str_version = to_number(GObject.pygobject_version)
     
     return float(str_version.rsplit('.',1)[0])
-
+    
+def compare_pygobject_version(version):
+    '''
+    return True if version is less than pygobject_version
+    i.e. 3.9 < 3.11
+    '''
+    to_number = lambda t: ".".join(str(v) for v in t)
+    
+    str_version = to_number(GObject.pygobject_version)
+  
+    split = str_version.rsplit('.',2)
+    split_compare = version.rsplit('.',2)
+    
+    if int(split_compare[0])<int(split[0]):
+        return True
+        
+    if int(split_compare[1])<int(split[1]):
+        return True
+        
+    return False
+        
 PYVER = sys.version_info[0]
 
 if PYVER >= 3:
@@ -126,26 +147,31 @@ def quote_plus(uri):
     else:
         return urllib.quote_plus(uri)
 
-        
-def is_rb3(shell):
-    if hasattr( shell.props.window, 'add_action' ):
-        return True
+def is_rb3(*args):
+    if hasattr(RB.Shell.props, 'ui_manager'):
+        return False
     else:
-        return False    
+        return True 
         
-class Menu(object):
+class Menu(GObject.Object):
     '''
     Menu object used to create window popup menus
     '''
+    __gsignals__ = {
+        'pre-popup': (GObject.SIGNAL_RUN_LAST, None, ())
+        }
+        
     def __init__(self, plugin, shell):
         '''
         Initializes the menu.
         '''
+        super(Menu, self).__init__()
         self.plugin = plugin
         self.shell = shell
         self._unique_num = 0
         
         self._rbmenu_items = {}
+        self._rbmenu_objects = {}
         
     def add_menu_item(self, menubar, section_name, action):
         '''
@@ -239,8 +265,6 @@ class Menu(object):
             for menu_item in self._rbmenu_items:
                 bar.remove(self._rbmenu_items[menu_item])
 
-            #del self._rbmenu_items[:]
-            
             bar.show_all()
             uim.ensure_update()
         
@@ -281,7 +305,7 @@ class Menu(object):
         
     def _connect_rb2_signals(self, signals):
         def _menu_connect(menu_item_name, func):
-            menu_item = self.builder.get_object(menu_item_name)
+            menu_item = self.get_menu_object(menu_item_name)
             menu_item.connect('activate', func)
             
         for key,value in signals.items():
@@ -303,6 +327,8 @@ class Menu(object):
         utility function to obtain the GtkMenu from the menu UI file
         :param popup_name: `str` is the name menu-id in the UI file
         '''
+        if popup_name in self._rbmenu_objects:
+            return self._rbmenu_objects[popup_name]
         item = self.builder.get_object(popup_name)
         
         if is_rb3(self.shell):
@@ -313,6 +339,8 @@ class Menu(object):
         else:
             popup_menu = item
         
+        self._rbmenu_objects[popup_name] = popup_menu
+        
         return popup_menu
             
     def get_menu_object(self, menu_name_or_link):
@@ -320,8 +348,9 @@ class Menu(object):
         utility function returns the GtkMenuItem/Gio.MenuItem
         :param menu_name_or_link: `str` to search for in the UI file
         '''
+        if menu_name_or_link in self._rbmenu_objects:
+            return self._rbmenu_objects[menu_name_or_link]
         item = self.builder.get_object(menu_name_or_link)
-
         if is_rb3(self.shell):
             if item:
                 popup_menu = item
@@ -330,7 +359,9 @@ class Menu(object):
                 popup_menu = app.get_plugin_menu(menu_name_or_link)
         else:
             popup_menu = item
-            
+        print (menu_name_or_link)
+        self._rbmenu_objects[menu_name_or_link] = popup_menu
+        
         return popup_menu
 
     def set_sensitive(self, menu_or_action_item, enable):
@@ -345,8 +376,16 @@ class Menu(object):
             item = self.shell.props.window.lookup_action(menu_or_action_item)
             item.set_enabled(enable)
         else:
-            item = self.builder.get_object(menu_or_action_item)
+            item = self.get_menu_object(menu_or_action_item)
             item.set_sensitive(enable)
+            
+    def popup(self, source, menu_name, button, time):
+        '''
+        utility function to show the popup menu
+        '''
+        self.emit('pre-popup')
+        menu = self.get_gtkmenu(source, menu_name)
+        menu.popup(None, None, None, None, button, time)
             
 class ActionGroup(object):
     '''
@@ -709,6 +748,7 @@ class Action(object):
     def _activate(self, action, *args):
         if self._do_update_state:
             self._current_state = not self._current_state
+            self.set_state(self._current_state)
         
         self._connect_func(action, None, self._connect_args)
         
@@ -757,6 +797,14 @@ class Action(object):
         else:
             return self.action.get_sensitive()
             
+    def set_state(self, value):
+        ''' 
+        set the state of a stateful action - this is applicable only
+        to RB2.99+
+        '''
+        if is_rb3(self.shell) and self.action.props.state_type:
+            self.action.change_state(GLib.Variant('b', value))
+
     def activate(self):
         ''' 
         invokes the activate signal for the action
@@ -807,3 +855,4 @@ class Action(object):
         else:
             menuitem.set_related_action(self.action)
             
+
