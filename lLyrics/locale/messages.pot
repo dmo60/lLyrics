@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-01 15:04+0100\n"
+"POT-Creation-Date: 2014-03-31 18:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,149 +17,149 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lLyrics.py:273 ../lLyrics.py:292
+#: ../lLyrics.py:276 ../lLyrics.py:295
 msgid "Lyrics"
 msgstr ""
 
-#: ../lLyrics.py:274
+#: ../lLyrics.py:277
 msgid "Display lyrics for the current playing song"
 msgstr ""
 
-#: ../lLyrics.py:278
+#: ../lLyrics.py:281
 msgid "Show lyrics"
 msgstr ""
 
-#: ../lLyrics.py:279
+#: ../lLyrics.py:282
 msgid "Search and display lyrics for this song"
 msgstr ""
 
 #. create save and cancel buttons for edited lyrics
-#: ../lLyrics.py:340
+#: ../lLyrics.py:343
 msgid "Save"
 msgstr ""
 
-#: ../lLyrics.py:342
+#: ../lLyrics.py:345
 msgid "Cancel"
 msgstr ""
 
 #. button for closing on demand lyrics
-#: ../lLyrics.py:349
+#: ../lLyrics.py:352
 msgid "Back to playing song"
 msgstr ""
 
-#: ../lLyrics.py:385 ../lLyrics.py:428
+#: ../lLyrics.py:388 ../lLyrics.py:431
 msgid "External"
 msgstr ""
 
-#: ../lLyrics.py:387 ../lLyrics.py:430 ../lLyrics.py:870
+#: ../lLyrics.py:390 ../lLyrics.py:433 ../lLyrics.py:882
 msgid "From cache file"
 msgstr ""
 
-#: ../lLyrics.py:391 ../Config.py:308
+#: ../lLyrics.py:394 ../Config.py:314
 msgid "Sources"
 msgstr ""
 
-#: ../lLyrics.py:395
+#: ../lLyrics.py:398
 msgid "Scan next source"
 msgstr ""
 
-#: ../lLyrics.py:396
+#: ../lLyrics.py:399
 msgid "Scan all sources"
 msgstr ""
 
-#: ../lLyrics.py:398
+#: ../lLyrics.py:401
 msgid "Search online"
 msgstr ""
 
-#: ../lLyrics.py:400
+#: ../lLyrics.py:403
 msgid "Mark as instrumental"
 msgstr ""
 
-#: ../lLyrics.py:402
+#: ../lLyrics.py:405
 msgid "Clear lyrics"
 msgstr ""
 
-#: ../lLyrics.py:403
+#: ../lLyrics.py:406
 msgid "Edit lyrics"
 msgstr ""
 
-#: ../lLyrics.py:407
+#: ../lLyrics.py:410
 msgid "Preferences"
 msgstr ""
 
-#: ../lLyrics.py:660
+#: ../lLyrics.py:671
 msgid "lLyrics Preferences"
 msgstr ""
 
-#: ../lLyrics.py:720 ../lLyrics.py:745 ../lLyrics.py:777 ../lLyrics.py:807
+#: ../lLyrics.py:731 ../lLyrics.py:756 ../lLyrics.py:788 ../lLyrics.py:818
 msgid "searching lyrics..."
 msgstr ""
 
-#: ../lLyrics.py:922
+#: ../lLyrics.py:932
 msgid "No lyrics found"
 msgstr ""
 
-#: ../Config.py:142
+#: ../Config.py:148
 msgid "Show sidebar on first playback"
 msgstr ""
 
-#: ../Config.py:155
+#: ../Config.py:161
 msgid "Save lyrics "
 msgstr ""
 
-#: ../Config.py:158
+#: ../Config.py:164
 msgid ""
 "Whether to automatically save retrieved lyrics in the folder specified below"
 msgstr ""
 
-#: ../Config.py:178
+#: ../Config.py:184
 msgid "default"
 msgstr ""
 
-#: ../Config.py:181
+#: ../Config.py:187
 msgid "Folder for lyrics"
 msgstr ""
 
-#: ../Config.py:195
+#: ../Config.py:201
 msgid "Always ignore parentheses in song title"
 msgstr ""
 
-#: ../Config.py:198
+#: ../Config.py:204
 msgid ""
 "When turned off, only parentheses containing specific strings (e.g. 'remix', "
 "'live', 'edit', etc) are filtered"
 msgstr ""
 
 #. check buttons for lyric sources
-#: ../Config.py:217
+#: ../Config.py:223
 msgid "Sources:"
 msgstr ""
 
-#: ../Config.py:248
+#: ../Config.py:254
 msgid ""
 "Warning: 'External' calls the Rhythmbox built-in lyrics plugin. It can not "
 "be guaranteed that the provided engines work properly. If you experience any "
 "problems, deactivate this option."
 msgstr ""
 
-#: ../Config.py:273
+#: ../Config.py:279
 msgid "Hide sidebar label"
 msgstr ""
 
-#: ../Config.py:287
+#: ../Config.py:293
 msgid "Show lyrics in left sidebar instead of right one"
 msgstr ""
 
-#: ../Config.py:290
+#: ../Config.py:296
 msgid ""
 "You have to disable and re-enable this plugin or restart Rhythmbox to apply "
 "changes here"
 msgstr ""
 
-#: ../Config.py:307
+#: ../Config.py:313
 msgid "General"
 msgstr ""
 
-#: ../Config.py:309
+#: ../Config.py:315
 msgid "Appearance"
 msgstr ""

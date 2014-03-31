@@ -1,142 +1,143 @@
-# German translations for PACKAGE package.
-# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# French translations for PACKAGE package.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# timo <timoloewe91@gmail.com>, 2012.
+# Meradi <rabahmeradi@gmail.com>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-03-31 18:45+0200\n"
-"PO-Revision-Date: 2012-08-05 12:01+0200\n"
-"Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
-"Language-Team: German\n"
-"Language: de\n"
+"PO-Revision-Date: 2014-03-30 17:50+0200\n"
+"Last-Translator: Meradi <rabahmeradi@gmail.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../lLyrics.py:276 ../lLyrics.py:295
 msgid "Lyrics"
-msgstr "Liedtexte"
+msgstr "Paroles"
 
 #: ../lLyrics.py:277
 msgid "Display lyrics for the current playing song"
-msgstr "Zeige Liedtext für den gerade gespielten Titel"
+msgstr "Afficher les paroles du morceau en cours de lecture"
 
 #: ../lLyrics.py:281
 msgid "Show lyrics"
-msgstr "Liedtext anzeigen"
+msgstr "Afficher les paroles"
 
 #: ../lLyrics.py:282
 msgid "Search and display lyrics for this song"
-msgstr "Suche und zeige Liedtext für diesen Titel"
+msgstr "Chercher et afficher les paroles de ce morceau"
 
 #. create save and cancel buttons for edited lyrics
 #: ../lLyrics.py:343
 msgid "Save"
-msgstr "Speichern"
+msgstr "Enregistrer"
 
 #: ../lLyrics.py:345
 msgid "Cancel"
-msgstr "Abbrechen"
+msgstr "Annuler"
 
 #. button for closing on demand lyrics
 #: ../lLyrics.py:352
 msgid "Back to playing song"
-msgstr "Zurück zum aktuellen Titel"
+msgstr "Retourner au morceau en cours de lecture"
 
 #: ../lLyrics.py:388 ../lLyrics.py:431
 msgid "External"
-msgstr "Extern"
+msgstr "Externe"
 
 #: ../lLyrics.py:390 ../lLyrics.py:433 ../lLyrics.py:882
 msgid "From cache file"
-msgstr "Aus Cache Datei"
+msgstr "A partir du fichier de cache "
 
 #: ../lLyrics.py:394 ../Config.py:314
 msgid "Sources"
-msgstr "Quellen"
+msgstr "Sources"
 
 #: ../lLyrics.py:398
 msgid "Scan next source"
-msgstr "Durchsuche nächste Quelle"
+msgstr "Chercher la source suivante"
 
 #: ../lLyrics.py:399
 msgid "Scan all sources"
-msgstr "Durchsuche alle Quellen"
+msgstr "Chercher tous les sources"
 
 #: ../lLyrics.py:401
 msgid "Search online"
-msgstr "Online suchen"
+msgstr "Chercher en ligne"
 
 #: ../lLyrics.py:403
 msgid "Mark as instrumental"
-msgstr "Als instrumental markieren"
+msgstr "Marquer ce morceau comme instrumental"
 
 #: ../lLyrics.py:405
 msgid "Clear lyrics"
-msgstr "Liedtext löschen"
+msgstr "Effacer les paroles"
 
 #: ../lLyrics.py:406
 msgid "Edit lyrics"
-msgstr "Liedtext bearbeiten"
+msgstr "Modifier les paroles"
 
 #: ../lLyrics.py:410
 msgid "Preferences"
-msgstr "Einstellungen"
+msgstr "Préférences"
 
 #: ../lLyrics.py:671
 msgid "lLyrics Preferences"
-msgstr "lLyrics Einstellungen"
+msgstr "Préférences de lLyrics"
 
 #: ../lLyrics.py:731 ../lLyrics.py:756 ../lLyrics.py:788 ../lLyrics.py:818
 msgid "searching lyrics..."
-msgstr "suche Liedtexte..."
+msgstr "Recherche des paroles..."
 
 #: ../lLyrics.py:932
 msgid "No lyrics found"
-msgstr "Keine Liedtexte gefunden"
+msgstr "Aucune paroles trouvées"
 
 #: ../Config.py:148
 msgid "Show sidebar on first playback"
-msgstr "Seitenleiste bei Wiedergabestart einblenden"
+msgstr "Afficher le paneau latérale en début de lecture"
 
 #: ../Config.py:161
 msgid "Save lyrics "
-msgstr "Liedtexte speichern"
+msgstr "Enregistrer les paroles"
 
 #: ../Config.py:164
 msgid ""
 "Whether to automatically save retrieved lyrics in the folder specified below"
 msgstr ""
-"Speichert gefundene Liedtexte automatisch im nachfolgend ausgewählten Ordner"
+"Enregistrer les paroles trouvées automatiquement dans le dossier sélectionné "
+"ci-dessous"
 
 #: ../Config.py:184
 msgid "default"
-msgstr "Standardeinstellung"
+msgstr "défault"
 
 #: ../Config.py:187
 msgid "Folder for lyrics"
-msgstr "Ordner für Liedtexte"
+msgstr "Dossier où enregistrer les paroles"
 
 #: ../Config.py:201
 msgid "Always ignore parentheses in song title"
-msgstr "Klammern im Songtitel immer ignorieren"
+msgstr "Ignorer toujours les parenthèses dans le titre des morceaux"
 
 #: ../Config.py:204
 msgid ""
 "When turned off, only parentheses containing specific strings (e.g. 'remix', "
 "'live', 'edit', etc) are filtered"
 msgstr ""
-"Falls ausgeschaltet, werden nur Klammern mit bestimmten Zeichenketten (z.B. "
-"'remix', 'live', 'edit', etc) gefiltert"
+"Si désactivé, seules certaines chaînes de caractères (par exemple « remix », "
+"« live », « edit », etc) seront filtrées"
 
 #. check buttons for lyric sources
 #: ../Config.py:223
 msgid "Sources:"
-msgstr "Quellen:"
+msgstr "Sources"
 
 #: ../Config.py:254
 msgid ""
@@ -144,30 +145,27 @@ msgid ""
 "be guaranteed that the provided engines work properly. If you experience any "
 "problems, deactivate this option."
 msgstr ""
-"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin. Es kann "
-"nicht garantiert werden, dass dieses korrekt funktioniert. Falls Probleme "
-"auftreten, deaktivieren Sie diese Option."
 
 #: ../Config.py:279
 msgid "Hide sidebar label"
-msgstr "Verstecke die Überschrift der Seitenleiste"
+msgstr "Cacher le titre du paneau latérale"
 
 #: ../Config.py:293
 msgid "Show lyrics in left sidebar instead of right one"
-msgstr "Zeige Liedtexte in der linken statt der rechten Seitenleiste"
+msgstr "Afficher les paroles dans le paneau latérale gauche"
 
 #: ../Config.py:296
 msgid ""
 "You have to disable and re-enable this plugin or restart Rhythmbox to apply "
 "changes here"
 msgstr ""
-"Zum Anwenden der Änderung muss das Plugin de- und reaktiviert oder Rhythmbox "
-"neu gestartet werden"
+"Vous devez désactiver et réactiver ce plugin ou redémarrer Rhythmbox pour "
+"appliquerles changements"
 
 #: ../Config.py:313
 msgid "General"
-msgstr "Allgemein"
+msgstr "Géneral"
 
 #: ../Config.py:315
 msgid "Appearance"
-msgstr "Erscheinungsbild"
+msgstr "Apparence"

@@ -294,7 +294,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
         self.label = Gtk.Label(_("Lyrics"))
         self.label.set_use_markup(True)
-        self.label.set_padding(3, 11)
+        self.label.set_padding(3, 10)
         self.label.set_alignment(0, 0)
         
         self.menu = self.get_button_menu()
@@ -440,8 +440,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def set_menu_sensitive(self, menu, sensitive):
+        index = 0
         for item in menu:
+            # 'Preferences' option should always be sensitive
+            if index == len(menu)-1:
+                continue
             item.set_sensitive(sensitive)
+            index += 1
     
     
     
@@ -491,9 +496,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if entry is None:
             return
 
-        # don't show lyrics for podcasts etc.
         if(entry.get_entry_type().get_name() != 'song'):
-            if not self.first and self.visible:
+            if not self.first:
                 self.first = True
                 print('removing the sidebar')
                 self.toggle_action_group.get_action("ToggleLyricSideBar").set_active(False)

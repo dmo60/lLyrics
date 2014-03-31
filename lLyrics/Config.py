@@ -21,8 +21,11 @@ from gi.repository import PeasGtk
 from gi.repository import Gtk
 from gi.repository import RB
 
+import gettext
+
 import lLyrics
 import lLyrics_rb3compat as Compat
+
 
 DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
 
@@ -130,6 +133,9 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         self.settings = Gio.Settings(DCONF_DIR)
 
     def do_create_configure_widget(self):
+        # init locales
+        gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
+
         # page 1 for general settings
         page1 = Gtk.VBox()
         
