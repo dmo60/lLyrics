@@ -11,7 +11,7 @@ install: schema locales
 	@cp -r ./lLyrics/ $(USER_PLUGIN_DIR)
 	@echo "Done!"
 
-install-systemwide: install-schema install-locales
+install-systemwide: schema locales
 	@if [ -d "$(SYSTEM_PLUGIN_DIR)rb" ]; then \
 		echo "Installing plugin files to $(SYSTEM_PLUGIN_DIR) ..."; \
 		sudo rm -r -f $(SYSTEM_PLUGIN_DIR)lLyrics/; \
@@ -32,6 +32,7 @@ schema:
 locales:
 	@echo "Installing locales..."
 	@for i in $(LOCALE_DIR)*.po; do \
+		echo `basename $$i`; \
 		lang=`basename $$i .po`; \
 		install -d $(LOCALE_DIR)$$lang/LC_MESSAGES; \
 		msgfmt -c $(LOCALE_DIR)$$lang.po -o $(LOCALE_DIR)$$lang/LC_MESSAGES/lLyrics.mo; \
@@ -49,9 +50,10 @@ uninstall:
 	
 update-po-files:
 	@echo "Update *.po files..."
-	@for i in $(LOCALE_DIR)*.po; do \
+	@cd $(LOCALE_DIR); \
+	for i in *.po; do \
+		echo `basename $$i`; \
 		lang=`basename $$i .po`; \
-		cd  $(LOCALE_DIR); \
 		intltool-update -g messages $$lang; \
 	done
 	
