@@ -489,8 +489,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if entry is None:
             return
         
-        # don't show lyrics for podcasts etc.
-        if(entry.get_entry_type().get_name() != 'song'):
+        # don't show lyrics for podcasts and radio
+        if entry.get_entry_type().get_name() in ('iradio', 'podcast-post'):
+            print("entry type: " + entry.get_entry_type().get_name())
             if not self.first:
                 self.first = True
                 print('removing the sidebar')
