@@ -27,6 +27,7 @@ from gi.repository import RB
 from gi.repository import Gtk
 from gi.repository import Pango
 from gi.repository import GdkPixbuf
+from gi.repository import GLib
 
 import ChartlyricsParser
 import LyricwikiParser
@@ -298,7 +299,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.label.set_alignment(0, 0)
         
         self.menu = self.get_button_menu()
-        self.set_menu_sensitive(self.menu, False)
+        self.set_menu_sensitive(False)
         
         # menu without toolbar
         icon_factory = Gtk.IconFactory()
@@ -439,27 +440,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
             
     
     
-    def set_menu_sensitive(self, menu, sensitive):
+    def set_menu_sensitive(self, sensitive):
         index = 0
-        for item in menu:
+        for item in self.menu:
             # 'Preferences' option should always be sensitive
-            if index == len(menu)-1:
+            if index == len(self.menu)-1:
                 continue
             item.set_sensitive(sensitive)
             index += 1
     
     
     
-    def set_menu_item_sensitive(self, menu, itemlabel, sensitive):
-        for item in menu:
-            if item.get_label() == itemlabel:
-                item.set_sensitive(sensitive)
-                break
-    
-    
-    
-    def set_radio_menu_item_active(self, menu, itemlabel):
-        for item in menu:
+    def set_radio_menu_item_active(self, itemlabel):
+        for item in self.radio_sources:
             if item.get_label() == itemlabel:
                 item.set_active(True)
                 break
@@ -495,7 +488,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
         if entry is None:
             return
-
+        
+        # don't show lyrics for podcasts etc.
         if(entry.get_entry_type().get_name() != 'song'):
             if not self.first:
                 self.first = True
@@ -612,9 +606,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
         self.write_lyrics_to_cache(self.path, lyrics)
-        self.show_lyrics(self.artist, self.title, lyrics)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
         
-        self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
+        self.set_radio_menu_item_active("SelectNothing")
         self.current_source = None
         
         
@@ -652,7 +646,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # the playing song might have changed during editing.
         self.path_before_edit = self.path
         
-        self.set_menu_sensitive(self.menu, False)
+        self.set_menu_sensitive(False)
         
         # Enable editing and set cursor
         self.textview.set_cursor_visible(True)
@@ -730,7 +724,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if self.path != self.path_before_edit:
             self.textbuffer.set_text(_("searching lyrics..."))
             
-        self.set_menu_sensitive(self.menu, True)
+        self.set_menu_sensitive(True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -755,7 +749,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         else:
             self.textbuffer.set_text(_("searching lyrics..."))
         
-        self.set_menu_sensitive(self.menu, True)
+        self.set_menu_sensitive(True)
         
         # Set event flag to indicate end of editing and wake all threads 
         # waiting to display new lyrics.
@@ -781,12 +775,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # otherwise search lyrics
         self.search_lyrics(self.player, playing_entry)
         
+    
+    
+    def set_displayed_text(self, text):
+        self.textbuffer.set_text(text)
+        
         
     
     def scan_source(self, source, artist, title):
-        Gdk.threads_enter()
-        self.textbuffer.set_text(_("searching lyrics..."))
-        Gdk.threads_leave()
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_displayed_text, _("searching lyrics..."))
           
         newthread = Thread(target=self._scan_source_thread, args=(source, artist, title))
         newthread.start()
@@ -794,7 +791,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
             
     def _scan_source_thread(self, source, artist, title):
-        self.set_menu_sensitive(self.menu, False)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, False)
              
         if source == "From cache file":
             lyrics = self.get_lyrics_from_cache(self.path)
@@ -806,17 +803,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
             print("song changed")
             return          
         
-        self.set_menu_sensitive(self.menu, True)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, True)
         
-        self.show_lyrics(self.artist, self.title, lyrics)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
         
         
         
     def scan_all_sources(self, artist, title, cache):
         if self.edit_event.is_set():
-            Gdk.threads_enter()
-            self.textbuffer.set_text(_("searching lyrics..."))
-            Gdk.threads_leave()
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_displayed_text, _("searching lyrics..."))
             
         newthread = Thread(target=self._scan_all_sources_thread, args=(artist, title, cache))
         newthread.start()
@@ -824,7 +819,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
     
     def _scan_all_sources_thread(self, artist, title, cache):
-        self.set_menu_sensitive(self.menu, False)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, False)
         
         lyrics = ""
         if cache:
@@ -858,12 +853,12 @@ class lLyrics(GObject.Object, Peas.Activatable):
                     self._scan_all_sources_thread(self.clean_artist, self.clean_title, False)
                     return    
                                        
-            self.set_radio_menu_item_active(self.radio_sources, "SelectNothing")
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, "SelectNothing")
             self.current_source = None  
                 
-        self.set_menu_sensitive(self.menu, True)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, True)
         
-        self.show_lyrics(self.artist, self.title, lyrics)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
 
         
                 
@@ -879,7 +874,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 
             print("got lyrics from cache")
             self.current_source = "From cache file"
-            self.set_radio_menu_item_active(self.radio_sources, _("From cache file"))
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, _("From cache file"))
             return lyrics
             
         return ""
@@ -904,7 +899,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         print("source: " + source)        
         self.current_source = source
-        self.set_radio_menu_item_active(self.radio_sources, source)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, source)
         
         parser = self.dict[source].Parser(artist, title)
         try:
@@ -926,24 +921,21 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     
-    def show_lyrics(self, artist, title, lyrics):
+    def show_lyrics(self, lyrics):
         if lyrics == "":
             print("no lyrics found")
             lyrics = _("No lyrics found")
         else:        
             lyrics, self.tags = Util.parse_lrc(lyrics)
         
-        Gdk.threads_enter()
+        self.textbuffer.set_text("%s - %s\n%s" % (self.artist, self.title, lyrics))
         
-        self.textbuffer.set_text("%s - %s\n%s" % (artist, title, lyrics))
         # make 'artist - title' header bold and underlined 
         start = self.textbuffer.get_start_iter()
         end = start.copy()
         end.forward_to_line_end()
         self.textbuffer.apply_tag(self.tag, start, end)
         
-        Gdk.threads_leave()
-    
     
     
     def elapsed_changed(self, player, seconds):
@@ -962,8 +954,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         self.current_tag = matching_tag
         
-        Gdk.threads_enter()
-        
         # remove old tag
         start, end = self.textbuffer.get_bounds()
         self.textbuffer.remove_tag(self.sync_tag, start, end)
@@ -976,5 +966,3 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textbuffer.apply_tag(self.sync_tag, start, end)
         self.textview.scroll_to_iter(start, 0.1, False, 0, 0)
         
-        Gdk.threads_leave()
-
