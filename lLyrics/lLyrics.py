@@ -569,7 +569,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def scan_selected_source_callback(self, action, activated_action):
         if not action.get_active():
             return 
-
+        
         source = activated_action
         if source == "SelectNothing" or source == self.current_source:
             return
@@ -607,10 +607,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
         self.write_lyrics_to_cache(self.path, lyrics)
-        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
-        
-        self.set_radio_menu_item_active("SelectNothing")
         self.current_source = None
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
         
         
         
@@ -854,7 +852,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
                     self._scan_all_sources_thread(self.clean_artist, self.clean_title, False)
                     return    
                                        
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, "SelectNothing")
             self.current_source = None  
                 
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, True)
@@ -863,7 +860,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         
                 
-    def get_lyrics_from_cache(self, path):        
+    def get_lyrics_from_cache(self, path): 
+        self.current_source = "From cache file"
+               
         # try to load lyrics from cache
         if os.path.exists (path):
             try:
@@ -872,10 +871,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 cachefile.close()
             except:
                 print("error reading cache file")
+                return ""
                 
             print("got lyrics from cache")
-            self.current_source = "From cache file"
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, _("From cache file"))
             return lyrics
             
         return ""
@@ -900,7 +898,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         print("source: " + source)        
         self.current_source = source
-        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_radio_menu_item_active, source)
         
         parser = self.dict[source].Parser(artist, title)
         try:
@@ -923,6 +920,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
     
     
     def show_lyrics(self, lyrics):
+        if self.current_source is None:
+            self.set_radio_menu_item_active("SelectNothing")
+        elif self.current_source == "From cache file":
+            self.set_radio_menu_item_active(_("From cache file"))
+        else:
+            self.set_radio_menu_item_active(self.current_source)
+        
         if lyrics == "":
             print("no lyrics found")
             lyrics = _("No lyrics found")
