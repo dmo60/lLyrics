@@ -1,0 +1,37 @@
+<sites>
+<site>
+    <name>metrolyrics</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#lyrics-body-text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>azlyrics</name>
+    <start><!-- start of lyrics --></start>
+    <end><!-- end of lyrics --></end>
+    <id>div</id>
+    <tagNumber>6</tagNumber>
+</site>
+<site>
+    <name>lyricsmode.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>p#lyrics_text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>songmeanings.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#textblock</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>songlyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>p#songLyricsDiv</id>
+    <tagNumber>0</tagNumber>
+</site>
+</sites>
