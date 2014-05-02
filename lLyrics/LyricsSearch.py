@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import string
 import urllib.request
 import urllib.parse
 import json
 import time
+import os
+import re
 
 from xml.dom.minidom import parse
 from bs4 import BeautifulSoup
@@ -66,6 +67,8 @@ class LyricsSearcher(object):
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s'\
                % query
         urls = []
+        site_list = [site for site in self.sites
+                             if site not in self.ignore_sites]
         for start in range(0, num_queries, 4):
             request_url = '{0}&start={1}'.format(url, start)
             print(request_url)
@@ -84,10 +87,9 @@ class LyricsSearcher(object):
                 else:
                     print('no more results!')
                     break
-                for items in results:
-                    for site in self.sites:
-                        if site.name not in self.ignore_sites and \
-                         site.name.lower() in (items['url']):
+                for site in site_list:
+                    for items in results:
+                        if site.name.lower() in (items['url']):
                             urls.append((site, items['url']))
             except:
                 pass
@@ -103,17 +105,23 @@ class LyricsSearcher(object):
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
+            #change the position of the site
+            temp = [s for s in self.sites if s.name != site.name]
+            self.sites = temp
+            self.sites.append(site)
             print("could not connect " + site.name)
             return ""
 
         resp = Util.bytes_to_string(resp)
         lyrics = self.get_lyrics(resp, site)
-        lyrics = string.capwords(lyrics, "\n").strip()
+        #lyrics = string.
         return lyrics
 
     def read_filters(self):
         print('reading filters...')
-        doc = parse('sites.xml')
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        xmlfile = os.path.join(BASE_DIR, 'sites.xml')
+        doc = parse(xmlfile)
         self.sites = []
         for item in doc.documentElement.getElementsByTagName("site"):
             try:
@@ -134,12 +142,14 @@ class LyricsSearcher(object):
 
     def get_lyrics(self, resp, site):
         # cut HTML source to relevant part
+        print(site.name)
         if(site.Id != None):
             soup = BeautifulSoup(resp)
             elements = soup.select(site.Id)
             size = len(elements)
             if size != 0 and site.tagNumber < size:
-                lyrics = elements[site.tagNumber].text
+                lyrics = str(elements[site.tagNumber])
+                lyrics = self.clean_html(lyrics)
                 lyrics = lyrics + "\n\n (source : " + site.name + ")"
                 return lyrics
             else:
@@ -166,26 +176,36 @@ class LyricsSearcher(object):
 
         lyrics = Util.decode_chars(resp)
         lyrics = lyrics + "\n\n (source : " + site.name + ")"
+        lyrics = self.clean_html(lyrics)
         return resp
 
     def Search_lyrics(self, artist, title, ignore_sites, file_path=None):
         self.title = title
         self.artist = artist
         self.file_path = file_path
+        self.ignore_sites = ignore_sites
+        print("ignored sites are : ")
         if self.file_path is not None:
             lyrics = Util.get_lyrics_from_audio_tag(file_path)
             if lyrics != "":
-                return "audio tag", lyrics
+                return None, lyrics
         print('searching lyrics...')
         urls = self.get_sources_to_search()  # we use Google api first
-        if len(urls) == 0:
+        site, lyrics = self.get_lyrics_from_sources(urls)
+        if site == "":
+            print('searching google (html)')
             urls = self.search_Google()
+            return self.get_lyrics_from_sources(urls)
+        return site, lyrics
+
+    def get_lyrics_from_sources(self, urls):
+        print(len(urls))
         for i in range(len(urls)):
             site, url = urls[i]
             print('searching lyrics from ' + url)
             lyrics = self.get_lyrics_from_source(site, url)
             if(lyrics != ""):
-                return site.name, lyrics
+                return site, lyrics
         return "", ""
 
     def search_Google(self):
@@ -209,25 +229,35 @@ class LyricsSearcher(object):
                 return urls
             soup = BeautifulSoup(resp)
             elements = soup.select("h3.r")
-            for i in range(len(elements)):
-                element = elements[i]
-                element = element.select("a")[0]
-                url = element['href']
-                url = self.parse_url(url)
-                for site in self.sites:
+            site_list = [site for site in self.sites
+                             if site not in self.ignore_sites]
+            for site in site_list:
+                for i in range(len(elements)):
+                    element = elements[i]
+                    element = element.select("a")[0]
+                    url = element['href']
+                    url = self.parse_url(url)
                     if site.name.lower() in (url):
                         urls.append((site, url))
-        except:
+        except Exception as e:
+            print(e)
             print("Error : opening url " + url)
         return urls
 
     def parse_url(self, url):
-        #print(url)
+        print(url)
         start = url.find("http")
         url = url[start:]
         end = url.find("&sa=U&ei=")
         url = url[:end]
         return url
+
+    def clean_html(self, html):
+        clean = re.sub('<[ /]*?br[ /]*?>', '\n', html)
+        clean = re.sub('</p>', '\n\n', clean)
+        clean = re.sub('<.*?>', '', clean)
+        clean = re.sub('\n\n\n', '\n\n', clean)
+        return clean
 
     def get_sites(self):
         return self.sites

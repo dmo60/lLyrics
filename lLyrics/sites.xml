@@ -1,37 +1,86 @@
 <sites>
 <site>
-    <name>metrolyrics</name>
+    <name>MetroLyrics</name>
     <start>no start</start>
     <end>no end</end>
     <id>div#lyrics-body-text</id>
     <tagNumber>0</tagNumber>
 </site>
 <site>
-    <name>azlyrics</name>
+    <name>AZLyrics</name>
     <start><!-- start of lyrics --></start>
     <end><!-- end of lyrics --></end>
     <id>div</id>
     <tagNumber>6</tagNumber>
 </site>
 <site>
-    <name>lyricsmode.com</name>
+    <name>LyricsMode.com</name>
     <start>no start</start>
     <end>no end</end>
     <id>p#lyrics_text</id>
     <tagNumber>0</tagNumber>
 </site>
 <site>
-    <name>songmeanings.com</name>
+    <name>SongMeanings.com</name>
     <start>no start</start>
     <end>no end</end>
     <id>div#textblock</id>
     <tagNumber>0</tagNumber>
 </site>
 <site>
-    <name>songlyrics.com</name>
+    <name>SongLyrics.com</name>
     <start>no start</start>
     <end>no end</end>
     <id>p#songLyricsDiv</id>
     <tagNumber>0</tagNumber>
 </site>
-</sites>
+<site>
+    <name>az-lyrics.us</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.song_text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>rapgenius.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.lyrics</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>oldielyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.lyrics</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>LyricsMania.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.lyrics-body</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>directlyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.2d18042a.lyrics</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>lyricsfreak.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#content</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>mp3lyrics.org</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#lyrics_text</id>
+    <tagNumber>0</tagNumber>
+</site>
+</sites> 

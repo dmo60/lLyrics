@@ -159,7 +159,7 @@ def get_lyrics_from_audio_tag(uri):
             return ""
 
         lyrics = lyrics[0].text
-        return string.capwords(lyrics, "\n").strip()
+        return lyrics
 
     # ogg vorbis file
     if "vorbis" in mime:
@@ -172,7 +172,7 @@ def get_lyrics_from_audio_tag(uri):
 
         if "unsyncedlyrics" in comments:
             lyrics = comments["unsyncedlyrics"][0]
-            return string.capwords(lyrics, "\n").strip()
+            return lyrics
 
         print ("no lyrics comment field found")
         return ""
@@ -180,11 +180,7 @@ def get_lyrics_from_audio_tag(uri):
         try:
             print('getting lyrics')
             music = MP4(uri)
-            print(music)
-            for item in music.tags:
-                print(item)
             lyrics = music.tags[b'\xa9lyr'][0]
-            print(lyrics)
             return lyrics
         except Exception as e:
             print(e)

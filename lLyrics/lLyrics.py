@@ -528,6 +528,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
               + self.artist + " - " + self.title)
 
         self.was_corrected = False
+        self.sites = []
 
         (self.clean_artist, self.clean_title) = self.clean_song_data(
                                                                 self.artist,
@@ -619,10 +620,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
             location = self.location = entry.\
                                     get_string(RB.RhythmDBPropType.LOCATION)
             self.window.set_progress(i / total,
-                                     _("{0} of {1}").format(i, total))
+                                     _("{0} of {1} ({2} found)").\
+                                            format(i, total, found_lyrics))
             self.window.set_text(title + " - " + artist)
             i = i + 1
-            lyrics = self.searcher.Search_lyrics(artist, title, [], location)
+            site, lyrics = self.searcher.Search_lyrics(artist, title, [], location)
             if lyrics != "":
                 found_lyrics += 1
                 self.write_lyrics_to_audio_tag(location, lyrics)
@@ -847,6 +849,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         #when we search second time we don't get lyrics from audio tag
         if(len(self.sites) != 0):
             location = None
+            for site in self.sites:
+                print (site)
 
         source, lyrics = self.searcher.Search_lyrics(artist, title,
                                                 self.sites, location)
@@ -868,8 +872,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 if corrected:
                     (self.clean_artist, self.clean_title) =\
                                             self.clean_song_data(artist, title)
-                    self._scan_all_sources_thread(self.clean_artist,
-                                                  self.clean_title, False)
+                    self._start_search_thread(location, self.clean_artist,
+                                              self.clean_title)
                     return
 
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
