@@ -324,8 +324,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textview.set_cursor_visible(False)
         self.textview.set_left_margin(10)
         self.textview.set_right_margin(10)
-        self.textview.set_pixels_above_lines(5)
-        self.textview.set_pixels_below_lines(5)
+        self.textview.set_pixels_above_lines(0)
+        self.textview.set_pixels_below_lines(0)
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
 
         # create a ScrollView
@@ -542,25 +542,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         artist = artist.lower()
         title = title.lower()
 
-        # remove accents
-        artist = unicodedata.normalize('NFKD', artist)
-        artist = "".join([c for c in artist if not unicodedata.combining(c)])
-        title = unicodedata.normalize('NFKD', title)
-        title = "".join([c for c in title if not unicodedata.combining(c)])
-
-        if self.ignore_brackets:
-            LYRICS_TITLE_STRIP.append("\(.*\)")
-
-        # replace ampersands and the like
-        for exp in LYRICS_ARTIST_REPLACE:
-            artist = re.sub(exp[0], exp[1], artist)
-        for exp in LYRICS_TITLE_REPLACE:
-            title = re.sub(exp[0], exp[1], title)
-
-        # strip things like "(live at Somewhere)", "(acoustic)", etc
-        for exp in LYRICS_TITLE_STRIP:
-            title = re.sub(exp, '', title)
-
         # compress spaces
         title = title.strip()
         artist = artist.strip()
@@ -584,8 +565,36 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         self.scan_source(source, self.clean_artist, self.clean_title)
 
+
     def scan_next_action_callback(self, action):
-        self.start_search(self.location, self.clean_artist, self.clean_title)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
+                             self.set_displayed_text,
+                             _("searching next lyrics..."))
+
+        newthread = Thread(target=self._scan_next,
+                           args=())
+        newthread.start()
+
+
+    def _scan_next(self):
+        print('searching next lyrics...')
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
+                             self.set_menu_sensitive, False)
+        artist = self.artist
+        title = self.title
+        lyrics = self.searcher.next_lyrics()
+        if title != self.title or self.artist != artist:
+            return
+        
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
+                             self.set_menu_sensitive, True)
+        
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
+                             self.show_lyrics, lyrics)
+        
+        Util.write_lyrics_to_audio_tag(self.location,
+                                           lyrics,
+                                           self.overwrite)
 
     def search_online_action_callback(self, action):
         webbrowser.open("http://www.google.com/search?q=%s+%s+lyrics" %
@@ -593,7 +602,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
     def instrumental_action_callback(self, action):
         lyrics = "-- Instrumental --"
-        self.write_lyrics_to_cache(self.path, lyrics)
+        self.write_lyrics_to_audio_tag(self.location, lyrics)
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
                              self.show_lyrics, lyrics)
 
@@ -624,7 +633,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                                             format(i, total, found_lyrics))
             self.window.set_text(title + " - " + artist)
             i = i + 1
-            site, lyrics = self.searcher.Search_lyrics(artist, title, [], location)
+            lyrics = self.searcher.Search_lyrics(artist, title, location)
             if lyrics != "":
                 found_lyrics += 1
                 self.write_lyrics_to_audio_tag(location, lyrics)
@@ -846,14 +855,9 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def _start_search_thread(self, location, artist, title):
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
                              self.set_menu_sensitive, False)
-        #when we search second time we don't get lyrics from audio tag
-        if(len(self.sites) != 0):
-            location = None
-            for site in self.sites:
-                print (site)
 
-        source, lyrics = self.searcher.Search_lyrics(artist, title,
-                                                self.sites, location)
+        lyrics = self.searcher.Search_lyrics(artist, title,
+                                                location)
         # We can't display new lyrics while user is editing!
         self.edit_event.wait()
 
@@ -861,7 +865,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if artist != self.clean_artist or title != self.clean_title:
             print("song changed")
             return
-
         if lyrics == "":
             # check for lastfm corrections
             if not self.was_corrected:
@@ -881,10 +884,11 @@ class lLyrics(GObject.Object, Peas.Activatable):
                                  "SelectNothing")
             self.current_source = None
         else:
-            Util.write_lyrics_to_audio_tag(self.location,
+            self.show_lyrics(lyrics)
+        
+        Util.write_lyrics_to_audio_tag(self.location,
                                            lyrics,
                                            self.overwrite)
-            self.sites.append(source)
 
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
                              self.set_menu_sensitive,
@@ -923,7 +927,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 print("error writing cache file")
 
     def write_lyrics_to_audio_tag(self, path, lyrics):
-        Util.write_lyrics_to_audio_tag(self.location, lyrics, self.overwrite)
+        Util.write_lyrics_to_audio_tag(path, lyrics, self.overwrite)
 
     def get_lyrics_from_source(self, source, artist, title):
         # Playing song might change during search, so we want to

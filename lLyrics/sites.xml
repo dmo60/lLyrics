@@ -15,7 +15,7 @@
 </site>
 <site>
     <name>LyricsMode.com</name>
-    <start>no start</start>
+    <start>no start</start> 
     <end>no end</end>
     <id>p#lyrics_text</id>
     <tagNumber>0</tagNumber>
@@ -81,6 +81,55 @@
     <start>no start</start>
     <end>no end</end>
     <id>div#lyrics_text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>sweetslyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div</id>
+    <tagNumber>20</tagNumber>
+</site>
+<site>
+    <name>elyricsworld.ee</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#lyric_itself</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>unpopularlyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#notepad</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>liriklagumu.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.entry-content</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>les-paroles-de-chansons.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.well</id>
+    <tagNumber>1</tagNumber>
+</site>
+<site>
+    <name>musixmatch.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div#lyrics</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>absolutelyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>p#view_lyrics</id>
     <tagNumber>0</tagNumber>
 </site>
 </sites> 
