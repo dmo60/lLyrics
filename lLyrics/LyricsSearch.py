@@ -1,4 +1,4 @@
-# Parser for leoslyrics.com
+# -*- coding: utf-8 -*-
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 
 import urllib.request
 import urllib.parse
+from httplib2 import iri2uri # Japanese url
 import json
 import time
 import os
@@ -204,6 +205,7 @@ class LyricsSearcher(object):
             lyrics = Util.get_lyrics_from_audio_tag(file_path)
             if lyrics != "":
                 return lyrics
+        self.index = 0
         print('searching lyrics...')
         self.get_sources_to_search()  # we use Google api first
         lyrics = self.get_lyrics_from_sources()
@@ -226,6 +228,7 @@ class LyricsSearcher(object):
 
     def get_lyrics_from_sources(self):
         print(self.urls)
+        print(self.index)
         while self.index != -1 and self.index < len(self.urls):
             print("self.index = " + str(self.index))
             site, url = self.urls[self.index]
@@ -243,8 +246,8 @@ class LyricsSearcher(object):
         url = url + "+"
         url = url + self.artist.replace(" ", "+")
         url = url + "+lyrics"
+        url = str(iri2uri(url))
         return url
-        print(url)
 
     def search_Google(self):
         url = self.get_url()
@@ -269,7 +272,6 @@ class LyricsSearcher(object):
                     element = element.select("a")[0]
                     url = element['href']
                     url = self.parse_url(url)
-                    print(url)
                     if site.name.lower() in (url):
                         self.urls.append((site, url))
         except Exception as e:
@@ -282,7 +284,7 @@ class LyricsSearcher(object):
         url = url[start:]
         end = url.find("&sa=U&ei=")
         url = url[:end]
-        return url
+        return urllib.parse.unquote(url)
 
     def clean_html(self, html):
         clean = re.sub('<[ /]*?br[ /]*?>', '\n', html)

@@ -132,4 +132,39 @@
     <id>p#view_lyrics</id>
     <tagNumber>0</tagNumber>
 </site>
+<site>
+    <name>musica.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>p</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>lyricstranslate.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.song-node-text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>tekstowo.pl</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.song-text</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>anime-lyrics.ru</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>td</id>
+    <tagNumber>7</tagNumber>
+</site>
+<site>
+    <name>nautiljon.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>td</id>
+    <tagNumber>3</tagNumber>
+</site>
 </sites> 
