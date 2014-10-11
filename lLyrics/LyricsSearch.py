@@ -15,7 +15,7 @@
 
 import urllib.request
 import urllib.parse
-from httplib2 import iri2uri # Japanese url
+from httplib2 import iri2uri # Japnese url
 import json
 import time
 import os
@@ -195,22 +195,30 @@ class LyricsSearcher(object):
         return resp
 
     def Search_lyrics(self, artist, title, file_path=None):
-        self.read_filters()
+        print("Searching lyrics for " + title + " " + artist) 
         self.title = title
         self.artist = artist
         self.file_path = file_path
         self.index = -1
         self.only_api = True
         if self.file_path is not None:
-            lyrics = Util.get_lyrics_from_audio_tag(file_path)
+            print("Searching tag file first")
+            lyrics = Util.get_lyrics_from_audio_tag(file_path).strip() 
             if lyrics != "":
                 return lyrics
         self.index = 0
-        print('searching lyrics...')
+        print('No lyrics found in file tag so searching lyrics on Internet...')
         self.get_sources_to_search()  # we use Google api first
         lyrics = self.get_lyrics_from_sources()
+        if lyrics != "":
+            return lyrics
+        print("We search Google html")
+        self.search_Google()
+        self.only_api = False
+        self.index = 0
+        lyrics = self.get_lyrics_from_sources()
         return lyrics
-    
+        
     def next_lyrics(self):
         if self.index == -1:
             print("first time")
@@ -223,6 +231,7 @@ class LyricsSearcher(object):
         if lyrics == "" and self.only_api:
             print('search Google html')
             self.search_Google()
+            self.only_api = False
             lyrics = self.get_lyrics_from_sources()
         return lyrics
 
