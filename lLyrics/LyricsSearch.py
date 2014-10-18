@@ -15,7 +15,7 @@
 
 import urllib.request
 import urllib.parse
-from httplib2 import iri2uri # Japnese url
+from httplib2 import iri2uri # Special characters in url like ö
 import json
 import time
 import os

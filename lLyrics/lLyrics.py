@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -550,11 +549,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         return (artist, title)
 
     def build_cache_path(self, artist, title):
-        artist_folder = os.path.join(self.lyrics_folder, artist[:128])
+        artist = re.sub('[^\w\-_\. ]', '_', artist[:128])
+        title = re.sub('[^\w\-_\. ]', '_', title[:128])
+        artist_folder = os.path.join(self.lyrics_folder, artist)
         if not os.path.exists(artist_folder):
             os.mkdir(artist_folder)
 
-        return os.path.join(artist_folder, title[:128] + '.lyric')
+        return os.path.join(artist_folder, title + '.lyric')
 
     def scan_selected_source_callback(self, action, activated_action):
         if not action.get_active():

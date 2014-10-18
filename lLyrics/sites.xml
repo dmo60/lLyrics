@@ -167,4 +167,25 @@
     <id>td</id>
     <tagNumber>3</tagNumber>
 </site>
+<site>
+    <name>violetlyrics.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.post-body.entry-content</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>lyrics.astraweb.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>font</id>
+    <tagNumber>2</tagNumber>
+</site>
+<site>
+    <name>allmusic.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>p#hidden_without_js</id>
+    <tagNumber>0</tagNumber>
+</site>
 </sites> 
