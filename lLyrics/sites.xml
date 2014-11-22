@@ -42,7 +42,7 @@
     <tagNumber>0</tagNumber>
 </site>
 <site>
-    <name>rapgenius.com</name>
+    <name>genius.com</name>
     <start>no start</start>
     <end>no end</end>
     <id>div.lyrics</id>
@@ -186,6 +186,20 @@
     <start>no start</start>
     <end>no end</end>
     <id>p#hidden_without_js</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>tunewiki.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>ul.lyric-lines</id>
+    <tagNumber>0</tagNumber>
+</site>
+<site>
+    <name>sing365.com</name>
+    <start>no start</start>
+    <end>no end</end>
+    <id>div.content_1</id>
     <tagNumber>0</tagNumber>
 </site>
 </sites> 
