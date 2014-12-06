@@ -61,6 +61,8 @@ class engine:
             ff = urllib.request.urlopen(url)
 #            original_lrc = re.sub('<br/>', '\n', ff.read())
             original_lrc = re.sub('<br/>', '\n', ff.read().decode('utf-8'))
+            original_lrc = re.sub('\n+', '\n', original_lrc)
+            original_lrc = re.sub(r'\] +', ']', original_lrc)
             ff.close()
         except IOError:
             return (None, True)
