@@ -80,3 +80,27 @@ class engine:
 
     def valid_lrc(self, lrc):
         return valid_lrc(lrc)
+        
+    def decompress(self, lyrics):
+        re_time = re.compile('\[\d+:\d+.*?\]')
+        re_meta = re.compile('\[[a-zA-Z]+:.*\]')
+        lrc = {}
+        meta = []
+        for line in lyrics:
+            if re_meta.search(line):
+                meta.append(line)
+                continue
+            tm = re_time.findall(line)
+            tx = re_time.sub('', line)
+            for t in tm:
+                lrc[t] = tx
+
+        lrc = sorted(lrc.items(), key=lambda d:d[0])
+        lyric = ''
+        for m in meta:
+            lyric += m + '\n'
+        lyric += '\n'
+        for l in lrc:
+            lyric += l[0] + l[1] + '\n'
+        
+        return lyric

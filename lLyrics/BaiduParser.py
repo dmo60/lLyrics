@@ -82,4 +82,6 @@ class Parser(engine.engine):
 #            print(encoding)
 #            lyrics = lyrics.decode(encoding, 'ignore')
 #            lyrics = lyrics.encode("utf-8", "replace")
-            return lyrics
+#            return lyrics
+            return self.decompress(lyrics.split('\n'))
+
