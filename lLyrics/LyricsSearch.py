@@ -81,7 +81,7 @@ class LyricsSearcher(object):
                                         + self.artist + ' lyrics'})
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s'\
                % query
-        for start in range(0, num_queries, 4):
+        for start in range(0, num_queries):
             request_url = '{0}&start={1}'.format(url, start)
             print(request_url)
             request = urllib.request.Request(request_url)
