@@ -15,7 +15,7 @@
 
 import urllib.request
 import urllib.parse
-from httplib2 import iri2uri # Special characters in url like ö
+from httplib2 import iri2uri # Japnese url
 import json
 import time
 import os
@@ -131,28 +131,18 @@ class LyricsSearcher(object):
         #lyrics = string.
         return lyrics
 
+    def as_site(self, dct):
+        if "sites" in dct.keys():
+            return dct
+        return Site(dct['name'], dct.get('start'),
+                    dct.get('end'), dct['id'], dct['tagNumber'])
+
     def read_filters(self):
         print('reading filters...')
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        xmlfile = os.path.join(BASE_DIR, 'sites.xml')
-        doc = parse(xmlfile)
-        self.sites = []
-        for item in doc.documentElement.getElementsByTagName("site"):
-            try:
-                site = Site()
-                site.name = item.getElementsByTagName("name")[0]\
-                                                .childNodes[0].nodeValue
-                site.start = item.getElementsByTagName("start")[0]\
-                                                .childNodes[0].nodeValue
-                site.end = item.getElementsByTagName("end")[0]\
-                                                .childNodes[0].nodeValue
-                site.Id = item.getElementsByTagName("id")[0]\
-                                                .childNodes[0].nodeValue
-                site.tagNumber = int(item.getElementsByTagName("tagNumber")[0]\
-                                                .childNodes[0].nodeValue)
-                self.sites.append(site)
-            except:
-                print('Error occured when reading xml file')
+        json_file = open(os.path.join(BASE_DIR, "sites.json"))
+        dct = json.load(json_file, object_hook = self.as_site)
+        self.sites = list(dct['sites'])
         print(self.sites)
 
     def get_lyrics(self, resp, site):

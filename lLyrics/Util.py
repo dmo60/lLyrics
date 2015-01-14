@@ -28,7 +28,7 @@ import urllib.parse
 from mutagenx.id3 import ID3, USLT, ID3NoHeaderError
 from mutagenx.oggvorbis import OggVorbis, OggVorbisHeaderError
 from mutagenx.mp4 import MP4
-
+from mutagenx.flac import FLAC
 
 try:
     import chardet
@@ -176,6 +176,15 @@ def get_lyrics_from_audio_tag(uri):
 
         print ("no lyrics comment field found")
         return ""
+    # FLAC file
+    if "flac" in mime:
+        try:
+            music = FLAC(uri)
+            if "lyrics" in music:
+                return music["lyrics"][0]
+        except Exception as e:
+            print(e)
+
     if "mp4" in mime:
         try:
             print('getting lyrics')
@@ -239,8 +248,18 @@ def write_lyrics_to_audio_tag(uri, lyrics, overwrite):
 
         comments["lyrics"] = lyrics
         comments.save()
+        print("Wrote lyrics to ogg vorbis file")
 
-        print ("wrote lyrics to vorbis comment")
+    if "flac" in mime:
+        try:
+            music = FLAC(uri)
+            music["lyrics"] = []
+            music["lyrics"] = lyrics
+            music.save()
+            print("Wrote lyrics to flac file")
+        except Exception as e:
+            print(e)
+
     if "mp4" in mime:
         try:
             music = MP4(uri)

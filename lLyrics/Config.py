@@ -21,6 +21,8 @@ from gi.repository import PeasGtk
 from gi.repository import Gtk
 from gi.repository import RB
 
+import lLyrics
+
 import gettext
 
 
@@ -230,10 +232,53 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
 
         page2.pack_start(vbox, False, False, 10)
 
+        page3 = Gtk.VBox()
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_shadow_type(Gtk.ShadowType.ETCHED_OUT)
+
+        store = Gtk.ListStore(str, str, str, str, int)
+        for site in lLyrics.searcher.get_sites():
+            store.append([site.name, site.start,
+                        site.end, site.Id, site.tagNumber])
+        tree = Gtk.TreeView(store)  
+        # tree.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
+        tree.set_rules_hint(True)
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Name", renderer, text=0)
+        tree.append_column(column)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Start", renderer, text=1)
+        tree.append_column(column)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("End", renderer, text=2)
+        tree.append_column(column)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Tag id", renderer, text=3)
+        tree.append_column(column)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Number", renderer, text=4)
+        tree.append_column(column)
+
+        scroll.add(tree)
+        vbox = Gtk.VBox()
+        vbox.pack_start(scroll, True, True, 0) 
+        hbox = Gtk.HBox()
+        button = Gtk.Button(_("Add source"))
+        hbox.pack_end(button, False, False, 0)
+
+        vbox.pack_start(hbox, False, False, 0)
+        
+        page3.pack_start(vbox, True, True, 0)
+
         # create a notebook as top level container
         nb = Gtk.Notebook()
         nb.append_page(page1, Gtk.Label(_("General")))
         nb.append_page(page2, Gtk.Label(_("Appearance")))
+        nb.append_page(page3, Gtk.Label(_("Sources")))
 
         nb.show_all()
         nb.set_size_request(300, -1)

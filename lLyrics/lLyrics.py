@@ -81,7 +81,7 @@ context_ui = """
 </ui>
 """
 
-
+searcher = LyricsSearcher()
 LYRICS_TITLE_STRIP = ["\(live[^\)]*\)",
                     "\(acoustic[^\)]*\)",
                     "\([^\)]*mix\)",
@@ -135,19 +135,15 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.edit_event = threading.Event()
         self.edit_event.set()
 
-        self.current_source = None
         self.tags = None
         self.current_tag = None
         self.showing_on_demand = False
         self.was_corrected = False
 
-        self.searcher = LyricsSearcher()
         self.location = None
         #for tests otherwise will be read from preferences
         self.overwrite = True
         self.cache = True
-        #will contains the sites that will not be search when again
-        self.sites = []
 
         # Search lyrics if already playing
         # (this will be the case if user reactivates plugin during playback)
@@ -229,7 +225,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     @staticmethod
     def get_sources(self):
         if self.sites is not None:
-            sites = self.searcher.get_sites()
+            sites = searcher.get_sites()
         else:
             return []
         sources = []
@@ -584,7 +580,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                              self.set_menu_sensitive, False)
         artist = self.artist
         title = self.title
-        lyrics = self.searcher.next_lyrics()
+        lyrics = searcher.next_lyrics()
         if title != self.title or self.artist != artist:
             return
         
@@ -635,7 +631,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                                             format(i, total, found_lyrics))
             self.window.set_text(title + " - " + artist)
             i = i + 1
-            lyrics = self.searcher.Search_lyrics(artist, title, location)
+            lyrics = searcher.Search_lyrics(artist, title, location)
             if lyrics != "":
                 found_lyrics += 1
                 self.write_lyrics_to_audio_tag(location, lyrics)
@@ -857,8 +853,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def _start_search_thread(self, location, artist, title):
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE,
                              self.set_menu_sensitive, False)
-
-        lyrics = self.searcher.Search_lyrics(artist, title,
+        lyrics = searcher.Search_lyrics(artist, title,
                                                 location)
         # We can't display new lyrics while user is editing!
         self.edit_event.wait()
