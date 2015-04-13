@@ -7,7 +7,7 @@ It is intended as a replacement of the built-in lyrics plugin of Rhythmbox with 
 
 
 
-![Screenshot](http://www.dmo60.de/lLyricsScreenshot.png)
+![Screenshot](img/screenshot-small.png)
 
 
 
@@ -27,7 +27,7 @@ Lyrics sources
   - Chartlyrics.com
   - Leoslyrics.com
   - Lyrdb.com
-  
+
 It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has some bugs and may cause instabilities.
 
 
@@ -62,11 +62,11 @@ Archlinux user can install the plugin via [this AUR package by Bersam](https://a
 #### Manual installation ####
 
 	1.) Press the "Download ZIP" button and extract the .zip file.
-	
+
 	2.) Change to the extracted folder and open a terminal.
-	
+
 	3.) Run `make install`.
-	
+
 	4.) Enable the plugin in Rhythmbox.
 
 This will install the plugin for the current user only. If you want to install it systemwide for all users, run `make install-systemwide` in step 3.
