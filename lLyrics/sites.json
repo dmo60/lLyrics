@@ -1,0 +1,149 @@
+{
+    "sites": [
+        {
+            "name": "MetroLyrics",
+            "id": "div#lyrics-body-text",
+            "tagNumber": 0
+        },
+        {
+            "name": "AZLyrics",
+            "id": "div",
+            "tagNumber": 6
+        },
+        {
+            "name": "LyricsMode.com",
+            "id": "p#lyrics_text",
+            "tagNumber": 0
+        },
+        {
+            "name": "SongMeanings.com",
+            "id": "div#textblock",
+            "tagNumber": 0
+        },
+        {
+            "name": "SongLyrics.com",
+            "id": "p#songLyricsDiv",
+            "tagNumber": 0
+        },
+        {
+            "name": "az-lyrics.us",
+            "id": "div.song_text",
+            "tagNumber": 0
+        },
+        {
+            "name": "genius.com",
+            "id": "div.lyrics",
+            "tagNumber": 0
+        },
+        {
+            "name": "oldielyrics.com",
+            "id": "div.lyrics",
+            "tagNumber": 0
+        },
+        {
+            "name": "LyricsMania.com",
+            "id": "div.lyrics-body",
+            "tagNumber": 0
+        },
+        {
+            "name": "directlyrics.com",
+            "id": "div.2d18042a.lyrics",
+            "tagNumber": 0
+        },
+        {
+            "name": "lyricsfreak.com",
+            "id": "div#content_h",
+            "tagNumber": 0
+        },
+        {
+            "name": "mp3lyrics.org",
+            "id": "div#lyrics_text",
+            "tagNumber": 0
+        },
+        {
+            "name": "sweetslyrics.com",
+            "id": "div",
+            "tagNumber": 20
+        },
+        {
+            "name": "elyricsworld.ee",
+            "id": "div#lyric_itself",
+            "tagNumber": 0
+        },
+        {
+            "name": "unpopularlyrics.com",
+            "id": "div#notepad",
+            "tagNumber": 0
+        },
+        {
+            "name": "liriklagumu.com",
+            "id": "div.entry-content",
+            "tagNumber": 0
+        },
+        {
+            "name": "les-paroles-de-chansons.com",
+            "id": "div.well",
+            "tagNumber": 1
+        },
+        {
+            "name": "musixmatch.com",
+            "id": "div#lyrics",
+            "tagNumber": 0
+        },
+        {
+            "name": "absolutelyrics.com",
+            "id": "p#view_lyrics",
+            "tagNumber": 0
+        },
+        {
+            "name": "musica.com",
+            "id": "p",
+            "tagNumber": 0
+        },
+        {
+            "name": "lyricstranslate.com",
+            "id": "div.song-node-text",
+            "tagNumber": 0
+        },
+        {
+            "name": "tekstowo.pl",
+            "id": "div.song-text",
+            "tagNumber": 0
+        },
+        {
+            "name": "anime-lyrics.ru",
+            "id": "td",
+            "tagNumber": 7
+        },
+        {
+            "name": "nautiljon.com",
+            "id": "td",
+            "tagNumber": 3
+        },
+        {
+            "name": "violetlyrics.com",
+            "id": "div.post-body.entry-content",
+            "tagNumber": 0
+        },
+        {
+            "name": "lyrics.astraweb.com",
+            "id": "font",
+            "tagNumber": 2
+        },
+        {
+            "name": "allmusic.com",
+            "id": "p#hidden_without_js",
+            "tagNumber": 0
+        },
+        {
+            "name": "tunewiki.com",
+            "id": "ul.lyric-lines",
+            "tagNumber": 0
+        },
+        {
+            "name": "sing365.com",
+            "id": "div.content_1",
+            "tagNumber": 0
+        }
+    ]
+}
