@@ -88,17 +88,28 @@ def time_to_seconds(time):
 
 
 def bytes_to_string(data):
+    encoding = 'utf-8'
     try:
-        encoding = chardet.detect(data)['encoding']
-    except:
-        print("could not detect bytes encoding, assume utf-8")
-        encoding = 'utf-8'
-    try:
-        string = data.decode(encoding, 'replace')
+        partialString = data.decode(encoding, 'replace')
+        try:
+            charSetRegex = re.compile("charset=\"?([a-zA-Z0-9\\-]*)\"?")
+            results = charSetRegex.search(partialString)
+            if(results != None):
+                encoding = results.group(1)
+                string = data.decode(encoding, 'replace')
+            else:
+                string = partialString
+        except:
+            print("Fail trying to get declared bytes encoding (charset) using regular expression")
+            try:
+                encoding = chardet.detect(data)['encoding']
+                string = data.decode(encoding, 'replace')
+            except:
+                print("could not detect bytes encoding, assume utf-8")
+                string = partialString
     except:
         print("failed to decode bytes to string")
         return ""
-    
     return string
 
 
