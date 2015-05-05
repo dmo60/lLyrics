@@ -92,11 +92,11 @@ def bytes_to_string(data):
     try:
         partialString = data.decode(encoding, 'replace')
         try:
-            charSetRegex = re.compile("charset=\"?([a-zA-Z0-9\\-]*)\"?")
-            results = charSetRegex.search(partialString)
+            bytes_to_string.charSetRegex = re.compile("charset=\"?([a-zA-Z0-9\\-]*)\"?")
+            results = bytes_to_string.charSetRegex.search(partialString)
             if(results != None):
                 encoding = results.group(1)
-                string = data.decode(encoding, 'replace')
+                string = data.decode(encoding)
             else:
                 string = partialString
         except:
