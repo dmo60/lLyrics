@@ -561,11 +561,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
 
     def build_cache_path(self, artist, title):
-        artist_folder = os.path.join(self.lyrics_folder, artist[:128])
-        if not os.path.exists (artist_folder):
-            os.mkdir (artist_folder)
+#        artist_folder = os.path.join(self.lyrics_folder, artist[:128])
+#        if not os.path.exists (artist_folder):
+#            os.mkdir (artist_folder)
 
-        return os.path.join(artist_folder, title[:128] + '.lyric')
+#        return os.path.join(artist_folder, title[:128] + '.lyric')
+
+        return os.path.join(self.lyrics_folder, artist + '-' + title[:128] + '.lrc')
 
 
 
