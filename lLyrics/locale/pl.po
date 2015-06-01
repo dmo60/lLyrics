@@ -1,0 +1,174 @@
+# German translations for PACKAGE package.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Rafał Łasocha <me@swistak35.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-06-01 17:09+0200\n"
+"PO-Revision-Date: 2015-06-01 17:09+0200\n"
+"Last-Translator: Rafał Łasocha <me@swistak35.com>\n"
+"Language-Team: Polish\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: ../lLyrics.py:277 ../lLyrics.py:296
+msgid "Lyrics"
+msgstr "Treść utworu"
+
+#: ../lLyrics.py:278
+msgid "Display lyrics for the current playing song"
+msgstr ""
+
+#: ../lLyrics.py:282
+msgid "Show lyrics"
+msgstr "Wyświetl treśc tego utworu"
+
+#: ../lLyrics.py:283
+msgid "Search and display lyrics for this song"
+msgstr ""
+
+#. create save and cancel buttons for edited lyrics
+#: ../lLyrics.py:344
+msgid "Save"
+msgstr "Zapisz"
+
+#: ../lLyrics.py:346
+msgid "Cancel"
+msgstr "Anuluj"
+
+#. button for closing on demand lyrics
+#: ../lLyrics.py:353
+msgid "Back to playing song"
+msgstr "Wróć do aktualnie odtwarzanego utworu"
+
+#: ../lLyrics.py:389 ../lLyrics.py:432
+msgid "External"
+msgstr "Zewnętrzne źródła"
+
+#: ../lLyrics.py:391 ../lLyrics.py:434 ../lLyrics.py:926
+msgid "From cache file"
+msgstr ""
+
+#: ../lLyrics.py:395 ../Config.py:314
+msgid "Sources"
+msgstr "Źródła"
+
+#: ../lLyrics.py:399
+msgid "Scan next source"
+msgstr "Sprawdź następne źródło"
+
+#: ../lLyrics.py:400
+msgid "Scan all sources"
+msgstr "Sprawdź wszystkie źródła"
+
+#: ../lLyrics.py:402
+msgid "Search online"
+msgstr "Wyszukaj online"
+
+#: ../lLyrics.py:404
+msgid "Mark as instrumental"
+msgstr "Oznacz jako utwór instrumentalny"
+
+#: ../lLyrics.py:406
+msgid "Clear lyrics"
+msgstr "Wyczyść treść"
+
+#: ../lLyrics.py:407
+msgid "Edit lyrics"
+msgstr "Edytuj tekst"
+
+#: ../lLyrics.py:411
+msgid "Preferences"
+msgstr "Ustawienia"
+
+#: ../lLyrics.py:664
+msgid "lLyrics Preferences"
+msgstr "Ustawienia"
+
+#: ../lLyrics.py:724 ../lLyrics.py:749 ../lLyrics.py:785 ../lLyrics.py:813
+msgid "searching lyrics..."
+msgstr "Wyszukiwanie tekstu utworu"
+
+#: ../lLyrics.py:932
+msgid "No lyrics found"
+msgstr "Nie znaleziono treści utworu"
+
+#: ../Config.py:148
+msgid "Show sidebar on first playback"
+msgstr "Wyświetl panel przy odtwarzaniu muzyki"
+
+#: ../Config.py:161
+msgid "Save lyrics "
+msgstr "Przechowuj teksty utworów"
+
+#: ../Config.py:164
+msgid ""
+"Whether to automatically save retrieved lyrics in the folder specified below"
+msgstr ""
+"Zapisywanie pobranych tekstów w poniższym folderze aby mieć do nich dostęp szybciej i bez połączenia z internetem"
+
+#: ../Config.py:184
+msgid "default"
+msgstr ""
+
+#: ../Config.py:187
+msgid "Folder for lyrics"
+msgstr "Katalog dla tekstów"
+
+#: ../Config.py:201
+msgid "Always ignore parentheses in song title"
+msgstr "Zawsze ignoruj nawiasy w tytułach utworów"
+
+#: ../Config.py:204
+msgid ""
+"When turned off, only parentheses containing specific strings (e.g. 'remix', "
+"'live', 'edit', etc) are filtered"
+msgstr ""
+"Kiedy wyłączone, tylko nawiasy zawierające konkretne słowa (np. 'remix', "
+"'live', 'edit' itp.) są filtrowane"
+
+#. check buttons for lyric sources
+#: ../Config.py:223
+msgid "Sources:"
+msgstr "Lista źródeł:"
+
+#: ../Config.py:254
+msgid ""
+"Warning: 'External' calls the Rhythmbox built-in lyrics plugin. It can not "
+"be guaranteed that the provided engines work properly. If you experience any "
+"problems, deactivate this option."
+msgstr ""
+"Uwaga: 'Zewnętrzne źródła' korzysta z wbudowanej wtyczki Rhythmboxa. Nie "
+"można zagwarantować, że wbudowane mechanizmy będą działały prawidłowo. Jeśli doświadczas jakichkolwiek "
+"problemów, spróbuj wyłączyć tę opcję."
+
+#: ../Config.py:279
+msgid "Hide sidebar label"
+msgstr "Ukryj nagłówek panelu"
+
+#: ../Config.py:293
+msgid "Show lyrics in left sidebar instead of right one"
+msgstr "Pokazuj treść utworu w lewym panelu, a nie w prawym"
+
+#: ../Config.py:296
+msgid ""
+"You have to disable and re-enable this plugin or restart Rhythmbox to apply "
+"changes here"
+msgstr ""
+"Musisz wyłączyć i jeszcze raz włączyć tę wtyczkę albo ponownie uruchomić Rhythmboxa żeby zmiany "
+"odniosły efekt"
+
+#: ../Config.py:313
+msgid "General"
+msgstr "Ogólne"
+
+#: ../Config.py:315
+msgid "Appearance"
+msgstr "Wygląd"
