@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 18:45+0200\n"
+"POT-Creation-Date: 2015-06-01 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,81 +17,81 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lLyrics.py:276 ../lLyrics.py:295
+#: ../lLyrics.py:277 ../lLyrics.py:296
 msgid "Lyrics"
 msgstr ""
 
-#: ../lLyrics.py:277
+#: ../lLyrics.py:278
 msgid "Display lyrics for the current playing song"
 msgstr ""
 
-#: ../lLyrics.py:281
+#: ../lLyrics.py:282
 msgid "Show lyrics"
 msgstr ""
 
-#: ../lLyrics.py:282
+#: ../lLyrics.py:283
 msgid "Search and display lyrics for this song"
 msgstr ""
 
 #. create save and cancel buttons for edited lyrics
-#: ../lLyrics.py:343
+#: ../lLyrics.py:344
 msgid "Save"
 msgstr ""
 
-#: ../lLyrics.py:345
+#: ../lLyrics.py:346
 msgid "Cancel"
 msgstr ""
 
 #. button for closing on demand lyrics
-#: ../lLyrics.py:352
+#: ../lLyrics.py:353
 msgid "Back to playing song"
 msgstr ""
 
-#: ../lLyrics.py:388 ../lLyrics.py:431
+#: ../lLyrics.py:389 ../lLyrics.py:432
 msgid "External"
 msgstr ""
 
-#: ../lLyrics.py:390 ../lLyrics.py:433 ../lLyrics.py:882
+#: ../lLyrics.py:391 ../lLyrics.py:434 ../lLyrics.py:926
 msgid "From cache file"
 msgstr ""
 
-#: ../lLyrics.py:394 ../Config.py:314
+#: ../lLyrics.py:395 ../Config.py:314
 msgid "Sources"
 msgstr ""
 
-#: ../lLyrics.py:398
+#: ../lLyrics.py:399
 msgid "Scan next source"
 msgstr ""
 
-#: ../lLyrics.py:399
+#: ../lLyrics.py:400
 msgid "Scan all sources"
 msgstr ""
 
-#: ../lLyrics.py:401
+#: ../lLyrics.py:402
 msgid "Search online"
 msgstr ""
 
-#: ../lLyrics.py:403
+#: ../lLyrics.py:404
 msgid "Mark as instrumental"
 msgstr ""
 
-#: ../lLyrics.py:405
+#: ../lLyrics.py:406
 msgid "Clear lyrics"
 msgstr ""
 
-#: ../lLyrics.py:406
+#: ../lLyrics.py:407
 msgid "Edit lyrics"
 msgstr ""
 
-#: ../lLyrics.py:410
+#: ../lLyrics.py:411
 msgid "Preferences"
 msgstr ""
 
-#: ../lLyrics.py:671
+#: ../lLyrics.py:664
 msgid "lLyrics Preferences"
 msgstr ""
 
-#: ../lLyrics.py:731 ../lLyrics.py:756 ../lLyrics.py:788 ../lLyrics.py:818
+#: ../lLyrics.py:724 ../lLyrics.py:749 ../lLyrics.py:785 ../lLyrics.py:813
 msgid "searching lyrics..."
 msgstr ""
 
