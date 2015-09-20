@@ -17,10 +17,12 @@ class Parser:
   def parse(self):
     ret = self.read(self.api())
     lrc = self.load(ret) if self.verify(ret) else ''
-    if self.isNoArtistAllowed and (not lrc) and self.artist:
+    if lrc:
+      return lrc
+    if self.isNoArtistAllowed and self.artist:
       self.artist = ''
       return self.parse()
-    return lrc
+    return ''
 
   # To support self.api.
   def quote(self, *args):
