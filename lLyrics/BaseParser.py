@@ -34,10 +34,13 @@ class Parser:
       return None
     return Util.bytes_to_string(raw)
 
+  def fetchJson(self, url):
+    raw = self.fetch(url)
+    return None if raw is None else json.loads(raw)
+
   # Fetch text from `self.api` for `self.load`, parse it as JSON if `self.isJson`.
   def read(self, url):
-    raw = self.fetch(url)
-    return None if raw is None else (json.loads(raw) if self.isJson else raw)
+    return self.fetchJson(url) if self.isJson else self.fetch(url)
 
   # Get the real lyric from verified `self.read(self.api())`.
   def load(self, ret):
