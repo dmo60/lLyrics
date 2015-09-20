@@ -45,7 +45,7 @@ class Parser:
   # Get the real lyric from verified `self.read(self.api())`.
   def load(self, ret):
     raw = self.resolve(ret)
-    return (raw if self.isSimple else self.fetch(raw)) or ''
+    return (raw if self.isSimple else self.dealResolved(raw)) or ''
 
   #####################################################################
   # A child class MAY overwrite the functions below.
@@ -55,10 +55,13 @@ class Parser:
     return not not ret
 
   # If `self.isSimple`, this should return the real lyric.
-  # Otherwise, a url for the lyric should be returned.
+  # Otherwise, the return value will be processed again by `self.dealResolved`.
   # See also `self.load`.
   def resolve(self, ret):
     return ret
+
+  def dealResolved(self, raw):
+    return self.fetch(raw)
 
   #####################################################################
   # A child class MUST overwrite the functions below.
