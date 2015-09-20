@@ -7,6 +7,7 @@ class Parser:
   source = 'unknown source'
   isJson = True       # See `self.read`
   isSimple = False    # See `self.resolve`
+  isNoArtistAllowed = True  # If set true, continue to search the song itself without its artist.
 
   def __init__(self, artist, title):
     self.artist = artist
@@ -15,7 +16,11 @@ class Parser:
 
   def parse(self):
     ret = self.read(self.api())
-    return self.load(ret) if self.verify(ret) else ''
+    lrc = self.load(ret) if self.verify(ret) else ''
+    if self.isNoArtistAllowed and (not lrc) and self.artist:
+      self.artist = ''
+      return self.parse()
+    return lrc
 
   # To support self.api.
   def quote(self, *args):
