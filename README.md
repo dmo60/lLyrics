@@ -27,6 +27,7 @@ Lyrics sources
   - Chartlyrics.com
   - Leoslyrics.com
   - Lyrdb.com
+  - GeCi.me
 
 It is also possible to retrieve lyrics from the built-in Rhythmbox lyrics plugin, but this is not recommended since it has some bugs and may cause instabilities.
 
