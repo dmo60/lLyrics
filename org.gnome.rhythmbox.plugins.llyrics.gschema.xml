@@ -3,15 +3,15 @@
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
 		<key name="active-sources" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com', 'GeCi.me', 'MP3.Baidu.com']</default>
 			<summary>List of lyrics sources to be scanned</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'Rapgenius.com', 'GeCi.me', 'MP3.Baidu.com', 'External'</description>
 		</key>
 		
 		<key name="scanning-order" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'External']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'GeCi.me', 'MP3.Baidu.com', 'External']</default>
 			<summary>Sources are scanned in this order</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'External'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsnmusic.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Rapgenius.com', 'Darklyrics.com', 'Chartlyrics.com', 'Leoslyrics.com', 'Lyrdb.com', 'GeCi.me', 'MP3.Baidu.com', 'External'</description>
 		</key>
 		
 		<key name="show-first" type="b">

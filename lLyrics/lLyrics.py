@@ -41,6 +41,8 @@ import DarklyricsParser
 import RapgeniusParser
 import LyricsNMusicParser
 import VagalumeParser
+import GeCiMeParser
+import BaiduMusicParser
 import External
 import Util
 
@@ -99,7 +101,7 @@ LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
 LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsnmusic.com", "Lyricsmania.com", 
-               "Vagalume.com.br", "Rapgenius.com", "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "External"]
+               "Vagalume.com.br", "Rapgenius.com", "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "GeCi.me", "MP3.Baidu.com", "External"]
 
 
 
@@ -129,6 +131,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                          "Lyrdb.com": LyrdbParser, "Leoslyrics.com": LeoslyricsParser, 
                          "Darklyrics.com": DarklyricsParser, "Rapgenius.com": RapgeniusParser, 
                          "Lyricsnmusic.com": LyricsNMusicParser, "Vagalume.com.br": VagalumeParser,
+                         "GeCi.me": GeCiMeParser, "MP3.Baidu.com": BaiduMusicParser,
                          "External": External})
         self.add_builtin_lyrics_sources()
         
