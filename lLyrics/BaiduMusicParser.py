@@ -26,4 +26,6 @@ class Parser(BaseParser.Parser):
       lrcLink = song['data']['songList'][0]['lrcLink']
     except:
       return ''
+    if not lrcLink or not lrcLink.replace(' ', ''):
+      return ''
     return self.fetch('http://music.baidu.com' + lrcLink) or ''
