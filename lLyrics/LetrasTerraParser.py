@@ -15,8 +15,7 @@
 
 import urllib.request, urllib.parse
 import string
-
-from html.parser import HTMLParser
+import html
 
 import Util
 
@@ -54,28 +53,27 @@ class Parser(object):
         
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<p>")
+        start = resp.find("<p><p>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+3):]
-        end = resp.find("<div id=")
+        resp = resp[(start+6):]
+        end = resp.find("</p></p>")
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:(end)]
+        resp = resp[:end]
         
         # replace unwanted parts
-        resp = resp.replace("<br/>", "")
-        resp = resp.replace("</p>", "")
-        resp = resp.replace("<p>", "\n")
-        
-        resp = HTMLParser().unescape(resp)
+        resp = resp.replace("<br/>", "\n")
+        resp = resp.replace("</p><p>", "\n\n")
+
+        resp = html.unescape(resp)
                 
         return resp
     
     def verify(self, resp):
-        # verify song artitst/title
+        # verify song artist/title
         title = resp
         start = title.find("<h1>")
         if start == -1:
@@ -93,7 +91,7 @@ class Parser(object):
         if end == -1:
             print("no title end found")
             return False
-        title = HTMLParser().unescape(title[:end]).lower()
+        title = html.unescape(title[:end]).lower()
         
         artist = resp
         start = artist.find("<h2>")
@@ -112,7 +110,7 @@ class Parser(object):
         if end == -1:
             print("no artist end found")
             return False
-        artist = HTMLParser().unescape(artist[:end]).lower()
+        artist = html.unescape(artist[:end]).lower()
         
         if self.artist != artist or self.title != title:
             print("wrong artist/title! " + artist + " - " + title)
