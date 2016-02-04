@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-31 18:45+0200\n"
+"POT-Creation-Date: 2016-02-04 16:47+0100\n"
 "PO-Revision-Date: 2012-08-05 12:01+0200\n"
 "Last-Translator: Timo Loewe <timoloewe91@gmail.com>\n"
 "Language-Team: German\n"
@@ -17,115 +17,111 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lLyrics.py:276 ../lLyrics.py:295
+#: ../lLyrics.py:256 ../lLyrics.py:275
 msgid "Lyrics"
 msgstr "Liedtexte"
 
-#: ../lLyrics.py:277
+#: ../lLyrics.py:259
 msgid "Display lyrics for the current playing song"
 msgstr "Zeige Liedtext für den gerade gespielten Titel"
 
-#: ../lLyrics.py:281
+#: ../lLyrics.py:263
 msgid "Show lyrics"
 msgstr "Liedtext anzeigen"
 
-#: ../lLyrics.py:282
+#: ../lLyrics.py:264
 msgid "Search and display lyrics for this song"
 msgstr "Suche und zeige Liedtext für diesen Titel"
 
 #. create save and cancel buttons for edited lyrics
-#: ../lLyrics.py:343
+#: ../lLyrics.py:323
 msgid "Save"
 msgstr "Speichern"
 
-#: ../lLyrics.py:345
+#: ../lLyrics.py:325
 msgid "Cancel"
 msgstr "Abbrechen"
 
 #. button for closing on demand lyrics
-#: ../lLyrics.py:352
+#: ../lLyrics.py:332
 msgid "Back to playing song"
 msgstr "Zurück zum aktuellen Titel"
 
-#: ../lLyrics.py:388 ../lLyrics.py:431
-msgid "External"
-msgstr "Extern"
-
-#: ../lLyrics.py:390 ../lLyrics.py:433 ../lLyrics.py:882
+#: ../lLyrics.py:366 ../lLyrics.py:404 ../lLyrics.py:839
 msgid "From cache file"
 msgstr "Aus Cache Datei"
 
-#: ../lLyrics.py:394 ../Config.py:314
+#: ../lLyrics.py:371 ../Config.py:302
 msgid "Sources"
 msgstr "Quellen"
 
-#: ../lLyrics.py:398
+#: ../lLyrics.py:375
 msgid "Scan next source"
 msgstr "Durchsuche nächste Quelle"
 
-#: ../lLyrics.py:399
+#: ../lLyrics.py:376
 msgid "Scan all sources"
 msgstr "Durchsuche alle Quellen"
 
-#: ../lLyrics.py:401
+#: ../lLyrics.py:378
 msgid "Search online"
 msgstr "Online suchen"
 
-#: ../lLyrics.py:403
+#: ../lLyrics.py:380
 msgid "Mark as instrumental"
 msgstr "Als instrumental markieren"
 
-#: ../lLyrics.py:405
+#: ../lLyrics.py:382
 msgid "Clear lyrics"
 msgstr "Liedtext löschen"
 
-#: ../lLyrics.py:406
+#: ../lLyrics.py:383
 msgid "Edit lyrics"
 msgstr "Liedtext bearbeiten"
 
-#: ../lLyrics.py:410
+#: ../lLyrics.py:387
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: ../lLyrics.py:671
+#: ../lLyrics.py:603
 msgid "lLyrics Preferences"
 msgstr "lLyrics Einstellungen"
 
-#: ../lLyrics.py:731 ../lLyrics.py:756 ../lLyrics.py:788 ../lLyrics.py:818
+#: ../lLyrics.py:660 ../lLyrics.py:683 ../lLyrics.py:713 ../lLyrics.py:737
 msgid "searching lyrics..."
 msgstr "suche Liedtexte..."
 
-#: ../lLyrics.py:932
+#: ../lLyrics.py:845
 msgid "No lyrics found"
 msgstr "Keine Liedtexte gefunden"
 
-#: ../Config.py:148
+#: ../Config.py:146
 msgid "Show sidebar on first playback"
 msgstr "Seitenleiste bei Wiedergabestart einblenden"
 
-#: ../Config.py:161
+#: ../Config.py:159
 msgid "Save lyrics "
 msgstr "Liedtexte speichern"
 
-#: ../Config.py:164
+#: ../Config.py:163
 msgid ""
 "Whether to automatically save retrieved lyrics in the folder specified below"
 msgstr ""
 "Speichert gefundene Liedtexte automatisch im nachfolgend ausgewählten Ordner"
 
-#: ../Config.py:184
+#: ../Config.py:183
 msgid "default"
 msgstr "Standardeinstellung"
 
-#: ../Config.py:187
+#: ../Config.py:186
 msgid "Folder for lyrics"
 msgstr "Ordner für Liedtexte"
 
-#: ../Config.py:201
+#: ../Config.py:200
 msgid "Always ignore parentheses in song title"
 msgstr "Klammern im Songtitel immer ignorieren"
 
-#: ../Config.py:204
+#: ../Config.py:203
 msgid ""
 "When turned off, only parentheses containing specific strings (e.g. 'remix', "
 "'live', 'edit', etc) are filtered"
@@ -134,29 +130,19 @@ msgstr ""
 "'remix', 'live', 'edit', etc) gefiltert"
 
 #. check buttons for lyric sources
-#: ../Config.py:223
+#: ../Config.py:222
 msgid "Sources:"
 msgstr "Quellen:"
 
-#: ../Config.py:254
-msgid ""
-"Warning: 'External' calls the Rhythmbox built-in lyrics plugin. It can not "
-"be guaranteed that the provided engines work properly. If you experience any "
-"problems, deactivate this option."
-msgstr ""
-"Warnung: 'Extern' nutzt das Rhythmbox-interne Liedtexte Plugin. Es kann "
-"nicht garantiert werden, dass dieses korrekt funktioniert. Falls Probleme "
-"auftreten, deaktivieren Sie diese Option."
-
-#: ../Config.py:279
+#: ../Config.py:267
 msgid "Hide sidebar label"
 msgstr "Verstecke die Überschrift der Seitenleiste"
 
-#: ../Config.py:293
+#: ../Config.py:281
 msgid "Show lyrics in left sidebar instead of right one"
 msgstr "Zeige Liedtexte in der linken statt der rechten Seitenleiste"
 
-#: ../Config.py:296
+#: ../Config.py:284
 msgid ""
 "You have to disable and re-enable this plugin or restart Rhythmbox to apply "
 "changes here"
@@ -164,10 +150,10 @@ msgstr ""
 "Zum Anwenden der Änderung muss das Plugin de- und reaktiviert oder Rhythmbox "
 "neu gestartet werden"
 
-#: ../Config.py:313
+#: ../Config.py:301
 msgid "General"
 msgstr "Allgemein"
 
-#: ../Config.py:315
+#: ../Config.py:303
 msgid "Appearance"
 msgstr "Erscheinungsbild"

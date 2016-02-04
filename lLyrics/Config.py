@@ -249,20 +249,9 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
 
             vbox.pack_start(hbox, False, False, 0)
 
-        warn = Gtk.Label("<i>" +
-                         _("Warning: 'External' calls the Rhythmbox built-in lyrics plugin. "
-                           "It can not be guaranteed that the provided engines work properly. "
-                           "If you experience any problems, deactivate this option.")
-                         + "</i>")
-        warn.set_alignment(0, 0)
-        warn.set_margin_left(15)
-        warn.set_line_wrap(True)
-        warn.set_use_markup(True)
-
         vbox2 = Gtk.VBox()
         vbox2.pack_start(label, False, False, 0)
         vbox2.pack_start(vbox, False, False, 0)
-        vbox2.pack_start(warn, False, False, 0)
 
         page2.pack_start(vbox2, False, False, 10)
 
