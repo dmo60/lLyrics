@@ -26,7 +26,8 @@ class Parser(object):
         self.title = title
         self.lyrics = ""
         
-    def parse(self):        
+    def parse(self):
+        self.artist = self.artist.replace("+", "and")
         artist = urllib.parse.quote(self.artist)
         title = urllib.parse.quote(self.title)
         join = urllib.parse.quote(' - ')

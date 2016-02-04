@@ -23,8 +23,6 @@ API_KEY = "5ad5728ee39ebc05de6b8a7a154202"
 
 class Parser(object):
 
-    HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0', 'Accept': '*/*'}
-    
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
@@ -40,7 +38,7 @@ class Parser(object):
               + "&track=" + clean_title.replace(" ", "+")
         print("call lyricsnmusic API: " + url)
         try:
-            resp = urllib.request.urlopen(urllib.request.Request(url, headers=self.HEADER), None, 3).read()
+            resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
         except:
             print("could not connect to lyricsnmusic.com API")
             return ""
@@ -63,7 +61,7 @@ class Parser(object):
         
         # open lyrics-URL
         try:
-            resp = urllib.request.urlopen(urllib.request.Request(lyrics_url, headers=self.HEADER), None, 3).read()
+            resp = urllib.request.urlopen(Util.add_request_header(lyrics_url), None, 3).read()
         except:
             print("could not open lyricsnmusic.com lyrics url")
             return ""

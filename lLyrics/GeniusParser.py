@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Parser for Rapgenius.com
+# Parser for Genius.com
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
@@ -30,16 +30,17 @@ class Parser(object):
 
     def parse(self):
         # remove punctuation from artist/title
+        self.artist = self.artist.replace("+", "and")
         clean_artist = Util.remove_punctuation(self.artist)
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://rapgenius.com/" + clean_artist.replace(" ", "-") + "-" +clean_title.replace(" ", "-") + "-lyrics"
+        url = "http://genius.com/" + clean_artist.replace(" ", "-") + "-" +clean_title.replace(" ", "-") + "-lyrics"
         print("rapgenius Url " + url)
         try:
-            resp = urllib.request.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
         except:
-            print("could not connect to rapgenius.com")
+            print("could not connect to genius.com")
             return ""
         
         resp = Util.bytes_to_string(resp)
@@ -51,20 +52,20 @@ class Parser(object):
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<div class=\"lyrics\"")
+        start = resp.find("<lyrics class=\"lyrics\"")
         if start == -1:
             print("lyrics start not found")
             return ""
         resp = resp[start:]
-        end = resp.find("</div>")
+        end = resp.find("</lyrics>")
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:(end)]
+        resp = resp[:end]
 
         # replace unwanted parts
-        resp = re.sub("<div[^>]*>","",resp)
-        resp = re.sub("<a[^>]*>","",resp)
+        resp = re.sub("<lyrics[^>]*>", "", resp)
+        resp = re.sub("<a[^>]*>", "", resp)
         resp = resp.replace("</a>", "")
         resp = resp.replace("<br>", "")
         resp = resp.replace("<br />", "")

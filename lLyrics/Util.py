@@ -34,6 +34,7 @@ except:
 
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
+HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0', 'Accept': '*/*'}
 
 def decode_chars(resp):
     chars = resp.split(";")
@@ -52,6 +53,11 @@ def remove_punctuation(data):
         data = data.replace(c, "")
     
     return data
+
+
+
+def add_request_header(url):
+    return urllib.request.Request(url, headers=HEADER)
 
 
 

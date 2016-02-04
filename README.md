@@ -22,7 +22,7 @@ Lyrics sources
   - AZLyrics.com
   - Lyricsnmusic.com
   - Lyricsmania.com
-  - Rapgenius.com
+  - Genius.com
   - Darklyrics.com
   - Chartlyrics.com
   - Leoslyrics.com

@@ -27,7 +27,7 @@ class Parser(object):
         
     def parse(self):
         # remove unwanted characters from artist and title strings
-        clean_artist = self.artist
+        clean_artist = self.artist.replace("+", "and")
         clean_artist = Util.remove_punctuation(clean_artist)
         clean_artist = clean_artist.replace(" ", "_")
         
