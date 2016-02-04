@@ -21,7 +21,9 @@ import Util
 
 API_KEY = "5ad5728ee39ebc05de6b8a7a154202"
 
-class Parser():
+class Parser(object):
+
+    HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0', 'Accept': '*/*'}
     
     def __init__(self, artist, title):
         self.artist = artist
@@ -34,10 +36,11 @@ class Parser():
         clean_title = Util.remove_punctuation(self.title)
         
         # API request
-        url = "http://api.lyricsnmusic.com/songs?api_key=" + API_KEY + "&artist=" + clean_artist.replace(" ", "+") + "&track=" + clean_title.replace(" ", "+")
+        url = "http://api.lyricsnmusic.com/songs?api_key=" + API_KEY + "&artist=" + clean_artist.replace(" ", "+") \
+              + "&track=" + clean_title.replace(" ", "+")
         print("call lyricsnmusic API: " + url)
         try:
-            resp = urllib.request.urlopen(url, None, 3).read()
+            resp = urllib.request.urlopen(urllib.request.Request(url, headers=self.HEADER), None, 3).read()
         except:
             print("could not connect to lyricsnmusic.com API")
             return ""
@@ -60,9 +63,9 @@ class Parser():
         
         # open lyrics-URL
         try:
-            resp = urllib.request.urlopen(lyrics_url, None, 3).read()
+            resp = urllib.request.urlopen(urllib.request.Request(lyrics_url, headers=self.HEADER), None, 3).read()
         except:
-            print("could not open lyricwiki url")
+            print("could not open lyricsnmusic.com lyrics url")
             return ""
         
         resp = Util.bytes_to_string(resp)
@@ -82,7 +85,7 @@ class Parser():
         if end == -1:
             print("lyrics end not found")
             return ""
-        resp = resp[:(end)]
+        resp = resp[:end]
         
         return resp
     
