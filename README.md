@@ -36,9 +36,9 @@ Requirements
 
 The 'master' branch supports Rhythmbox 3.0 and above. **It is incompatible with older Rhythmbox 2.xx versions!**
 
-To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will quite certainly not be updated or developed any further.
+To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will not be updated or developed any further.
 
-To install lLyrics from source you will need the package gettext.
+To install lLyrics from source you will need the package `gettext`.
 
 #### Dependencies ####
 
@@ -67,8 +67,9 @@ Archlinux user can install the plugin via [this AUR package by Bersam](https://a
 	
 	4.) Enable the plugin in Rhythmbox.
 
-This will install the plugin for the current user only. If you want to install it systemwide for all users, run `make install-systemwide` in step 3.
 It will ask for your sudo password, but don't worry, it is only required to install the schema file that is needed to save your preferences.
+
+If you want to install the plugin systemwide for all users, run `make install-systemwide` in step 3.
 
 To uninstall, run `make uninstall`.
 
