@@ -30,7 +30,7 @@ class Parser(object):
         clean_artist = self.artist
         if clean_artist.startswith("the "):
             clean_artist = clean_artist[4:]
-        clean_artist = clean_artist.replace("and", "")
+        clean_artist = clean_artist.replace(" and ", "")
         clean_artist = clean_artist.replace(" ", "")
         clean_artist = Util.remove_punctuation(clean_artist)
         
@@ -55,19 +55,19 @@ class Parser(object):
         
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<!-- start of lyrics -->")
+        start = resp.find("that. -->")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+25):]
-        end = resp.find("<!-- end of lyrics -->")
+        resp = resp[(start+9):]
+        end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:(end-1)]
         
         # replace unwanted parts
-        resp = resp.replace("<br />", "")
+        resp = resp.replace("<br>", "")
         resp = resp.replace("<i>", "")
         resp = resp.replace("</i>", "")
                 
