@@ -440,8 +440,8 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def set_menu_sensitive(self, sensitive):
         index = 0
         for item in self.menu:
-            # 'Preferences' option should always be sensitive
-            if index == len(self.menu)-1:
+            # 'Preferences' and 'Mark as instrumental' options should always be sensitive
+            if item.get_label()=='Preferences' or item.get_label()=="Mark as instrumental":
                 continue
             item.set_sensitive(sensitive)
             index += 1
@@ -606,6 +606,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.write_lyrics_to_cache(self.path, lyrics)
         self.current_source = None
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.show_lyrics, lyrics)
+        self.set_menu_sensitive(True)
         
         
         
@@ -798,6 +799,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         if artist != self.clean_artist or title != self.clean_title:
             print("song changed")
             return          
+        # check is source is removed (probably because it's been set as instrumental)
+        if self.current_source == None:
+            print("current source removed (likely set as instrumental)")
+            return
         
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.set_menu_sensitive, True)
         
@@ -829,6 +834,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 if artist != self.clean_artist or title != self.clean_title:
                     print("song changed")
                     return
+                # check is source is removed (probably because it's been set as instrumental)
+                if self.current_source == None:
+                    print("current source removed (likely set as instrumental)")
+                    return
                 i += 1
         
         # We can't display new lyrics while user is editing! 
@@ -837,6 +846,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # check if playing song changed
         if artist != self.clean_artist or title != self.clean_title:
             print("song changed")
+            return
+        # check is source is removed (probably because it's been set as instrumental)
+        if self.current_source == None:
+            print("current source removed (likely set as instrumental)")
             return
             
         if lyrics == "": 
