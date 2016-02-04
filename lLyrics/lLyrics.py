@@ -291,7 +291,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
     def init_sidebar(self):
         self.vbox = Gtk.VBox()
         
-        hbox_header = Gtk.HBox();
+        hbox_header = Gtk.HBox()
                 
         self.label = Gtk.Label(_("Lyrics"))
         self.label.set_use_markup(True)
