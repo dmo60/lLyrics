@@ -14,10 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib.request, urllib.error, urllib.parse
-import re
 import string
-
-from html.parser import HTMLParser
+import html
 
 import Util
 
@@ -34,7 +32,8 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
             
         # create lyrics Url
-        url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" + clean_artist.replace(" ", "-") + ".html"
+        url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" \
+              + clean_artist.replace(" ", "-") + ".html"
         print("metrolyrics Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -56,7 +55,7 @@ class Parser(object):
             print("no title end found")
             return ""
         title = title[:end]
-        title = HTMLParser().unescape(title)
+        title = html.unescape(title)
         songdata = title.split(" - ")
         try:
             if self.artist != songdata[0].lower() or self.title != songdata[1].lower():
@@ -82,12 +81,12 @@ class Parser(object):
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:(end)]
+        resp = resp[:end]
         
         # replace unwanted parts
         resp = resp.replace("<p class='verse'>", "")
         resp = resp.replace("</p>", "\n\n")
-        resp = resp.replace("<br/>", "")
+        resp = resp.replace("<br>", "")
         resp = resp.strip()
         
         return resp
