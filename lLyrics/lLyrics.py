@@ -35,7 +35,6 @@ import MetrolyricsParser
 import LetrasTerraParser
 import LyrdbParser
 import AZLyricsParser
-import LeoslyricsParser
 import LyricsmaniaParser
 import DarklyricsParser
 import GeniusParser
@@ -98,8 +97,9 @@ LYRICS_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)", "\([^\)]*mix\)", "\(
 LYRICS_TITLE_REPLACE=[("/", "-"), (" & ", " and ")]
 LYRICS_ARTIST_REPLACE=[("/", "-"), (" & ", " and ")]
 
-LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsnmusic.com", "Lyricsmania.com", 
-               "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com", "Leoslyrics.com", "Lyrdb.com", "External"]
+LYRICS_SOURCES=["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsnmusic.com",
+                "Lyricsmania.com", "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com", "Lyrdb.com",
+                "External"]
 
 
 
@@ -126,8 +126,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.dict = dict({"Lyricwiki.org": LyricwikiParser, "Letras.terra.com.br": LetrasTerraParser,
                          "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
                          "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
-                         "Lyrdb.com": LyrdbParser, "Leoslyrics.com": LeoslyricsParser, 
-                         "Darklyrics.com": DarklyricsParser, "Genius.com": GeniusParser,
+                         "Lyrdb.com": LyrdbParser, "Darklyrics.com": DarklyricsParser, "Genius.com": GeniusParser,
                          "Lyricsnmusic.com": LyricsNMusicParser, "Vagalume.com.br": VagalumeParser,
                          "External": External})
         self.add_builtin_lyrics_sources()
