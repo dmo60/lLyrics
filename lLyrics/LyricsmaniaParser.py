@@ -52,20 +52,25 @@ class Parser(object):
         
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start_string = """<div id='songlyrics_h' class='dn'>"""
-        start = resp.find(start_string)
+        start = resp.find("</strong>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+len(start_string)+1):]
+        resp = resp[(start+9):]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:(end)]
+        resp = resp[:end]
         
         # replace unwanted parts
+        resp = resp.replace("<br>\n", "\n")
+        resp = resp.replace("\n<br>", "\n")
+        resp = resp.replace("<br>", "\n")
         resp = resp.replace("<br />", "")
-                
+        resp = resp.replace("<div class=\"p402_premium\">\n", "")
+
+        resp = "\n".join(line.strip() for line in resp.split("\n"))
+
         return resp
         
