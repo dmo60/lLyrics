@@ -31,10 +31,10 @@ try:
 except:
     print("module chardet not found or not installed!")
 
-
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
 HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0', 'Accept': '*/*'}
+
 
 def decode_chars(resp):
     chars = resp.split(";")
@@ -47,50 +47,45 @@ def decode_chars(resp):
     return resp
 
 
-
 def remove_punctuation(data):
     for c in string.punctuation:
         data = data.replace(c, "")
-    
-    return data
 
+    return data
 
 
 def add_request_header(url):
     return urllib.request.Request(url, headers=HEADER)
 
 
-
 def parse_lrc(data):
     tag_regex = "(\[\d+\:\d+\.\d*])"
     match = re.search(tag_regex, data)
-    
+
     # no tags
     if match is None:
         return (data, None)
-    
+
     data = data[match.start():]
     splitted = re.split(tag_regex, data)[1:]
-    
+
     tags = []
     lyrics = ''
     for i in range(len(splitted)):
         if i % 2 == 0:
             # tag
-            tags.append((time_to_seconds(splitted[i]), splitted[i+1]))
+            tags.append((time_to_seconds(splitted[i]), splitted[i + 1]))
         else:
             # lyrics
             lyrics += splitted[i]
-    
+
     return (lyrics, tags)
-    
-    
-    
+
+
 def time_to_seconds(time):
     time = time[1:-1].replace(":", ".")
     t = time.split(".")
     return 60 * int(t[0]) + int(t[1])
-
 
 
 def bytes_to_string(data):
@@ -121,35 +116,32 @@ def bytes_to_string(data):
     return decoded_string
 
 
-
 def get_lastfm_correction(artist, title):
-    params = urllib.parse.urlencode({'method':'track.getcorrection',
-                               'api_key':LASTFM_API_KEY,
-                               'artist':artist, 
-                               'track':title})
+    params = urllib.parse.urlencode({'method': 'track.getcorrection',
+                                     'api_key': LASTFM_API_KEY,
+                                     'artist': artist,
+                                     'track': title})
     try:
         result = urllib.request.urlopen("http://ws.audioscrobbler.com/2.0/?" + params, None, 3).read()
     except:
         print("could not connect to LastFM API")
         return (artist, title, False)
-    
+
     response = xml.dom.minidom.parseString(result)
     corrections = response.getElementsByTagName("correction")
     if not corrections:
         print("no LastFM corrections found")
         return (artist, title, False)
-    
+
     # only consider one correction for now
     correction = corrections[0]
-    
+
     if correction.getAttribute("artistcorrected") == "1":
         artist = correction.getElementsByTagName("name")[0].firstChild.data
         print("LastFM artist correction: " + artist)
-    
-    
+
     if correction.getAttribute("trackcorrected") == "1":
         title = correction.getElementsByTagName("name")[1].firstChild.data
         print("LastFM title correction: " + title)
-    
+
     return (artist, title, True)
-    

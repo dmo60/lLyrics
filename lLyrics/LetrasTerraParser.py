@@ -19,60 +19,60 @@ import html
 
 import Util
 
+
 class Parser(object):
-    
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
         self.lyrics = ""
-        
+
     def parse(self):
         self.artist = self.artist.replace("+", "and")
         artist = urllib.parse.quote(self.artist)
         title = urllib.parse.quote(self.title)
         join = urllib.parse.quote(' - ')
-            
+
         # create artist Url
         url = "http://letras.mus.br/winamp.php?t=%s%s%s" % (artist, join, title)
-        
+
         print("letras.terra.com.br Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
             print("could not connect to letras.terra.com.br")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
-        
+
         if not self.verify(resp):
             return ""
-        
+
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-        
+
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
         start = resp.find("<p><p>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+6):]
+        resp = resp[(start + 6):]
         end = resp.find("</p></p>")
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:end]
-        
+
         # replace unwanted parts
         resp = resp.replace("<br/>", "\n")
         resp = resp.replace("</p><p>", "\n\n")
 
         resp = html.unescape(resp)
-                
+
         return resp
-    
+
     def verify(self, resp):
         # verify song artist/title
         title = resp
@@ -80,41 +80,41 @@ class Parser(object):
         if start == -1:
             print("no title found")
             return False
-        title = title[(start+4):]
-        
+        title = title[(start + 4):]
+
         start = title.find(">")
         if start == -1:
             print("no title start found")
             return False
-        title = title[(start+1):]
-        
+        title = title[(start + 1):]
+
         end = title.find("</a>")
         if end == -1:
             print("no title end found")
             return False
         title = html.unescape(title[:end]).lower()
-        
+
         artist = resp
         start = artist.find("<h2>")
         if start == -1:
             print("no artist found")
             return False
-        artist = artist[(start+4):]
-        
+        artist = artist[(start + 4):]
+
         start = artist.find(">")
         if start == -1:
             print("no artist start found")
             return False
-        artist = artist[(start+1):]
-        
+        artist = artist[(start + 1):]
+
         end = artist.find("</a>")
         if end == -1:
             print("no artist end found")
             return False
         artist = html.unescape(artist[:end]).lower()
-        
+
         if self.artist != artist or self.title != title:
             print("wrong artist/title! " + artist + " - " + title)
             return False
-        
+
         return True

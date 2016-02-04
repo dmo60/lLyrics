@@ -19,78 +19,78 @@ import string
 
 import Util
 
+
 class Parser():
-    
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
         self.lyrics = ""
-        
+
     def parse(self):
         # API request
-        url = "http://app2.vagalume.com.br/api/search.php?nolyrics=1&art=" + urllib.parse.quote(self.artist) + "&mus=" + urllib.parse.quote(self.title)
+        url = "http://app2.vagalume.com.br/api/search.php?nolyrics=1&art=" + urllib.parse.quote(
+            self.artist) + "&mus=" + urllib.parse.quote(self.title)
         print("call Vagalume API: " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
             print("could not connect to vagalume.com.br API")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
         if resp == "":
             return ""
-        
+
         resp = json.loads(resp)
-        
+
         if "notfound" in resp["type"]:
             return ""
-        
+
         if resp["type"] == "aprox":
             if not self.verify(resp):
                 return ""
-            
+
         lyrics_url = resp["mus"][0]["url"]
         print("url: " + lyrics_url)
-        
+
         # open lyrics-URL
         try:
             resp = urllib.request.urlopen(lyrics_url, None, 3).read()
         except:
             print("could not open lyricwiki url")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
-        
+
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-    
+
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
         start = resp.find("<div itemprop=description>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+26):]
+        resp = resp[(start + 26):]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:(end)]
-        
+
         # replace unwanted parts
         resp = resp.replace("<br/>", "\n")
-        
+
         return resp
-        
+
     def verify(self, resp):
         artist = resp["art"]["name"].lower()
         title = resp["mus"][0]["name"].lower()
-        
+
         if self.artist != artist or self.title != title:
             print("wrong artist/title! " + artist + " - " + title)
             return False
-        
+
         return True
-        

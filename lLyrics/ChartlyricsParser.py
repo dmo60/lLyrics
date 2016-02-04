@@ -24,8 +24,8 @@ from html.parser import HTMLParser
 
 import Util
 
+
 class Parser(HTMLParser):
-    
     def __init__(self, artist, title):
         HTMLParser.__init__(self)
         self.artist = artist
@@ -33,15 +33,15 @@ class Parser(HTMLParser):
         self.tag = None
         self.correct = True
         self.lyrics = ""
-    
+
     # define handler for parsing             
     def handle_starttag(self, tag, attrs):
         self.tag = tag
-    
+
     # definde handler for parsing    
     def handle_endtag(self, tag):
         self.tag = None
-    
+
     # definde handler for parsing               
     def handle_data(self, data):
         if self.tag == "lyricsong":
@@ -54,20 +54,20 @@ class Parser(HTMLParser):
             return
         if self.correct and self.tag == "lyric":
             self.lyrics = data
-        
+
     def parse(self):
         # API searchLyric request
-        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib.parse.quote(self.artist) + "&song=" + urllib.parse.quote(self.title)
+        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib.parse.quote(
+            self.artist) + "&song=" + urllib.parse.quote(self.title)
         print("call chartlyrics API: " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
             print("could not connect to chartlyric.com API")
-        
+
         resp = Util.bytes_to_string(resp)
         self.feed(resp)
-        
+
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-        

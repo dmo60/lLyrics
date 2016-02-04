@@ -21,8 +21,8 @@ from html.parser import HTMLParser
 
 import Util
 
-class Parser(object):
 
+class Parser(object):
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
@@ -35,14 +35,14 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://genius.com/" + clean_artist.replace(" ", "-") + "-" +clean_title.replace(" ", "-") + "-lyrics"
+        url = "http://genius.com/" + clean_artist.replace(" ", "-") + "-" + clean_title.replace(" ", "-") + "-lyrics"
         print("rapgenius Url " + url)
         try:
             resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
         except:
             print("could not connect to genius.com")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
 
         self.lyrics = self.get_lyrics(resp)

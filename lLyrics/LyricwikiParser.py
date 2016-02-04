@@ -19,8 +19,8 @@ import string
 
 import Util
 
-class Parser(object):
 
+class Parser(object):
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
@@ -75,13 +75,13 @@ class Parser(object):
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+9):]
+        resp = resp[(start + 9):]
 
         end = resp.find("<!--")
         if end == -1:
             print("lyrics end not found")
             return ""
-        resp = resp[:(end-1)]
+        resp = resp[:(end - 1)]
 
         # replace unwanted characters
         resp = resp.replace("<br />", "&#10;").replace("&#", "")
@@ -95,7 +95,3 @@ class Parser(object):
             resp = ""
 
         return resp
-
-
-
-

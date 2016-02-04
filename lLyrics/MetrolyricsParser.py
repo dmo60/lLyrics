@@ -19,19 +19,19 @@ import html
 
 import Util
 
+
 class Parser(object):
-    
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
         self.lyrics = ""
-        
+
     def parse(self):
         # remove punctuation from artist/title
         self.artist = self.artist.replace("+", "and")
         clean_artist = Util.remove_punctuation(self.artist)
         clean_title = Util.remove_punctuation(self.title)
-            
+
         # create lyrics Url
         url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" \
               + clean_artist.replace(" ", "-") + ".html"
@@ -41,16 +41,16 @@ class Parser(object):
         except:
             print("could not connect to metrolyrics.com")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
-        
+
         # verify title
         title = resp
         start = title.find("<title>")
         if start == -1:
             print("no title found")
             return ""
-        title = title[(start+7):]
+        title = title[(start + 7):]
         end = title.find(" Lyrics | MetroLyrics</title>")
         if end == -1:
             print("no title end found")
@@ -65,12 +65,12 @@ class Parser(object):
         except:
             print("incomplete artist/title")
             return ""
-        
+
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-    
+
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
         start = resp.find("<p class='verse'>")
@@ -83,12 +83,11 @@ class Parser(object):
             print("lyrics end not found ")
             return ""
         resp = resp[:end]
-        
+
         # replace unwanted parts
         resp = resp.replace("<p class='verse'>", "")
         resp = resp.replace("</p>", "\n\n")
         resp = resp.replace("<br>", "")
         resp = resp.strip()
-        
+
         return resp
-    

@@ -21,18 +21,18 @@ import Util
 
 API_KEY = "5ad5728ee39ebc05de6b8a7a154202"
 
-class Parser(object):
 
+class Parser(object):
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
         self.lyrics = ""
-        
+
     def parse(self):
         # remove punctuation from artist/title
         clean_artist = Util.remove_punctuation(self.artist)
         clean_title = Util.remove_punctuation(self.title)
-        
+
         # API request
         url = "http://api.lyricsnmusic.com/songs?api_key=" + API_KEY + "&artist=" + clean_artist.replace(" ", "+") \
               + "&track=" + clean_title.replace(" ", "+")
@@ -42,51 +42,51 @@ class Parser(object):
         except:
             print("could not connect to lyricsnmusic.com API")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
         if resp == "":
             return ""
-        
+
         resp = json.loads(resp)
-        
+
         if len(resp) == 0:
             return ""
-        
+
         resp = self.verify(resp)
         if resp is None:
             return ""
-        
+
         lyrics_url = resp["url"]
         print("url: " + lyrics_url)
-        
+
         # open lyrics-URL
         try:
             resp = urllib.request.urlopen(Util.add_request_header(lyrics_url), None, 3).read()
         except:
             print("could not open lyricsnmusic.com lyrics url")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-    
+
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
         start = resp.find("<pre itemprop='description'>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+28):]
+        resp = resp[(start + 28):]
         end = resp.find("</pre>")
         if end == -1:
             print("lyrics end not found")
             return ""
         resp = resp[:end]
-        
+
         return resp
-    
+
     def verify(self, resp):
         for entry in resp:
             title = entry["title"].lower()
@@ -94,6 +94,5 @@ class Parser(object):
             if self.artist == artist and self.title == title:
                 return entry
             print("wrong artist/title! " + artist + " - " + title)
-            
+
         return None
-        

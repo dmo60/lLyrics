@@ -18,23 +18,23 @@ import string
 
 import Util
 
+
 class Parser(object):
-    
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
         self.lyrics = ""
-        
+
     def parse(self):
         # remove unwanted characters from artist and title strings
         clean_artist = self.artist.replace("+", "and")
         clean_artist = Util.remove_punctuation(clean_artist)
         clean_artist = clean_artist.replace(" ", "_")
-        
+
         clean_title = self.title
         clean_title = Util.remove_punctuation(clean_title)
         clean_title = clean_title.replace(" ", "_")
-            
+
         # create lyrics Url
         url = "http://www.lyricsmania.com/" + clean_title + "_lyrics_" + clean_artist + ".html"
         print("lyricsmania Url " + url)
@@ -43,26 +43,26 @@ class Parser(object):
         except:
             print("could not connect to lyricsmania.com")
             return ""
-        
+
         resp = Util.bytes_to_string(resp)
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
-        
+
         return self.lyrics
-        
+
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
         start = resp.find("</strong>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start+9):]
+        resp = resp[(start + 9):]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:end]
-        
+
         # replace unwanted parts
         resp = resp.replace("<br>\n", "\n")
         resp = resp.replace("\n<br>", "\n")
@@ -73,4 +73,3 @@ class Parser(object):
         resp = "\n".join(line.strip() for line in resp.split("\n"))
 
         return resp
-        
