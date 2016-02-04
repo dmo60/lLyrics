@@ -7,7 +7,7 @@ It is intended as a replacement of the built-in lyrics plugin of Rhythmbox with 
 
 
 
-![Screenshot](http://www.dmo60.de/lLyricsScreenshot.png)
+![Screenshot](img/screenshot-small.png)
 
 
 
@@ -60,11 +60,11 @@ Archlinux user can install the plugin via [this AUR package by Bersam](https://a
 #### Manual installation ####
 
 	1.) Press the "Download ZIP" button and extract the .zip file.
-	
+
 	2.) Change to the extracted folder and open a terminal.
-	
+
 	3.) Run `make install`.
-	
+
 	4.) Enable the plugin in Rhythmbox.
 
 It will ask for your sudo password, but don't worry, it is only required to install the schema file that is needed to save your preferences.
