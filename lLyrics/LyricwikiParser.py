@@ -43,7 +43,8 @@ class Parser(object):
 
         resp = json.loads(resp)
 
-        if resp["lyrics"] == "Not found":
+        print(resp)
+        if resp["lyrics"] == "Not found" or resp["isOnTakedownList"] == '1':
             return ""
 
         lyrics_url = resp["url"]
