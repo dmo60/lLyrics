@@ -304,13 +304,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         icon_factory.add("llyrics_menu", Gtk.IconSet.new_from_pixbuf(pxbf))
         icon_factory.add_default()
         
-        menu_button = Gtk.Image.new_from_stock("llyrics_menu", Gtk.IconSize.SMALL_TOOLBAR);
-        eventBox = Gtk.EventBox();
-        eventBox.add(menu_button);
-        eventBox.connect("button-press-event", self.popup_menu, self.menu)
+        menu_button = Gtk.Image.new_from_stock("llyrics_menu", Gtk.IconSize.SMALL_TOOLBAR)
+        event_box = Gtk.EventBox()
+        event_box.add(menu_button)
+        event_box.connect("button-press-event", self.popup_menu, self.menu)
         
         hbox_header.pack_start(self.label, True, True, 0)
-        hbox_header.pack_end(eventBox, False, False, 5)
+        hbox_header.pack_end(event_box, False, False, 5)
         
         # create a TextView for displaying lyrics
         self.textview = Gtk.TextView()
@@ -351,7 +351,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.back_button.connect("clicked", self.back_button_callback)
                 
         # pack everything into side pane
-        self.vbox.pack_start(hbox_header, False, False, 0);
+        self.vbox.pack_start(hbox_header, False, False, 0)
         self.vbox.pack_start(sw, True, True, 0)
         self.vbox.pack_end(self.hbox, False, False, 3)
         self.vbox.pack_end(self.back_button, False, False, 3)        
@@ -362,14 +362,13 @@ class lLyrics(GObject.Object, Peas.Activatable):
         
         if self.hide_label:
             self.label.hide()
-            
-        self.vbox.set_size_request(200, -1)
+
         self.visible = False
         
         
         
     def get_button_menu(self):
-        menu = Gtk.Menu();
+        menu = Gtk.Menu()
         
         self.radio_sources = Gtk.Menu()
         
@@ -387,10 +386,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.radio_sources.append(Gtk.SeparatorMenuItem())
         self.add_radio_menu_item(self.radio_sources, _("From cache file"), self.scan_selected_source_callback, last_item)
         
-        self.radio_sources.show_all();
+        self.radio_sources.show_all()
         
-        item_sources = Gtk.MenuItem(_("Sources"));
-        item_sources.set_submenu(self.radio_sources);
+        item_sources = Gtk.MenuItem(_("Sources"))
+        item_sources.set_submenu(self.radio_sources)
         menu.append(item_sources)
         
         self.add_menu_item(menu, _("Scan next source"), self.scan_next_action_callback)
