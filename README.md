@@ -55,7 +55,7 @@ In Ubuntu based distribution, you can install this plugin via [this PPA by fossf
 
 #### Archlinux: AUR ####
 
-Archlinux user can install the plugin via [this AUR package by Bersam](https://aur.archlinux.org/packages/rhythmbox-llyrics-git/).
+Archlinux user can install the plugin via [this AUR package](https://aur.archlinux.org/packages/rhythmbox-llyrics/).
 
 #### Manual installation ####
 
