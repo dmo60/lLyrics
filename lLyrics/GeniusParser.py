@@ -66,6 +66,8 @@ class Parser(object):
         # replace unwanted parts
         resp = re.sub("<lyrics[^>]*>", "", resp)
         resp = re.sub("<a[^>]*>", "", resp)
+        resp = re.sub("<!--[^>]*>", "", resp)
+        resp = re.sub("<div[^>]*><script.*?>.*?<\/div>", "", resp)
         resp = resp.replace("</a>", "")
         resp = resp.replace("<br>", "")
         resp = resp.replace("<br />", "")
