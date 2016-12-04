@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib.request, urllib.parse
-import json
+import urllib.request, urllib.error, urllib.parse
 import string
+import html
 
 import Util
 
@@ -27,71 +27,43 @@ class Parser(object):
         self.lyrics = ""
 
     def parse(self):
-        # API getSong request
-        url = "http://lyrics.wikia.com/api.php?func=getSong&artist=" + urllib.parse.quote(self.artist) \
-              + "&song=" + urllib.parse.quote(self.title) + "&fmt=realjson"
-        print("call lyrikwiki API: " + url)
+        # format artist and title
+        self.artist = self.artist.replace(" ", "_")
+        self.title = self.title.replace(" ", "_")
+        clean_artist = urllib.parse.quote(self.artist)
+        clean_title = urllib.parse.quote(self.title)
+
+        # create lyrics Url
+        url = "http://lyrics.wikia.com/wiki/" + clean_artist + ":" + clean_title
+        print("lyricwiki Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
-            print("could not connect to lyricwiki.org API")
-            return ""
-
-        resp = Util.bytes_to_string(resp)
-        if resp == "":
-            return ""
-
-        resp = json.loads(resp)
-
-        print(resp)
-        if resp["lyrics"] == "Not found" or resp["isOnTakedownList"] == '1':
-            return ""
-
-        lyrics_url = resp["url"]
-        print("url: " + lyrics_url)
-
-        # open lyrics-URL
-        try:
-            resp = urllib.request.urlopen(lyrics_url, None, 3).read()
-        except:
-            print("could not open lyricwiki url")
+            print("could not connect to lyricwiki.org")
             return ""
 
         resp = Util.bytes_to_string(resp)
         self.lyrics = self.get_lyrics(resp)
-        self.lyrics = string.capwords(self.lyrics, "\n").strip()
 
         return self.lyrics
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<div class='lyricbox'>")
+        start = resp.find("class='lyricbox'>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[start:]
-
-        start = resp.find("</script>")
-        if start == -1:
-            print("lyrics start not found")
-            return ""
-        resp = resp[(start + 9):]
-
-        end = resp.find("<!--")
+        resp = resp[(start + 17):]
+        end = resp.find("<div class='lyricsbreak'>")
         if end == -1:
             print("lyrics end not found")
             return ""
-        resp = resp[:(end - 1)]
+        resp = resp[:end]
 
-        # replace unwanted characters
-        resp = resp.replace("<br />", "&#10;").replace("&#", "")
-
-        # decode characters
-        resp = Util.decode_chars(resp)
-
-        # if lyrics incomplete, skip!
-        if resp.find("[...]") != -1:
-            print("incomplete lyrics")
-            resp = ""
+        # replace unwanted parts
+        resp = html.unescape(resp)
+        resp = resp.replace("<br>", "\n")
+        resp = resp.replace("<br />", "\n")
+        resp = resp.strip()
 
         return resp
