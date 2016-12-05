@@ -16,10 +16,12 @@ install-systemwide: schema locales
 		echo "Installing plugin files to $(SYSTEM_PLUGIN_DIR) ..."; \
 		sudo rm -r -f $(SYSTEM_PLUGIN_DIR)lLyrics/; \
 		sudo cp -r ./lLyrics/ $(SYSTEM_PLUGIN_DIR); \
+		sudo chmod -R 755 $(SYSTEM_PLUGIN_DIR)lLyrics/; \
 	else \
 		echo "Installing plugin files to $(SYSTEM64_PLUGIN_DIR) ..."; \
 		sudo rm -r -f $(SYSTEM64_PLUGIN_DIR)lLyrics/; \
 		sudo cp -r ./lLyrics/ $(SYSTEM64_PLUGIN_DIR); \
+		sudo chmod -R 755 $(SYSTEM64_PLUGIN_DIR)lLyrics/; \
 	fi
 	@echo "Done!"
 
@@ -56,5 +58,3 @@ update-po-files:
 		lang=`basename $$i .po`; \
 		intltool-update -g messages $$lang; \
 	done
-	
-
