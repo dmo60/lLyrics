@@ -17,6 +17,8 @@ import urllib.request, urllib.error, urllib.parse
 import string
 import html
 
+import re
+
 import Util
 
 
@@ -64,6 +66,10 @@ class Parser(object):
         resp = html.unescape(resp)
         resp = resp.replace("<br>", "\n")
         resp = resp.replace("<br />", "\n")
+        resp = resp.replace("<i>", "")
+        resp = resp.replace("</i>", "")
+        resp = re.sub("<a[^>]*>", "", resp)
+        resp = resp.replace("</a>", "")
         resp = resp.strip()
 
         return resp
