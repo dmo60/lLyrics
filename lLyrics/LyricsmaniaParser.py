@@ -64,11 +64,12 @@ class Parser(object):
         resp = resp[:end]
 
         # replace unwanted parts
-        resp = resp.replace("<br>\n", "\n")
-        resp = resp.replace("\n<br>", "\n")
+        resp = resp.replace("\n", "")
         resp = resp.replace("<br>", "\n")
-        resp = resp.replace("<br />", "")
-        resp = resp.replace("<div class=\"p402_premium\">\n", "")
+        resp = resp.replace("<br />", "\n")
+        resp = resp.replace("\n\n", "\n")
+        resp = resp.replace("<div class=\"p402_premium\">", "")
+        resp = resp.replace("<div class=\"fb-quotable\">", "")
 
         resp = "\n".join(line.strip() for line in resp.split("\n"))
 
