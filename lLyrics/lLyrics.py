@@ -282,7 +282,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         # menu without toolbar
         icon_factory = Gtk.IconFactory()
-        pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/menu-arrow.png")
+        pxbf = GdkPixbuf.Pixbuf.new_from_file(os.path.dirname(__file__) + "/menu-icon.png")
         icon_factory.add("llyrics_menu", Gtk.IconSet.new_from_pixbuf(pxbf))
         icon_factory.add_default()
 
@@ -424,8 +424,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                 break
 
     def popup_menu(self, widget, event, menu):
-        menu.popup(None, None, lambda x, y: (event.x_root + event.x, event.y_root + event.y, True), None, event.button,
-                   event.time)
+        menu.popup(None, widget, None, None, event.button, event.time)
 
     def toggle_visibility(self, action, param=None, data=None):
         action = self.toggle_action_group.get_action('ToggleLyricSideBar')
