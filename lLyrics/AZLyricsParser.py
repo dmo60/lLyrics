@@ -30,13 +30,14 @@ class Parser(object):
         clean_artist = self.artist
         if clean_artist.startswith("the "):
             clean_artist = clean_artist[4:]
-        clean_artist = clean_artist.replace(" and ", "")
         clean_artist = clean_artist.replace(" ", "")
         clean_artist = Util.remove_punctuation(clean_artist)
+        clean_artist = clean_artist.lower()
 
         clean_title = self.title
         clean_title = clean_title.replace(" ", "")
         clean_title = Util.remove_punctuation(clean_title)
+        clean_title = clean_title.lower()
 
         # create lyrics Url
         url = "http://www.azlyrics.com/lyrics/" + clean_artist + "/" + clean_title + ".html"
