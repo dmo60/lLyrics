@@ -3,15 +3,15 @@
 	<schema id="org.gnome.rhythmbox.plugins.llyrics" path="/org/gnome/rhythmbox/plugins/llyrics/">
 		
 		<key name="active-sources" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Genius.com']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Darklyrics.com', 'Chartlyrics.com', 'Genius.com', 'lyrics.alsong.co.kr']</default>
 			<summary>List of lyrics sources to be scanned</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Darklyrics.com', 'Chartlyrics.com', 'Genius.com'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Darklyrics.com', 'Chartlyrics.com', 'Genius.com', 'lyrics.alsong.co.kr'</description>
 		</key>
 		
 		<key name="scanning-order" type="as">
-			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Genius.com', 'Darklyrics.com', 'Chartlyrics.com']</default>
+			<default>['Lyricwiki.org', 'Letras.terra.com.br', 'Vagalume.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Genius.com', 'Darklyrics.com', 'Chartlyrics.com', 'lyrics.alsong.co.kr']</default>
 			<summary>Sources are scanned in this order</summary>
-			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Genius.com', 'Darklyrics.com', 'Chartlyrics.com'</description>
+			<description>Possible values are: 'Lyricwiki.org', 'Letras.terra.com.br', 'Metrolyrics.com', 'AZLyrics.com', 'Lyricsmania.com', 'Vagalume.com.br', 'Genius.com', 'Darklyrics.com', 'Chartlyrics.com', 'lyrics.alsong.co.kr'</description>
 		</key>
 		
 		<key name="show-first" type="b">
