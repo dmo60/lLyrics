@@ -38,6 +38,7 @@ import LyricsmaniaParser
 import DarklyricsParser
 import GeniusParser
 import VagalumeParser
+import ALSongLyricsParser
 import Util
 
 from lLyrics_rb3compat import ActionGroup
@@ -94,7 +95,7 @@ LYRICS_TITLE_REPLACE = [("/", "-"), (" & ", " and ")]
 LYRICS_ARTIST_REPLACE = [("/", "-"), (" & ", " and ")]
 
 LYRICS_SOURCES = ["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com",
-                  "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com"]
+                  "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com", "lyrics.alsong.co.kr"]
 
 
 class lLyrics(GObject.Object, Peas.Activatable):
@@ -117,7 +118,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                           "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
                           "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
                           "Darklyrics.com": DarklyricsParser, "Genius.com": GeniusParser,
-                          "Vagalume.com.br": VagalumeParser})
+                          "Vagalume.com.br": VagalumeParser, "lyrics.alsong.co.kr": ALSongLyricsParser})
         self.add_builtin_lyrics_sources()
 
         # Get the user preferences
@@ -357,7 +358,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         last_item = item_unselect
 
-        for entry in LYRICS_SOURCES[:-1]:
+        for entry in LYRICS_SOURCES:
             last_item = self.add_radio_menu_item(self.radio_sources, entry, self.scan_selected_source_callback,
                                                  last_item)
 
