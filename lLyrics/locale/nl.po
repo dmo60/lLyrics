@@ -1,154 +1,161 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Dutch translations for PACKAGE package.
+# Copyright (C) 2019 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
+# Heimen Stoffels <vistausss@outlook.com>, 2019.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-16 20:18+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2019-09-16 20:40+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
+"Language-Team: Dutch <kde-i18n-doc@kde.org>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=US-ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 19.11.70\n"
 
 #: ../lLyrics.py:255 ../lLyrics.py:274
 msgid "Lyrics"
-msgstr ""
+msgstr "Songtekst"
 
 #: ../lLyrics.py:258
 msgid "Display lyrics for the current playing song"
-msgstr ""
+msgstr "Toon de songtekst van het huidige nummer"
 
 #: ../lLyrics.py:262
 msgid "Show lyrics"
-msgstr ""
+msgstr "Songtekst tonen"
 
 #: ../lLyrics.py:263
 msgid "Search and display lyrics for this song"
-msgstr ""
+msgstr "Zoek en toon de songtekst van dit nummer"
 
 #. create save and cancel buttons for edited lyrics
 #: ../lLyrics.py:322
 msgid "Save"
-msgstr ""
+msgstr "Opslaan"
 
 #: ../lLyrics.py:324
 msgid "Cancel"
-msgstr ""
+msgstr "Annuleren"
 
 #. button for closing on demand lyrics
 #: ../lLyrics.py:331
 msgid "Back to playing song"
-msgstr ""
+msgstr "Terug naar nummer"
 
 #: ../lLyrics.py:365 ../lLyrics.py:403 ../lLyrics.py:837
 msgid "From cache file"
-msgstr ""
+msgstr "Uit cachebestand"
 
 #: ../lLyrics.py:370 ../Config.py:302
 msgid "Sources"
-msgstr ""
+msgstr "Bronnen"
 
 #: ../lLyrics.py:374
 msgid "Scan next source"
-msgstr ""
+msgstr "Volgende bron doorzoeken"
 
 #: ../lLyrics.py:375
 msgid "Scan all sources"
-msgstr ""
+msgstr "Alle bronnen doorzoeken"
 
 #: ../lLyrics.py:377
 msgid "Search online"
-msgstr ""
+msgstr "Zoeken op internet"
 
 #: ../lLyrics.py:379
 msgid "Mark as instrumental"
-msgstr ""
+msgstr "Markeren als instrumentaal"
 
 #: ../lLyrics.py:381
 msgid "Clear lyrics"
-msgstr ""
+msgstr "Songtekst wissen"
 
 #: ../lLyrics.py:382
 msgid "Edit lyrics"
-msgstr ""
+msgstr "Songtekst aanpassen"
 
 #: ../lLyrics.py:386
 msgid "Preferences"
-msgstr ""
+msgstr "Voorkeuren"
 
 #: ../lLyrics.py:601
 msgid "lLyrics Preferences"
-msgstr ""
+msgstr "lLyrics-voorkeuren"
 
 #: ../lLyrics.py:658 ../lLyrics.py:681 ../lLyrics.py:711 ../lLyrics.py:735
 msgid "searching lyrics..."
-msgstr ""
+msgstr "Bezig met zoeken..."
 
 #: ../lLyrics.py:843
 msgid "No lyrics found"
-msgstr ""
+msgstr "Geen songtekst gevonden"
 
 #: ../Config.py:146
 msgid "Show sidebar on first playback"
-msgstr ""
+msgstr "Zijbalk tonen bij eerste keer afspelen"
 
 #: ../Config.py:159
 msgid "Save lyrics "
-msgstr ""
+msgstr "Songteksten opslaan"
 
 #: ../Config.py:163
 msgid ""
 "Whether to automatically save retrieved lyrics in the folder specified below"
 msgstr ""
+"Of songteksten automatisch moeten worden opgeslagen in onderstaande map"
 
 #: ../Config.py:183
 msgid "default"
-msgstr ""
+msgstr "Standaard"
 
 #: ../Config.py:186
 msgid "Folder for lyrics"
-msgstr ""
+msgstr "Map met songteksten"
 
 #: ../Config.py:200
 msgid "Always ignore parentheses in song title"
-msgstr ""
+msgstr "Haakjes in namen van nummers negeren"
 
 #: ../Config.py:203
 msgid ""
 "When turned off, only parentheses containing specific strings (e.g. 'remix', "
 "'live', 'edit', etc) are filtered"
 msgstr ""
+"Schakel dit uit om woorden tussen haakjes (bijv. 'remix', 'live', 'edit',"
+" etc.) "
+"te negeren"
 
 #. check buttons for lyric sources
 #: ../Config.py:222
 msgid "Sources:"
-msgstr ""
+msgstr "Bronnen:"
 
 #: ../Config.py:267
 msgid "Hide sidebar label"
-msgstr ""
+msgstr "Zijbalklabel verbergen"
 
 #: ../Config.py:281
 msgid "Show lyrics in left sidebar instead of right one"
-msgstr ""
+msgstr "Songtekst in linker zijbalk tonen in plaats van rechter zijbalk"
 
 #: ../Config.py:284
 msgid ""
 "You have to disable and re-enable this plugin or restart Rhythmbox to apply "
 "changes here"
 msgstr ""
+"Schakel deze plug-in uit en weer in of herstart Rhythmbox om de wijzigingen "
+"toe te passen"
 
 #: ../Config.py:301
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 #: ../Config.py:303
 msgid "Appearance"
-msgstr ""
+msgstr "Uiterlijk"
