@@ -45,6 +45,8 @@ class Parser(object):
             out = self.get_flac_lyrics(path)
         if out == "":
             file = self.check_for_file(dir, file_name)
+            if file == "":
+            	return ""
             out = ""
             for line in file.readlines():
                 out += line
@@ -68,7 +70,7 @@ class Parser(object):
             return ""
     def get_id3_lyrics(self, path):
         try:
-            file = ID3("/home/alpemwarrior/If Pokémon were in Australia-RnXoiGxdIqM.mp3")
+            file = ID3(path)
         except:
             return ""
         if len(file.getall("USLT")) > 0:
