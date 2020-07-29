@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Parses lyrics from a .lyric or .lrc file or from the tags of the song
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +18,7 @@ from mutagen.oggvorbis import OggVorbis
 from mutagen.oggopus import OggOpus
 from mutagen.flac import FLAC
 from mutagen.id3 import ID3
+
 
 class Parser(object):
     def __init__(self, artist, title, song_path):
@@ -43,18 +43,17 @@ class Parser(object):
             out = self.get_opus_lyrics(path)
         elif path.endswith("flac"):
             out = self.get_flac_lyrics(path)
-        if out == "":
+        if out is None:
             file = self.check_for_file(dir, file_name)
-            if file == "":
-            	return ""
+            if file is None:
+                return ""
             out = ""
             for line in file.readlines():
                 out += line
             file.close()
-            self.lyrics = out
             return out
-        else:
-            return out
+        return out
+
     def check_for_file(self, dir, file_name):
         # This only checks for .lrc or .lyric files with the same name as the song or with the same "cleaned" name as
         # the song. If you have files in any other format, please add it to this function.
@@ -67,57 +66,40 @@ class Parser(object):
         elif path.isfile(dir + self.title + ".lyric"):
             return open(dir + self.title + ".lyric")
         else:
-            return ""
+            return None
+
     def get_id3_lyrics(self, path):
         try:
             file = ID3(path)
         except:
-            return ""
+            return None
         if len(file.getall("USLT")) > 0:
             out = file.getall("USLT")[0]
             return out.text
         else:
-            print("No lyrics!")
-            return ""
+            return None
+
     def get_opus_lyrics(self, path):
         file = OggOpus(path)
-        out = ""
-        try:
-            out = file["LYRICS"]
-        except:
-            pass
-        try:
-            out = file["UNSYNCEDLYRICS"]
-        except:
-            pass
-        if out != "":
-            return out[0]
-        return ""
+        return self.get_tag_lyrics(file)
+
     def get_ogg_lyrics(self, path):
         file = OggVorbis(path)
-        out = ""
-        try:
-            out = file["LYRICS"]
-        except:
-            pass
-        try:
-            out = file["UNSYNCEDLYRICS"]
-        except:
-            pass
-        if out != "":
-            return out[0]
-        return ""
+        return self.get_tag_lyrics(file)
+
     def get_flac_lyrics(self, path):
         file = FLAC(path)
+        return self.get_tag_lyrics(file)
+
+    def get_tag_lyrics(self, file_tags):
         out = ""
         try:
-            out = file["LYRICS"]
+            out = file_tags["LYRICS"]
         except:
-            pass
-        try:
-            out = file["UNSYNCEDLYRICS"]
-        except:
-            pass
+            try:
+                out = file_tags["UNSYNCEDLYRICS"]
+            except:
+                pass
         if out != "":
             return out[0]
-        return ""
+        return None
