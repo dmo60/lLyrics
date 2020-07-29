@@ -816,7 +816,6 @@ class lLyrics(GObject.Object, Peas.Activatable):
         print("source: " + source)
         self.current_source = source
         if source == "Local File":
-            print(title)
             parser = self.dict[source].Parser(artist, title, self.song_url)
         else:
             parser = self.dict[source].Parser(artist, title)
