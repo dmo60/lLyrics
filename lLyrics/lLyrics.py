@@ -29,6 +29,7 @@ from gi.repository import Pango
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
 
+import LocalParser
 import ChartlyricsParser
 import LyricwikiParser
 import MetrolyricsParser
@@ -94,7 +95,7 @@ LYRICS_TITLE_REPLACE = [("/", "-"), (" & ", " and ")]
 LYRICS_ARTIST_REPLACE = [("/", "-"), (" & ", " and ")]
 
 LYRICS_SOURCES = ["Lyricwiki.org", "Letras.terra.com.br", "Metrolyrics.com", "AZLyrics.com", "Lyricsmania.com",
-                  "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com"]
+                  "Vagalume.com.br", "Genius.com", "Darklyrics.com", "Chartlyrics.com", "Local File"]
 
 
 class lLyrics(GObject.Object, Peas.Activatable):
@@ -117,7 +118,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
                           "Metrolyrics.com": MetrolyricsParser, "AZLyrics.com": AZLyricsParser,
                           "Lyricsmania.com": LyricsmaniaParser, "Chartlyrics.com": ChartlyricsParser,
                           "Darklyrics.com": DarklyricsParser, "Genius.com": GeniusParser,
-                          "Vagalume.com.br": VagalumeParser})
+                          "Vagalume.com.br": VagalumeParser, "Local File": LocalParser})
         self.add_builtin_lyrics_sources()
 
         # Get the user preferences
@@ -198,6 +199,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.lyrics_before_edit = None
         self.edit_event = None
         self.path_before_edit = None
+        self.song_url = None
         self.sources = None
         self.cache = None
         self.lyrics_folder = None
@@ -472,6 +474,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # get the song data
         self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
         self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
+        self.song_url = entry.get_string(RB.RhythmDBPropType.LOCATION)
 
         print("search lyrics for " + self.artist + " - " + self.title)
 
@@ -812,8 +815,10 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         print("source: " + source)
         self.current_source = source
-
-        parser = self.dict[source].Parser(artist, title)
+        if source == "Local File":
+            parser = self.dict[source].Parser(artist, title, self.song_url)
+        else:
+            parser = self.dict[source].Parser(artist, title)
         try:
             lyrics = parser.parse()
         except Exception as e:
