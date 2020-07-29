@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib3
+import urllib
 import os.path as path
 from mutagen.oggvorbis import OggVorbis
 from mutagen.oggopus import OggOpus

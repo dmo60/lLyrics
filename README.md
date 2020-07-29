@@ -42,7 +42,7 @@ To install lLyrics from source you will need the package `gettext`.
 
 #### Dependencies ####
 
-lLyrics can be run without the need of any additional packages, but it is recommended to install the python module **"chardet"** for better handling of different encodings.
+lLyrics can be run without the need of any additional packages, but it is recommended to install the python module **"chardet"** for better handling of different encodings. The mutagen module is also required to read from the song's metadata.
 
 
 
