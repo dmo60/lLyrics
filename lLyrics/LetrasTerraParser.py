@@ -30,10 +30,10 @@ class Parser(object):
         self.artist = self.artist.replace("+", "and")
         artist = urllib.parse.quote(self.artist)
         title = urllib.parse.quote(self.title)
-        join = urllib.parse.quote(' - ')
+        join = urllib.parse.quote(" - ")
 
         # create artist Url
-        url = "http://letras.mus.br/winamp.php?t=%s%s%s" % (artist, join, title)
+        url = "https://www.letras.mus.br/winamp.php?t=%s%s%s" % (artist, join, title)
 
         print("letras.terra.com.br Url " + url)
         try:
@@ -58,7 +58,7 @@ class Parser(object):
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start + 6):]
+        resp = resp[(start + 6) :]
         end = resp.find("</p></p>")
         if end == -1:
             print("lyrics end not found ")
@@ -80,13 +80,13 @@ class Parser(object):
         if start == -1:
             print("no title found")
             return False
-        title = title[(start + 4):]
+        title = title[(start + 4) :]
 
         start = title.find(">")
         if start == -1:
             print("no title start found")
             return False
-        title = title[(start + 1):]
+        title = title[(start + 1) :]
 
         end = title.find("</a>")
         if end == -1:
@@ -99,13 +99,13 @@ class Parser(object):
         if start == -1:
             print("no artist found")
             return False
-        artist = artist[(start + 4):]
+        artist = artist[(start + 4) :]
 
         start = artist.find(">")
         if start == -1:
             print("no artist start found")
             return False
-        artist = artist[(start + 1):]
+        artist = artist[(start + 1) :]
 
         end = artist.find("</a>")
         if end == -1:
