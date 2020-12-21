@@ -25,7 +25,8 @@ from gi.repository import Peas
 from gi.repository import Gdk
 from gi.repository import RB
 from gi.repository import Gtk
-from gi.repository import Pango
+
+# from gi.repository import Pango
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
 
@@ -231,6 +232,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.position = None
         self.hbox = None
         self.back_button = None
+        self.line_spacing = None
 
         self.shell = None
 
@@ -255,9 +257,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.ignore_brackets = config.get_ignore_brackets()
         self.left_sidebar = config.get_left_sidebar()
         self.hide_label = config.get_hide_label()
+        self.line_spacing = config.get_line_spacing()
 
         # if this is called in do_activate or we need a reload to apply, return here
         if key is None or key in ["left-sidebar"]:
+            return
+
+        if key == "line-spacing":
+            if self.line_spacing:
+                self.textview.set_pixels_above_lines(5)
+                self.textview.set_pixels_below_lines(5)
+            else:
+                self.textview.set_pixels_above_lines(0)
+                self.textview.set_pixels_below_lines(0)
             return
 
         if key == "hide-label":
@@ -335,8 +347,14 @@ class lLyrics(GObject.Object, Peas.Activatable):
         self.textview.set_cursor_visible(False)
         self.textview.set_left_margin(10)
         self.textview.set_right_margin(10)
-        self.textview.set_pixels_above_lines(5)
-        self.textview.set_pixels_below_lines(5)
+
+        if self.line_spacing:
+            self.textview.set_pixels_above_lines(5)
+            self.textview.set_pixels_below_lines(5)
+        else:
+            self.textview.set_pixels_above_lines(0)
+            self.textview.set_pixels_below_lines(0)
+
         self.textview.set_wrap_mode(Gtk.WrapMode.WORD)
 
         # create a ScrollView
@@ -351,7 +369,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # tag to style headers bold and underlined
         self.tag = self.textbuffer.create_tag(
             None,
-            underline=Pango.Underline.SINGLE,
+            # underline=Pango.Underline.SINGLE,
             weight=600,
             pixels_above_lines=10,
             pixels_below_lines=20,

@@ -63,5 +63,13 @@ Set to False to disable this (note that in this case, lyrics sources have to be 
 			</description>
 		</key>
 
+		<key name="line-spacing" type="b">
+			<default>true</default>
+			<summary>Spacing between the lines</summary>
+			<description>
+				Whether to have 10px spacing or no spacing between the lines.
+			</description>
+		</key>
+
 	</schema>
 </schemalist>
