@@ -40,7 +40,13 @@ class Parser(object):
         clean_title = clean_title.lower()
 
         # create lyrics Url
-        url = "http://www.azlyrics.com/lyrics/" + clean_artist + "/" + clean_title + ".html"
+        url = (
+            "https://www.azlyrics.com/lyrics/"
+            + clean_artist
+            + "/"
+            + clean_title
+            + ".html"
+        )
         print("azlyrics Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -60,12 +66,12 @@ class Parser(object):
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start + 9):]
+        resp = resp[(start + 9) :]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:(end - 1)]
+        resp = resp[: (end - 1)]
 
         # replace unwanted parts
         resp = resp.replace("<br>", "")
