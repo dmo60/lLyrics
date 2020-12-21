@@ -360,7 +360,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # create a ScrollView
         sw = Gtk.ScrolledWindow()
         sw.add(self.textview)
-        sw.set_shadow_type(Gtk.ShadowType.IN)
+        # sw.set_shadow_type(Gtk.ShadowType.IN)
 
         # initialize a TextBuffer to store lyrics in
         self.textbuffer = Gtk.TextBuffer()
