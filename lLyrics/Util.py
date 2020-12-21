@@ -1,7 +1,7 @@
 # Utility functions
 #
 # Chartlyrics API seems to have problems with multiple consecutive requests
-# (it apparently requires a 20-30sec interval between two API-calls), 
+# (it apparently requires a 20-30sec interval between two API-calls),
 # so just use SearchLyricDirect since it only needs one API request.
 
 # This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,10 @@ except:
 
 LASTFM_API_KEY = "6c7ca93cb0e98979a94c79a7a7373b77"
 
-HEADER = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0', 'Accept': '*/*'}
+HEADER = {
+    "User-Agent": "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
+    "Accept": "*/*",
+}
 
 
 def decode_chars(resp):
@@ -66,11 +69,11 @@ def parse_lrc(data):
     if match is None:
         return (data, None)
 
-    data = data[match.start():]
+    data = data[match.start() :]
     splitted = re.split(tag_regex, data)[1:]
 
     tags = []
-    lyrics = ''
+    lyrics = ""
     for i in range(len(splitted)):
         if i % 2 == 0:
             # tag
@@ -89,12 +92,12 @@ def time_to_seconds(time):
 
 
 def bytes_to_string(data):
-    encoding = 'utf-8'
+    encoding = "utf-8"
     decoded_string = ""
     try:
-        partial_string = data.decode(encoding, 'replace')
+        partial_string = data.decode(encoding, "replace")
         try:
-            bytes_to_string.charSetRegex = re.compile("charset=\"?([a-zA-Z0-9\\-]*)\"?")
+            bytes_to_string.charSetRegex = re.compile('charset="?([a-zA-Z0-9\\-]*)"?')
             results = bytes_to_string.charSetRegex.search(partial_string)
             if results is not None:
                 encoding = results.group(1)
@@ -103,10 +106,12 @@ def bytes_to_string(data):
             else:
                 decoded_string = partial_string
         except:
-            print("Fail trying to get declared bytes encoding (charset) using regular expression")
+            print(
+                "Fail trying to get declared bytes encoding (charset) using regular expression"
+            )
             try:
-                encoding = chardet.detect(data)['encoding']
-                decoded_string = data.decode(encoding, 'replace')
+                encoding = chardet.detect(data)["encoding"]
+                decoded_string = data.decode(encoding, "replace")
             except:
                 print("could not detect bytes encoding, assume utf-8")
                 decoded_string = partial_string
@@ -117,12 +122,18 @@ def bytes_to_string(data):
 
 
 def get_lastfm_correction(artist, title):
-    params = urllib.parse.urlencode({'method': 'track.getcorrection',
-                                     'api_key': LASTFM_API_KEY,
-                                     'artist': artist,
-                                     'track': title})
+    params = urllib.parse.urlencode(
+        {
+            "method": "track.getcorrection",
+            "api_key": LASTFM_API_KEY,
+            "artist": artist,
+            "track": title,
+        }
+    )
     try:
-        result = urllib.request.urlopen("http://ws.audioscrobbler.com/2.0/?" + params, None, 3).read()
+        result = urllib.request.urlopen(
+            "http://ws.audioscrobbler.com/2.0/?" + params, None, 3
+        ).read()
     except:
         print("could not connect to LastFM API")
         return (artist, title, False)
