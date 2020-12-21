@@ -400,7 +400,7 @@ class lLyrics(GObject.Object, Peas.Activatable):
 
         last_item = item_unselect
 
-        for entry in LYRICS_SOURCES[:-1]:
+        for entry in LYRICS_SOURCES:
             last_item = self.add_radio_menu_item(
                 self.radio_sources, entry, self.scan_selected_source_callback, last_item
             )
