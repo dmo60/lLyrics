@@ -33,7 +33,13 @@ class Parser(object):
         clean_artist = clean_artist.replace(" ", "")
 
         # create artist Url
-        url = "http://www.darklyrics.com/" + clean_artist[:1] + "/" + clean_artist + ".html"
+        url = (
+            "http://www.darklyrics.com/"
+            + clean_artist[:1]
+            + "/"
+            + clean_artist
+            + ".html"
+        )
         print("darklyrics artist Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -44,7 +50,9 @@ class Parser(object):
         resp = Util.bytes_to_string(resp)
 
         # find title with lyrics url
-        match = re.search("<a href=\"\.\.(.*?)\">" + self.title + "</a><br />", resp, re.I)
+        match = re.search(
+            '<a href="\.\.(.*?)">' + self.title + "</a><br />", resp, re.I
+        )
         if match is None:
             print("could not find title")
             return ""
@@ -67,8 +75,17 @@ class Parser(object):
 
     def get_lyrics(self, resp):
         # search for the relevant lyrics
-        match = re.search("<h3><a name=\"" + self.track_no + "\">" + self.track_no + "\. " + self.title + "</a></h3>",
-                          resp, re.I)
+        match = re.search(
+            '<h3><a name="'
+            + self.track_no
+            + '">'
+            + self.track_no
+            + "\. "
+            + self.title
+            + "</a></h3>",
+            resp,
+            re.I,
+        )
         if match is None:
             print("lyrics start not found")
             return ""
