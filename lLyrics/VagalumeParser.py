@@ -73,11 +73,11 @@ class Parser:
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<div itemprop=description>")
+        start = resp.find("<div id=lyrics>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start + 26) :]
+        resp = resp[(start + 15) :]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
@@ -86,6 +86,7 @@ class Parser:
 
         # replace unwanted parts
         resp = resp.replace("<br/>", "\n")
+        resp = resp.replace("<br>", "\n")
 
         return resp
 
