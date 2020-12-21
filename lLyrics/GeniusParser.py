@@ -20,6 +20,7 @@ import string
 from html.parser import HTMLParser
 
 import Util
+import time
 
 
 class Parser(object):
@@ -35,7 +36,13 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://genius.com/" + clean_artist.replace(" ", "-") + "-" + clean_title.replace(" ", "-") + "-lyrics"
+        url = (
+            "https://genius.com/"
+            + clean_artist.replace(" ", "-")
+            + "-"
+            + clean_title.replace(" ", "-")
+            + "-lyrics"
+        )
         print("rapgenius Url " + url)
         try:
             resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
@@ -43,7 +50,21 @@ class Parser(object):
             print("could not connect to genius.com")
             return ""
 
-        resp = Util.bytes_to_string(resp)
+        # Genius serves 2 HTML versions, so we loop to try to get the easier one to process
+        for x in range(0, 9):
+            try:
+                resp = urllib.request.urlopen(
+                    Util.add_request_header(url), None, 3
+                ).read()
+            except:
+                print("could not connect to genius.com")
+                return ""
+
+            resp = Util.bytes_to_string(resp)
+            start = resp.find('<div class="lyrics">')
+            if start != -1:
+                break
+            time.sleep(0.5)
 
         self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
@@ -52,12 +73,12 @@ class Parser(object):
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<lyrics")
+        start = resp.find('<div class="lyrics">')
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[start:]
-        end = resp.find("</lyrics>")
+        resp = resp[(start + 20) :]
+        end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
             return ""
@@ -68,6 +89,7 @@ class Parser(object):
         resp = re.sub("<a[^>]*>", "", resp)
         resp = re.sub("<!--[^>]*>", "", resp)
         resp = resp.replace("</a>", "")
+        resp = resp.replace("<br><br>", "\n")
         resp = resp.replace("<br>", "")
         resp = resp.replace("<br />", "")
         resp = resp.replace("<p>", "")
