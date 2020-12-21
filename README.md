@@ -15,12 +15,10 @@ It is intended as a replacement of the built-in lyrics plugin of Rhythmbox with 
 Lyrics sources
 ---------------
 
-  - Lyricwiki.org
-  - Letras.terra.com.br
+  - Letras.mus.br
   - Vagalume.com.br
   - Metrolyrics.com
   - AZLyrics.com
-  - Lyricsnmusic.com
   - Lyricsmania.com
   - Genius.com
   - Darklyrics.com
