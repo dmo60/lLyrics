@@ -942,13 +942,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
         else:
             lyrics, self.tags = Util.parse_lrc(lyrics)
 
-        self.textbuffer.set_text("%s - %s\n%s" % (self.artist, self.title, lyrics))
+        # self.textbuffer.set_text("%s - %s\n%s" % (self.artist, self.title, lyrics))
 
         # make 'artist - title' header bold and underlined
-        start = self.textbuffer.get_start_iter()
-        end = start.copy()
-        end.forward_to_line_end()
-        self.textbuffer.apply_tag(self.tag, start, end)
+        # start = self.textbuffer.get_start_iter()
+        # end = start.copy()
+        # end.forward_to_line_end()
+        # self.textbuffer.apply_tag(self.tag, start, end)
+
+        # put 'artist - title' in sidebar label and make it centered
+        self.label.set_markup("<b>%s - %s</b>" % (self.artist, self.title))
+        self.label.set_alignment(0.5, 0)
+
+        self.textbuffer.set_text(lyrics)
 
     def elapsed_changed(self, player, seconds):
         if not self.tags or not self.edit_event.is_set():
