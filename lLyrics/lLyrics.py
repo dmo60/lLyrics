@@ -26,7 +26,7 @@ from gi.repository import Gdk
 from gi.repository import RB
 from gi.repository import Gtk
 
-# from gi.repository import Pango
+from gi.repository import Pango
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
 
@@ -951,8 +951,19 @@ class lLyrics(GObject.Object, Peas.Activatable):
         # self.textbuffer.apply_tag(self.tag, start, end)
 
         # put 'artist - title' in sidebar label and make it centered
-        self.label.set_markup("<b>%s - %s</b>" % (self.artist, self.title))
+        entry = self.player.get_playing_entry()
+
+        self.artist = entry.get_string(RB.RhythmDBPropType.ARTIST)
+        self.title = entry.get_string(RB.RhythmDBPropType.TITLE)
+
+        for exp in LYRICS_ARTIST_REPLACE:
+            artist = re.sub(exp[0], exp[1], self.artist)
+        for exp in LYRICS_TITLE_REPLACE:
+            title = re.sub(exp[0], exp[1], self.title)
+
+        self.label.set_markup("<b>%s - %s</b>" % (artist, title))
         self.label.set_alignment(0.5, 0)
+        self.label.set_ellipsize(Pango.EllipsizeMode.END)
 
         self.textbuffer.set_text(lyrics)
 
