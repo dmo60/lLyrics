@@ -36,7 +36,13 @@ class Parser(object):
         clean_title = clean_title.replace(" ", "_")
 
         # create lyrics Url
-        url = "http://www.lyricsmania.com/" + clean_title + "_lyrics_" + clean_artist + ".html"
+        url = (
+            "https://www.lyricsmania.com/"
+            + clean_title
+            + "_lyrics_"
+            + clean_artist
+            + ".html"
+        )
         print("lyricsmania Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -56,20 +62,26 @@ class Parser(object):
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start + 9):]
+        resp = resp[(start + 9) :]
         end = resp.find("</div>")
         if end == -1:
-            print("lyrics end not found ")
+            print("lyrics end not found")
+            return ""
+        resp = resp[(end + 6) :]
+        end = resp.find("</div>")
+        if end == -1:
+            print("lyrics end not found")
             return ""
         resp = resp[:end]
 
         # replace unwanted parts
         resp = resp.replace("\n", "")
         resp = resp.replace("<br>", "\n")
+        resp = resp.replace("<br/>", "\n")
         resp = resp.replace("<br />", "\n")
-        resp = resp.replace("\n\n", "\n")
-        resp = resp.replace("<div class=\"p402_premium\">", "")
-        resp = resp.replace("<div class=\"fb-quotable\">", "")
+        # resp = resp.replace("\n\n", "\n")
+        resp = resp.replace('<div class="p402_premium">', "")
+        resp = resp.replace('<div class="fb-quotable">', "")
 
         resp = "\n".join(line.strip() for line in resp.split("\n"))
 

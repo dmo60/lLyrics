@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib.request, urllib.error, urllib.parse
+import re
 import string
 import html
 
@@ -33,8 +34,13 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://www.metrolyrics.com/" + clean_title.replace(" ", "-") + "-lyrics-" \
-              + clean_artist.replace(" ", "-") + ".html"
+        url = (
+            "https://www.metrolyrics.com/"
+            + clean_title.replace(" ", "-")
+            + "-lyrics-"
+            + clean_artist.replace(" ", "-")
+            + ".html"
+        )
         print("metrolyrics Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -50,7 +56,7 @@ class Parser(object):
         if start == -1:
             print("no title found")
             return ""
-        title = title[(start + 7):]
+        title = title[(start + 7) :]
         end = title.find(" Lyrics | MetroLyrics</title>")
         if end == -1:
             print("no title end found")
@@ -60,7 +66,12 @@ class Parser(object):
         songdata = title.split(" - ")
         try:
             if self.artist != songdata[0].lower() or self.title != songdata[1].lower():
-                print("wrong artist/title! " + songdata[0].lower() + " - " + songdata[1].lower())
+                print(
+                    "wrong artist/title! "
+                    + songdata[0].lower()
+                    + " - "
+                    + songdata[1].lower()
+                )
                 return ""
         except:
             print("incomplete artist/title")
@@ -78,16 +89,22 @@ class Parser(object):
             print("lyrics start not found")
             return ""
         resp = resp[start:]
-        end = resp.find("</div>")
+        end = resp.find("</sd-lyricbody>")
         if end == -1:
             print("lyrics end not found ")
             return ""
-        resp = resp[:end]
+        resp = resp[: (end - 8)]
 
         # replace unwanted parts
+        resp = re.sub("<!--WIDGET[^>]+>.*?<!--END[^>]*>", "", resp, 0, re.DOTALL)
+        resp = re.sub("<!--[^>]*>", "", resp)
+        resp = re.sub("<div[^>]*>", "", resp)
         resp = resp.replace("<p class='verse'>", "")
+        resp = resp.replace("\n\n\n", "")
+        resp = resp.replace("\n\n", "")
         resp = resp.replace("</p>", "\n\n")
         resp = resp.replace("<br>", "")
+        resp = resp.replace("</div>", "")
         resp = resp.strip()
 
         return resp

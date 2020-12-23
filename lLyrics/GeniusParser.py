@@ -20,6 +20,24 @@ import string
 from html.parser import HTMLParser
 
 import Util
+import time
+
+l = []
+
+
+class MyHTMLParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        if tag == "div":
+            for i, j in attrs:
+                if "RightSidebar" in j:
+                    l.append("\n")
+
+    def handle_startendtag(self, tag, attrs):
+        if tag == "br":
+            l.append("\n")
+
+    def handle_data(self, data):
+        l.append(data)
 
 
 class Parser(object):
@@ -35,8 +53,20 @@ class Parser(object):
         clean_title = Util.remove_punctuation(self.title)
 
         # create lyrics Url
-        url = "http://genius.com/" + clean_artist.replace(" ", "-") + "-" + clean_title.replace(" ", "-") + "-lyrics"
+        url = (
+            "https://genius.com/"
+            + clean_artist.replace(" ", "-")
+            + "-"
+            + clean_title.replace(" ", "-")
+            + "-lyrics"
+        )
         print("rapgenius Url " + url)
+        try:
+            resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
+        except:
+            print("could not connect to genius.com")
+            return ""
+
         try:
             resp = urllib.request.urlopen(Util.add_request_header(url), None, 3).read()
         except:
@@ -52,26 +82,43 @@ class Parser(object):
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<lyrics")
+        start = resp.find('<div class="lyrics">')
+        if start != -1:
+            resp = resp[(start + 20) :]
+            end = resp.find("</div>")
+            if end == -1:
+                print("lyrics end not found ")
+                return ""
+            resp = resp[:end]
+
+            # replace unwanted parts
+            resp = re.sub("<a[^>]*>", "", resp)
+            resp = re.sub("<!--[^>]*>", "", resp)
+            resp = resp.replace("</a>", "")
+            resp = resp.replace("<br><br>", "\n")
+            resp = resp.replace("<br>", "")
+            resp = resp.replace("<br />", "")
+            resp = resp.replace("<p>", "")
+            resp = resp.replace("</p>", "")
+            resp = resp.strip()
+
+            return resp
+
+        # parse alternative HTML version received from Genius
+        start = resp.find('<div id="lyrics"')
         if start == -1:
             print("lyrics start not found")
             return ""
         resp = resp[start:]
-        end = resp.find("</lyrics>")
+        end = resp.find('<div id="about"')
         if end == -1:
             print("lyrics end not found ")
             return ""
         resp = resp[:end]
 
-        # replace unwanted parts
-        resp = re.sub("<lyrics[^>]*>", "", resp)
-        resp = re.sub("<a[^>]*>", "", resp)
-        resp = re.sub("<!--[^>]*>", "", resp)
-        resp = resp.replace("</a>", "")
-        resp = resp.replace("<br>", "")
-        resp = resp.replace("<br />", "")
-        resp = resp.replace("<p>", "")
-        resp = resp.replace("</p>", "")
-        resp = resp.strip()
+        parser = MyHTMLParser()
+        parser.feed(resp)
+        resp = "".join(l)
+        l.clear()
 
         return resp

@@ -20,7 +20,7 @@ import string
 import Util
 
 
-class Parser():
+class Parser:
     def __init__(self, artist, title):
         self.artist = artist
         self.title = title
@@ -28,8 +28,12 @@ class Parser():
 
     def parse(self):
         # API request
-        url = "http://app2.vagalume.com.br/api/search.php?nolyrics=1&art=" + urllib.parse.quote(
-            self.artist) + "&mus=" + urllib.parse.quote(self.title)
+        url = (
+            "http://app2.vagalume.com.br/api/search.php?nolyrics=1&art="
+            + urllib.parse.quote(self.artist)
+            + "&mus="
+            + urllib.parse.quote(self.title)
+        )
         print("call Vagalume API: " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
@@ -69,11 +73,11 @@ class Parser():
 
     def get_lyrics(self, resp):
         # cut HTML source to relevant part
-        start = resp.find("<div itemprop=description>")
+        start = resp.find("<div id=lyrics>")
         if start == -1:
             print("lyrics start not found")
             return ""
-        resp = resp[(start + 26):]
+        resp = resp[(start + 15) :]
         end = resp.find("</div>")
         if end == -1:
             print("lyrics end not found ")
@@ -82,6 +86,7 @@ class Parser():
 
         # replace unwanted parts
         resp = resp.replace("<br/>", "\n")
+        resp = resp.replace("<br>", "\n")
 
         return resp
 

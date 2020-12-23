@@ -26,7 +26,7 @@ import gettext
 import lLyrics
 import lLyrics_rb3compat as Compat
 
-DCONF_DIR = 'org.gnome.rhythmbox.plugins.llyrics'
+DCONF_DIR = "org.gnome.rhythmbox.plugins.llyrics"
 
 
 class Config(object):
@@ -121,9 +121,12 @@ class Config(object):
     def get_hide_label(self):
         return self.settings["hide-label"]
 
+    def get_line_spacing(self):
+        return self.settings["line-spacing"]
+
 
 class ConfigDialog(GObject.Object, PeasGtk.Configurable):
-    __gtype_name__ = 'lLyricsConfigDialog'
+    __gtype_name__ = "lLyricsConfigDialog"
     object = GObject.property(type=GObject.Object)
 
     def __init__(self):
@@ -132,7 +135,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
 
     def do_create_configure_widget(self):
         # init locales
-        gettext.install('lLyrics', os.path.dirname(__file__) + "/locale/")
+        gettext.install("lLyrics", os.path.dirname(__file__) + "/locale/")
 
         # page 1 for general settings
         page1 = Gtk.VBox()
@@ -160,7 +163,12 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label.set_use_markup(True)
 
         descr = Gtk.Label(
-            "<i>" + _("Whether to automatically save retrieved lyrics in the folder specified below") + "</i>")
+            "<i>"
+            + _(
+                "Whether to automatically save retrieved lyrics in the folder specified below"
+            )
+            + "</i>"
+        )
         descr.set_alignment(0, 0)
         descr.set_margin_left(15)
         descr.set_line_wrap(True)
@@ -200,8 +208,14 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         label = Gtk.Label("<b>" + _("Always ignore parentheses in song title") + "</b>")
         label.set_use_markup(True)
 
-        descr = Gtk.Label("<i>" + _("When turned off, only parentheses containing specific strings "
-                                    "(e.g. 'remix', 'live', 'edit', etc) are filtered") + "</i>")
+        descr = Gtk.Label(
+            "<i>"
+            + _(
+                "When turned off, only parentheses containing specific strings "
+                "(e.g. 'remix', 'live', 'edit', etc) are filtered"
+            )
+            + "</i>"
+        )
         descr.set_alignment(0, 0)
         descr.set_margin_left(15)
         descr.set_line_wrap(True)
@@ -213,6 +227,28 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         vbox.pack_start(hbox, False, False, 0)
         vbox.pack_start(descr, False, False, 0)
 
+        page1.pack_start(vbox, False, False, 10)
+
+        # line spacing
+        hbox = Gtk.HBox()
+        switch = Gtk.Switch()
+        switch.set_active(self.settings["line-spacing"])
+        switch.connect("notify::active", self.switch_toggled, "line-spacing")
+
+        label = Gtk.Label("<b>" + _("Line spacing ") + "</b>")
+        label.set_use_markup(True)
+
+        descr = Gtk.Label("<i>" + _("Spacing between lines in lyrics") + "</i>")
+        descr.set_alignment(0, 0)
+        descr.set_margin_left(15)
+        descr.set_line_wrap(True)
+        descr.set_use_markup(True)
+
+        hbox.pack_start(label, False, False, 5)
+        hbox.pack_start(switch, False, False, 5)
+        vbox = Gtk.VBox()
+        vbox.pack_start(hbox, False, False, 0)
+        vbox.pack_start(descr, False, False, 0)
         page1.pack_start(vbox, False, False, 10)
 
         # page 2 for sources settings
@@ -235,16 +271,21 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
             check.connect("toggled", self.source_toggled, source)
             hbox.pack_start(check, True, True, 3)
 
-            button_up = Gtk.Button('\u2191')
+            button_up = Gtk.Button("\u2191")
             button_up.connect("clicked", self.reorder_sources, source, hbox, vbox, "up")
             hbox.pack_start(button_up, False, False, 3)
             if self.settings["scanning-order"].index(source) == 0:
                 button_up.set_sensitive(False)
 
-            button_down = Gtk.Button('\u2193')
-            button_down.connect("clicked", self.reorder_sources, source, hbox, vbox, "down")
+            button_down = Gtk.Button("\u2193")
+            button_down.connect(
+                "clicked", self.reorder_sources, source, hbox, vbox, "down"
+            )
             hbox.pack_start(button_down, False, False, 3)
-            if self.settings["scanning-order"].index(source) == len(self.settings["scanning-order"]) - 1:
+            if (
+                self.settings["scanning-order"].index(source)
+                == len(self.settings["scanning-order"]) - 1
+            ):
                 button_down.set_sensitive(False)
 
             vbox.pack_start(hbox, False, False, 0)
@@ -278,11 +319,19 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         switch.set_active(self.settings["left-sidebar"])
         switch.connect("notify::active", self.switch_toggled, "left-sidebar")
 
-        label = Gtk.Label("<b>" + _("Show lyrics in left sidebar instead of right one") + "</b>")
+        label = Gtk.Label(
+            "<b>" + _("Show lyrics in left sidebar instead of right one") + "</b>"
+        )
         label.set_use_markup(True)
 
-        descr = Gtk.Label("<i>" + _("You have to disable and re-enable this plugin or restart Rhythmbox "
-                                    "to apply changes here") + "</i>")
+        descr = Gtk.Label(
+            "<i>"
+            + _(
+                "You have to disable and re-enable this plugin or restart Rhythmbox "
+                "to apply changes here"
+            )
+            + "</i>"
+        )
         descr.set_alignment(0, 0)
         descr.set_margin_left(15)
         descr.set_line_wrap(True)
@@ -296,7 +345,7 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
 
         page3.pack_start(vbox, False, False, 10)
 
-        # create a notebook as top level container        
+        # create a notebook as top level container
         nb = Gtk.Notebook()
         nb.append_page(page1, Gtk.Label(_("General")))
         nb.append_page(page2, Gtk.Label(_("Sources")))

@@ -1,7 +1,7 @@
 # Parser for Chartlyrics.com API
 #
 # Chartlyrics API seems to have problems with multiple consecutive requests
-# (it apparently requires a 20-30sec interval between two API-calls), 
+# (it apparently requires a 20-30sec interval between two API-calls),
 # so just use SearchLyricDirect since it only needs one API request.
 
 # This program is free software: you can redistribute it and/or modify
@@ -34,15 +34,15 @@ class Parser(HTMLParser):
         self.correct = True
         self.lyrics = ""
 
-    # define handler for parsing             
+    # define handler for parsing
     def handle_starttag(self, tag, attrs):
         self.tag = tag
 
-    # definde handler for parsing    
+    # definde handler for parsing
     def handle_endtag(self, tag):
         self.tag = None
 
-    # definde handler for parsing               
+    # definde handler for parsing
     def handle_data(self, data):
         if self.tag == "lyricsong":
             if data.lower() != self.title:
@@ -57,17 +57,36 @@ class Parser(HTMLParser):
 
     def parse(self):
         # API searchLyric request
-        url = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist=" + urllib.parse.quote(
-            self.artist) + "&song=" + urllib.parse.quote(self.title)
-        print("call chartlyrics API: " + url)
+        url = (
+            "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?artist="
+            + urllib.parse.quote(self.artist)
+            + "&song="
+            + urllib.parse.quote(self.title)
+        )
+        print("chartlyrics Url " + url)
         try:
             resp = urllib.request.urlopen(url, None, 3).read()
         except:
             print("could not connect to chartlyric.com API")
+            return ""
 
         resp = Util.bytes_to_string(resp)
-        self.feed(resp)
-
+        self.lyrics = self.get_lyrics(resp)
         self.lyrics = string.capwords(self.lyrics, "\n").strip()
 
         return self.lyrics
+
+    def get_lyrics(self, resp):
+        # cut HTML source to relevant part
+        start = resp.find("<Lyric>")
+        if start == -1:
+            print("lyrics start not found")
+            return ""
+        resp = resp[(start + 7) :]
+        end = resp.find("</Lyric>")
+        if end == -1:
+            print("lyrics end not found ")
+            return ""
+        resp = resp[:end]
+
+        return resp
