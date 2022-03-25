@@ -37,7 +37,7 @@ Requirements
 
 The 'master' branch supports Rhythmbox 3.0 and above. **It is incompatible with older Rhythmbox 2.xx versions!**
 
-To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will not be updated or developed any further and it does not have Musixmatch support.
+To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will not be updated or developed any further.
 
 To install lLyrics from source you will need the package `gettext`.
 
