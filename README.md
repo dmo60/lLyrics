@@ -15,7 +15,6 @@ It is intended as a replacement of the built-in lyrics plugin of Rhythmbox with 
 Lyrics sources
 ---------------
 
-  - Musixmatch
   - Lyricwiki.org
   - Letras.terra.com.br
   - Vagalume.com.br
@@ -49,6 +48,14 @@ lLyrics can be run without the need of any additional packages, but it is recomm
 
 Installation
 ---------------
+
+#### Ubuntu & derivates: PPA ####
+
+In Ubuntu based distribution, you can install this plugin via [this PPA by fossfreedom](https://launchpad.net/~fossfreedom/+archive/rhythmbox-plugins).
+
+#### Archlinux: AUR ####
+
+Archlinux user can install the plugin via [this AUR package](https://aur.archlinux.org/packages/rhythmbox-llyrics/).
 
 #### Manual installation ####
 
