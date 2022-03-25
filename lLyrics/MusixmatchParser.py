@@ -34,13 +34,13 @@ class Parser(object):
         try:
             resp = urllib.request.urlopen(query, None, 5)
         except:
-            print("Cannot connect to Musixmatch\nQuery URL:%s" % (query))
+            print("Cannot connect to Musixmatch\ncall Musixmatch API:%s" % (query))
             traceback.print_exc()
             return ""
 
         # Stop if HTTP Response code is not 200
         if resp.status != 200:
-            print("Error! Query URL:%s\nHTML Reponse Code:%s" % (query, resp.status))
+            print("Error! call Musixmatch API:%s\nHTML Reponse Code:%s" % (query, resp.status))
             return ""
 
         # Parse JSON response
@@ -50,7 +50,7 @@ class Parser(object):
         # Check API Response Status Code
         status_code = resp['message']['header']['status_code']
         if status_code != 200:
-            print("Query URL: %s\nError from Musixmatch API>> %s: %s" % (query, status_code, self.get_error_details_from_status_code(status_code)))
+            print("call Musixmatch API: %s\nError from Musixmatch API>> %s: %s" % (query, status_code, self.get_error_details_from_status_code(status_code)))
             return ""
 
         # Fetch and log track details and confidence score from the API
