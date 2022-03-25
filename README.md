@@ -15,6 +15,7 @@ It is intended as a replacement of the built-in lyrics plugin of Rhythmbox with 
 Lyrics sources
 ---------------
 
+  - Musixmatch
   - Lyricwiki.org
   - Letras.terra.com.br
   - Vagalume.com.br
@@ -36,7 +37,7 @@ Requirements
 
 The 'master' branch supports Rhythmbox 3.0 and above. **It is incompatible with older Rhythmbox 2.xx versions!**
 
-To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will not be updated or developed any further.
+To get the plugin for Rhythmbox 2.xx, change to branch 'RB2'! It provides the last version compatible with Rhythmbox 2.xx, but please note, that it will not be updated or developed any further and it does not have Musixmatch support.
 
 To install lLyrics from source you will need the package `gettext`.
 
@@ -48,14 +49,6 @@ lLyrics can be run without the need of any additional packages, but it is recomm
 
 Installation
 ---------------
-
-#### Ubuntu & derivates: PPA ####
-
-In Ubuntu based distribution, you can install this plugin via [this PPA by fossfreedom](https://launchpad.net/~fossfreedom/+archive/rhythmbox-plugins).
-
-#### Archlinux: AUR ####
-
-Archlinux user can install the plugin via [this AUR package](https://aur.archlinux.org/packages/rhythmbox-llyrics/).
 
 #### Manual installation ####
 
